@@ -44,7 +44,7 @@ def serialize_data(rows_data):
 
 if __name__ == '__main__':
     # for test
-    d = get_excel_data('./yys_test.xlsx')
+    d = get_excel_data('./example/data_Template.xlsx')
     m = serialize_data(d)
     print(m)
     for k,v in m.items():
