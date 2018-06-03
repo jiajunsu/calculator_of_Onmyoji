@@ -25,14 +25,14 @@ def _get_sheet_rows(filename, sheet_name):
 def get_mitama_data(filename):
     rows_data = _get_sheet_rows(filename, sheet_name=u'御魂')
     mitama_data = dict()
-    data_len = len(data_format.MITAMA_COL_NAME_CN)
+    data_len = len(data_format.MITAMA_COL_NAME_ZH)
     
     rows_data.next()  # skip first row
     for r_data in rows_data:
         serial = r_data[0].value
         data = dict()
         for i in range(1, data_len):
-            prop_name = data_format.MITAMA_COL_NAME_EN[i]
+            prop_name = data_format.MITAMA_COL_NAME_ZH[i]
             data[prop_name] = r_data[i].value
 
         mitama_data[serial] = data
@@ -47,8 +47,8 @@ def get_mitama_enhance(filename):
     rows_data.next()  # skip first row
     for r_data in rows_data:
         mitama_name = r_data[0].value
-        data = {'prop_type': r_data[1].value,
-                'prop_value': r_data[2].value}
+        data = {u'加成类型': r_data[1].value,
+                u'加成数值': r_data[2].value}
         mitama_en_prop[mitama_name] = data
 
     return mitama_en_prop
@@ -59,7 +59,7 @@ def sep_mitama_by_loc(mitama_data):
                        4: [], 5: [], 6: []}
 
     for d_k, d_v in mitama_data.items():
-        loc = int(d_v['loc'])
+        loc = int(d_v[u'位置'])
         mitama_loc_data[loc].append({d_k: d_v})
 
     return mitama_loc_data
@@ -69,6 +69,7 @@ if __name__ == '__main__':
     # for test
     test_file = './example/data_Template.xlsx'
     d = get_mitama_data(test_file)
+    print(d)
     l_d = sep_mitama_by_loc(d)
     print(l_d)
 

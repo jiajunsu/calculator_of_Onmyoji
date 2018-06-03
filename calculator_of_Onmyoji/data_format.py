@@ -1,9 +1,9 @@
 # coding: utf-8
 
-MITAMA_COL_NAME_CN = ['序号', '御魂类型', '位置', '攻击',
-                      '攻击加成', '防御', '防御加成', '暴击',
-                      '爆击伤害', '生命', '生命加成', '效果命中',
-                      '效果抵抗', '速度']
+MITAMA_COL_NAME_ZH = [u'序号', u'御魂类型', u'位置', u'攻击',
+                      u'攻击加成', u'防御', u'防御加成', u'暴击',
+                      u'爆击伤害', u'生命', u'生命加成', u'效果命中',
+                      u'效果抵抗', u'速度']
 
 MITAMA_COL_NAME_EN = ['serial', 'types', 'loc', 'damage',
                       'damage_bonus', 'defend', 'defend_bonus', 'critical',
