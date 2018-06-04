@@ -2,7 +2,7 @@
 
 import itertools
 
-import data_format
+from calculator_of_Onmyoji import data_format
 
 
 def make_combination(data_dict):

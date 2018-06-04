@@ -5,7 +5,7 @@ import traceback
 
 import xlrd
 
-import data_format
+from calculator_of_Onmyoji import data_format
 
 
 def _get_sheet_rows(filename, sheet_name):
