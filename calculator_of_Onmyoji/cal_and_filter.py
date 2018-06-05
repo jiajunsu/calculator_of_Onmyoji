@@ -13,16 +13,16 @@ def make_combination(data_dict):
     return list(itertools.product(d1, d2, d3, d4, d5, d6))
 
 
-def filter_mitama(mitama_comb_list, mitama_enhance, 
-                  mitama_type='', type_min_num=0, 
+def filter_mitama(mitama_comb_list, mitama_enhance,
+                  mitama_type='', type_min_num=0,
                   prop_type='', prop_min_value=0):
 
     comb_data_list = cal_mitama_comb_prop(mitama_comb_list, mitama_enhance)
-    
+
     filter_result = []
     for comb_data in comb_data_list:
         sum_data = comb_data.get('sum', {})
-        if (mitama_type and 
+        if (mitama_type and
                 not fit_mitama_type(sum_data, mitama_type, type_min_num)):
             continue
         if (prop_type and
@@ -67,7 +67,7 @@ def sum_prop(mitama_comb, mitama_enhance):
     for mitama in mitama_comb:
         mitama_info = mitama.values()[0]
 
-        # 记录总御魂类型，用于计算御魂套装加成 
+        # 记录总御魂类型，用于计算御魂套装加成
         mitama_type = mitama_info.get(u'御魂类型')
         if mitama_type not in mitama_type_count:
             mitama_type_count[mitama_type] = 1
@@ -83,9 +83,10 @@ def sum_prop(mitama_comb, mitama_enhance):
         if m_count < 2:  # 忽略套装效果
             continue
         else:
-            multi_times = 2 if m_count == 6 else 1  # 6个同类型御魂计算2次套装效果
+            multi_times = 2 if m_count == 6 else 1  # 6个同类御魂算2次套装效果
             prop_type = mitama_enhance[m_type].get(u'加成类型')
-            sum_result[prop_type] += multi_times * mitama_enhance[m_type].get(u'加成数值')
+            sum_result[prop_type] += (multi_times *
+                                      mitama_enhance[m_type].get(u'加成数值'))
 
     sum_result[u'御魂计数'] = mitama_type_count
 
@@ -106,7 +107,7 @@ if __name__ == '__main__':
     f_t = filter_mitama(comb, m_e, mitama_type=u'针女', type_min_num=4)
     print(len(f_t))
 
-    f_p = filter_mitama(comb, m_e, prop_type=u'暴击', prop_min_value=90) 
+    f_p = filter_mitama(comb, m_e, prop_type=u'暴击', prop_min_value=90)
     print(len(f_p))
 
     f_t_p = filter_mitama(comb, m_e, mitama_type=u'针女', type_min_num=4,

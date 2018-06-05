@@ -16,8 +16,8 @@ def _get_sheet_rows(filename, sheet_name):
     try:
         xls_book = xlrd.open_workbook(filename=filename)
         data_sheet = xls_book.sheet_by_name(sheet_name)
-        return data_sheet.get_rows() 
-    except:
+        return data_sheet.get_rows()
+    except Exception:
         print(traceback.format_exc())
         raise
 
@@ -26,7 +26,7 @@ def get_mitama_data(filename):
     rows_data = _get_sheet_rows(filename, sheet_name=u'御魂')
     mitama_data = dict()
     data_len = len(data_format.MITAMA_COL_NAME_ZH)
-    
+
     rows_data.next()  # skip first row
     for r_data in rows_data:
         serial = r_data[0].value
@@ -75,4 +75,4 @@ if __name__ == '__main__':
 
     p = get_mitama_enhance(test_file)
     for k, v in p.items():
-        print(k, v) 
+        print(k, v)
