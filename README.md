@@ -1,4 +1,4 @@
-# calculator_of_Onmyoji
+# calculator\_of\_Onmyoji
 
 御魂搭配计算器
 
