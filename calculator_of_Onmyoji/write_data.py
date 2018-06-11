@@ -5,11 +5,19 @@ import xlwt
 import data_format
 
 
+MAX_ROW = 60000
+
+
 def write_mitama_result(filename, comb_data_list,
                         header_row=data_format.OUTPUT_HEADER):
     workbook = xlwt.Workbook(encoding='utf-8')
-    result_sheet = workbook.add_sheet(u'result')
-    detail_sheet = workbook.add_sheet(u'detail')
+    result_sheet_num = 0
+    detail_sheet_num = 0
+
+    result_sheet = workbook.add_sheet('result_%s' % result_sheet_num)
+    detail_sheet = workbook.add_sheet('detail_%s' % detail_sheet_num)
+    result_sheet_num += 1
+    detail_sheet_num += 1
 
     col_nums = len(header_row)
 
@@ -29,6 +37,12 @@ def write_mitama_result(filename, comb_data_list,
         result_sheet.write(result_row, 2, label=u'sum')
         write_mitama_row(result_sheet, sum_data, result_row, start_col=4)
         result_row += 1
+        if result_row > MAX_ROW:
+            result_sheet = workbook.add_sheet(u'result_%s' % result_sheet_num)
+            for c in range(col_nums):
+                result_sheet.write(0, c, label=header_row[c])
+            result_sheet_num += 1
+            result_row = 1
 
         # write each mitama data into detail file
         mitama_data = comb_data.get('info', set())
@@ -40,6 +54,12 @@ def write_mitama_result(filename, comb_data_list,
             write_mitama_row(detail_sheet, mitama_prop,
                              detail_row, start_col=2)
             detail_row += 1
+        if detail_row > MAX_ROW:
+            detail_sheet = workbook.add_sheet('detail_%s' % detail_sheet_num)
+            for c in range(col_nums):
+                detail_sheet.write(0, c, label=header_row[c])
+            detail_sheet_num += 1
+            detail_row = 1
 
         serial_num += 1
 
