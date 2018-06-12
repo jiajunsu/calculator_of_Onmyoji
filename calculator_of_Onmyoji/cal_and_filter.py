@@ -5,7 +5,10 @@ import itertools
 from calculator_of_Onmyoji import data_format
 
 
-def make_combination(data_dict):
+def filter_loc2make_combination(data_dict,
+                                l2_prop, l2_value,
+                                l4_prop, l4_value,
+                                l6_prop, l6_value):
     if len(data_dict) != 6:
         raise KeyError("combination dict source must have 6 keys")
 
@@ -13,6 +16,16 @@ def make_combination(data_dict):
     print('mitama nums by loc is %s %s %s %s %s %s' % (len(d1), len(d2),
                                                        len(d3), len(d4),
                                                        len(d5), len(d6)))
+    if l2_prop:
+        d2 = filter_loc_prop(d2, l2_prop, l2_value)
+    if l4_prop:
+        d4 = filter_loc_prop(d4, l4_prop, l4_value)
+    if l6_prop:
+        d6 = filter_loc_prop(d6, l6_prop, l6_value)
+
+    print('after filter by loc prop %s %s %s %s %s %s' % (len(d1), len(d2),
+                                                          len(d3), len(d4),
+                                                          len(d5), len(d6)))
     return itertools.product(d1, d2, d3, d4, d5, d6)
 
 
@@ -20,7 +33,7 @@ def filter_loc_prop(data_list, prop_type, prop_min_value):
     def prop_value_le_min(mitama):
         mitama_info = mitama.values()[0]
         if (mitama_info[prop_type] and
-                mitama_info[prop_type] >= prop_min_value:)
+                mitama_info[prop_type] >= prop_min_value):
             return True
         else:
             return False

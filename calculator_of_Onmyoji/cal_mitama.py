@@ -42,15 +42,19 @@ parser.add_argument("-6P", "--sth-prop-value",
                          u'例如"-6P 暴击,55"为六号位暴击至少55')
 
 
+def sep_utf_str(utf_str):
+    # solve problem with get utf8 args from shell
+    return utf_str.decode('utf8').split(',')
+
+
 def main():
     args = parser.parse_args()
     file_name = args.source_data
-    # solve problem with get utf8 args from shell
-    mitama_suit = args.mitama_suit.decode('utf8')
-    mitama_type, type_min_num = mitama_suit.split(',')
-
-    prop_limit = args.prop_limit.decode('utf8')
-    prop_type, prop_min_value = prop_limit.split(',')
+    mitama_type, type_min_num = sep_utf_str(args.mitama_suit)
+    prop_type, prop_min_value = sep_utf_str(args.prop_limit)
+    l2_prop, l2_prop_value = sep_utf_str(args.sec_prop_value)
+    l4_prop, l4_prop_value = sep_utf_str(args.fth_prop_value)
+    l6_prop, l6_prop_value = sep_utf_str(args.sth_prop_value)
 
     origin_data = load_data.get_mitama_data(file_name)
     suit_enhance = load_data.get_mitama_enhance(file_name)
@@ -58,7 +62,11 @@ def main():
 
     locate_sep_data = load_data.sep_mitama_by_loc(origin_data)
     print('sep data by loc finish')
-    mitama_comb = cal.make_combination(locate_sep_data)
+
+    mitama_comb = cal.filter_loc2make_combination(locate_sep_data,
+                                                  l2_prop, int(l2_prop_value),
+                                                  l4_prop, int(l4_prop_value),
+                                                  l6_prop, int(l6_prop_value))
     print('make combination finish')
 
     filter_result = cal.filter_mitama(mitama_comb, suit_enhance,
