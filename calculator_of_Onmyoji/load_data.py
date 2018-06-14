@@ -22,7 +22,7 @@ def _get_sheet_rows(filename, sheet_name):
         raise
 
 
-def get_mitama_data(filename):
+def get_mitama_data(filename, ignore_serial):
     rows_data = _get_sheet_rows(filename, sheet_name=u'御魂')
     mitama_data = dict()
     data_len = len(data_format.MITAMA_COL_NAME_ZH)
@@ -30,6 +30,10 @@ def get_mitama_data(filename):
     rows_data.next()  # skip first row
     for r_data in rows_data:
         serial = r_data[0].value
+
+        if skip_serial(serial, ignore_serial):
+            continue
+
         data = dict()
         for i in range(1, data_len):
             prop_name = data_format.MITAMA_COL_NAME_ZH[i]
@@ -38,6 +42,13 @@ def get_mitama_data(filename):
         mitama_data[serial] = data
 
     return mitama_data
+
+
+def skip_serial(serial, ignore_list):
+    for ig in ignore_list:
+        if ig and isinstance(serial, (str, unicode)) and ig in serial:
+            return True
+    return False
 
 
 def get_mitama_enhance(filename):

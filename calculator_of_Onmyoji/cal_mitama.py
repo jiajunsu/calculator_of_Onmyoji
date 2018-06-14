@@ -45,11 +45,20 @@ parser.add_argument("-6P", "--sth-prop-value",
                     default=',0',
                     help=u'六号位限制的属性类型和数值，'
                          u'例如"-6P 暴击,55"为六号位暴击至少55')
+parser.add_argument("-IG", "--ignore-serial",
+                    type=str,
+                    default='',
+                    help=u'忽略的御魂序号关键字，用逗号,间隔'
+                         u'例如"-IG 天狗,鸟"为御魂序号包含天狗或鸟则滤除')
 
 
 def sep_utf_str(utf_str):
     # solve problem with get utf8 args from shell
-    return utf_str.decode('utf8').split(',')
+    uni_str = utf_str.decode('utf8')
+    if ',' in uni_str:
+        return uni_str.split(',')
+    else:
+        return [uni_str]
 
 
 def main():
@@ -64,7 +73,9 @@ def main():
     l4_prop, l4_prop_value = sep_utf_str(args.fth_prop_value)
     l6_prop, l6_prop_value = sep_utf_str(args.sth_prop_value)
 
-    origin_data = load_data.get_mitama_data(file_name)
+    ignore_serial = sep_utf_str(args.ignore_serial)
+
+    origin_data = load_data.get_mitama_data(file_name, ignore_serial)
     suit_enhance = load_data.get_mitama_enhance(file_name)
     print('load data finish')
 
