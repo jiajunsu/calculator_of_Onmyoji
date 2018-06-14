@@ -25,6 +25,11 @@ parser.add_argument("-P", "--prop-limit",
                     default=',0',
                     help=u'期望限制的属性类型，'
                          u'例如"-P 暴击,90"为暴击至少90')
+parser.add_argument("-SP", "--sec-prop-limit",
+                    type=str,
+                    default=',0',
+                    help=u'期望限制的属性类型，'
+                         u'例如"-SP 暴击伤害,50"为暴击伤害至少50')
 parser.add_argument("-2P", "--sec-prop-value",
                     type=str,
                     default=',0',
@@ -50,8 +55,11 @@ def sep_utf_str(utf_str):
 def main():
     args = parser.parse_args()
     file_name = args.source_data
+
     mitama_type, type_min_num = sep_utf_str(args.mitama_suit)
     prop_type, prop_min_value = sep_utf_str(args.prop_limit)
+    s_prop_type, s_prop_min_value = sep_utf_str(args.sec_prop_limit)
+
     l2_prop, l2_prop_value = sep_utf_str(args.sec_prop_value)
     l4_prop, l4_prop_value = sep_utf_str(args.fth_prop_value)
     l6_prop, l6_prop_value = sep_utf_str(args.sth_prop_value)
@@ -73,7 +81,9 @@ def main():
                                       mitama_type=mitama_type,
                                       type_min_num=int(type_min_num),
                                       prop_type=prop_type,
-                                      prop_min_value=int(prop_min_value))
+                                      prop_min_value=int(prop_min_value),
+                                      s_prop_type=s_prop_type,
+                                      s_prop_min_value=int(s_prop_min_value))
     print('filter mitama finish')
 
     write_data.write_mitama_result(args.output_file, filter_result)
