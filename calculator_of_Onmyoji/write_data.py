@@ -11,6 +11,7 @@ MAX_ROW = 60000
 def write_mitama_result(filename, comb_data_list,
                         header_row=data_format.OUTPUT_HEADER):
     workbook = xlwt.Workbook(encoding='utf-8')
+    result_num = 0
     result_sheet_num = 0
     detail_sheet_num = 0
 
@@ -30,6 +31,7 @@ def write_mitama_result(filename, comb_data_list,
     detail_row = 1
     serial_num = 1
     for comb_data in comb_data_list:
+        result_num += 1
         # first row of each comb_data is sum info
         sum_data = comb_data.get('sum', {})
         # first colume of a mitama_comb is serial number
@@ -64,6 +66,7 @@ def write_mitama_result(filename, comb_data_list,
         serial_num += 1
 
     workbook.save(filename)
+    print("write finish, we got %s results" % result_num)
 
 
 def write_mitama_row(worksheet, comb_prop, row_num, start_col,
