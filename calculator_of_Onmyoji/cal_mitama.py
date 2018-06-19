@@ -11,7 +11,7 @@ from calculator_of_Onmyoji import write_data
 parser = argparse.ArgumentParser()
 parser.add_argument("source_data",
                     type=str,
-                    help=u'御魂数据表格，格式参照example/data_Template.xlsx')
+                    help=u'御魂数据表格，格式参照example/data_Template.xls')
 parser.add_argument("output_file",
                     type=str,
                     help=u'输出文件位置，格式为pathto/filename.xls')
@@ -23,13 +23,9 @@ parser.add_argument("-M", "--mitama-suit",
 parser.add_argument("-P", "--prop-limit",
                     type=str,
                     default=',0',
-                    help=u'期望限制的属性类型，'
-                         u'例如"-P 暴击,90"为暴击至少90')
-parser.add_argument("-SP", "--sec-prop-limit",
-                    type=str,
-                    default=',0',
-                    help=u'期望限制的属性类型，'
-                         u'例如"-SP 暴击伤害,50"为暴击伤害至少50')
+                    help=u'期望限制的属性类型，多个属性条件用英文句号.间隔, '
+                         u'例如"-P 暴击,90.暴击伤害,70"为暴击至少90'
+                         u'且暴击伤害至少70')
 parser.add_argument("-2P", "--sec-prop-value",
                     type=str,
                     default=',0',
@@ -61,13 +57,24 @@ def sep_utf_str(utf_str):
         return [uni_str]
 
 
+def format_prop_limit(utf_str):
+    uni_str = utf_str.decode('utf8')
+    prop_limit_list = uni_str.split('.')
+    prop_limit = dict()
+    for limit in prop_limit_list:
+        if ',' not in limit:
+            continue
+        prop, value = limit.split(',')
+        prop_limit[prop] = value
+    return prop_limit
+
+
 def main():
     args = parser.parse_args()
     file_name = args.source_data
 
     mitama_type, type_min_num = sep_utf_str(args.mitama_suit)
-    prop_type, prop_min_value = sep_utf_str(args.prop_limit)
-    s_prop_type, s_prop_min_value = sep_utf_str(args.sec_prop_limit)
+    prop_limit = format_prop_limit(args.prop_limit)
 
     l2_prop, l2_prop_value = sep_utf_str(args.sec_prop_value)
     l4_prop, l4_prop_value = sep_utf_str(args.fth_prop_value)
@@ -91,10 +98,7 @@ def main():
     filter_result = cal.filter_mitama(mitama_comb, suit_enhance,
                                       mitama_type=mitama_type,
                                       type_min_num=int(type_min_num),
-                                      prop_type=prop_type,
-                                      prop_min_value=int(prop_min_value),
-                                      s_prop_type=s_prop_type,
-                                      s_prop_min_value=int(s_prop_min_value))
+                                      prop_limit=prop_limit)
     print('filter mitama finish')
 
     write_data.write_mitama_result(args.output_file, filter_result)

@@ -43,21 +43,20 @@ def filter_loc_prop(data_list, prop_type, prop_min_value):
 
 def filter_mitama(mitama_comb_list, mitama_enhance,
                   mitama_type='', type_min_num=0,
-                  prop_type='', prop_min_value=0,
-                  s_prop_type='', s_prop_min_value=0):
+                  prop_limit=None):
 
     mitama_sum_data = fit_mitama_type(mitama_comb_list,
                                       mitama_type, type_min_num)
     print('filter mitama type finish')
 
-    if prop_type:
+    if prop_limit is None:
+        prop_limit = dict()
+
+    for prop_type, prop_min_value in prop_limit.items():
         mitama_sum_data = fit_prop_value(mitama_sum_data, prop_type,
                                          prop_min_value, mitama_enhance)
     print('filter mitama prop value finish')
 
-    if s_prop_type:
-        mitama_sum_data = fit_prop_value(mitama_sum_data, s_prop_type,
-                                         s_prop_min_value, mitama_enhance)
 
     comb_data_list = cal_mitama_comb_prop(mitama_sum_data, mitama_enhance)
     print('cal mitama sum prop finish')
