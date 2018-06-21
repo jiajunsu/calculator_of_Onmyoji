@@ -65,7 +65,7 @@ def format_prop_limit(utf_str):
         if ',' not in limit:
             continue
         prop, value = limit.split(',')
-        prop_limit[prop] = value
+        prop_limit[prop] = int(value)
     return prop_limit
 
 
