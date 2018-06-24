@@ -43,10 +43,10 @@ def filter_loc_prop(data_list, prop_type, prop_min_value):
 
 def filter_mitama(mitama_comb_list, mitama_enhance,
                   mitama_type='', type_min_num=0,
-                  prop_limit=None):
+                  prop_limit=None, all_suit=True):
 
     mitama_sum_data = fit_mitama_type(mitama_comb_list,
-                                      mitama_type, type_min_num)
+                                      mitama_type, type_min_num, all_suit)
     print('filter mitama type finish')
 
     if prop_limit is None:
@@ -64,7 +64,8 @@ def filter_mitama(mitama_comb_list, mitama_enhance,
     return comb_data_list
 
 
-def fit_mitama_type(mitama_comb_list, expect_mitama_type, min_num):
+def fit_mitama_type(mitama_comb_list, expect_mitama_type, min_num,
+                    all_suit):
     for mitama_comb in mitama_comb_list:
         mitama_type_count = {}
         for mitama in mitama_comb:
@@ -75,6 +76,14 @@ def fit_mitama_type(mitama_comb_list, expect_mitama_type, min_num):
                 mitama_type_count[mitama_type] = 1
             else:
                 mitama_type_count[mitama_type] += 1
+
+        if all_suit:
+            is_suit = True
+            for _, count in mitama_type_count.items():
+                if count < 2:
+                    is_suit = False
+            if not is_suit:
+                continue
 
         if (not expect_mitama_type) or (expect_mitama_type
                 and mitama_type_count.get(expect_mitama_type) >= min_num):

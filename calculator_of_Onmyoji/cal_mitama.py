@@ -48,6 +48,11 @@ parser.add_argument("-IG", "--ignore-serial",
                     default='',
                     help=u'忽略的御魂序号关键字，用逗号,间隔'
                          u'例如"-IG 天狗,鸟"为御魂序号包含天狗或鸟则滤除')
+parser.add_argument("-AS", "--all-suit",
+                    type=bool,
+                    default=True,
+                    help=u'是否全为套装，默认为True。'
+                         u'"-AS False"为允许非套装的组合出现，如5针女1破势')
 
 
 def sep_utf_str(utf_str):
@@ -106,7 +111,8 @@ def main():
     filter_result = cal.filter_mitama(mitama_comb, suit_enhance,
                                       mitama_type=mitama_type,
                                       type_min_num=int(type_min_num),
-                                      prop_limit=prop_limit)
+                                      prop_limit=prop_limit,
+                                      all_suit=args.all_suit)
     print('filter mitama finish')
 
     write_data.write_mitama_result(args.output_file, filter_result)
