@@ -44,7 +44,6 @@ def filter_loc_prop(data_list, prop_type, prop_min_value):
 def filter_mitama(mitama_comb_list, mitama_enhance,
                   mitama_type='', type_min_num=0,
                   prop_limit=None, all_suit=True):
-    print(all_suit)
     mitama_sum_data = fit_mitama_type(mitama_comb_list,
                                       mitama_type, type_min_num, all_suit)
     print('filter mitama type finish')
