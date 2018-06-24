@@ -1,0 +1,15 @@
+See: https://github.com/jiajunsu/calculator_of_Onmyoji/issues/2
+
+Destination platform: win 64bit
+-------------------------------
+
+### Requirments:
+> wine
+> python-2.7.15.amd64.msi
+
+### Note:
+Change pip.ini in wine
+> ~/.wine/drive_c/users/root/pip/pip.ini
+
+### Complie:
+```wine ~/.wine/drive_c/Python27/Scripts/pyinstaller.exe -F calculator_of_Onmyoji/cal_mitama.py -p /usr/local/lib/python2.7/dist-packages/```

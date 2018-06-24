@@ -2,12 +2,14 @@
 # coding: utf-8
 
 import argparse
+import platform
 
 from calculator_of_Onmyoji import cal_and_filter as cal
 from calculator_of_Onmyoji import load_data
 from calculator_of_Onmyoji import write_data
 
 
+sysstr = platform.system()
 parser = argparse.ArgumentParser()
 parser.add_argument("source_data",
                     type=str,
@@ -50,7 +52,10 @@ parser.add_argument("-IG", "--ignore-serial",
 
 def sep_utf_str(utf_str):
     # solve problem with get utf8 args from shell
-    uni_str = utf_str.decode('utf8')
+    if sysstr == 'Windows':
+        uni_str = utf_str.decode('gbk')
+    else:
+        uni_str = utf_str.decode('utf8')
     if ',' in uni_str:
         return uni_str.split(',')
     else:
@@ -58,7 +63,10 @@ def sep_utf_str(utf_str):
 
 
 def format_prop_limit(utf_str):
-    uni_str = utf_str.decode('utf8')
+    if sysstr == 'Windows':
+        uni_str = utf_str.decode('gbk')
+    else:
+        uni_str = utf_str.decode('utf8')
     prop_limit_list = uni_str.split('.')
     prop_limit = dict()
     for limit in prop_limit_list:

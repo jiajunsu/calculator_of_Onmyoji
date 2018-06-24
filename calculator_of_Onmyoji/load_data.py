@@ -10,7 +10,7 @@ from calculator_of_Onmyoji import data_format
 
 def _get_sheet_rows(filename, sheet_name):
     if not os.path.exists(filename):
-        print("文件不存在 ", filename)
+        print(u"文件不存在 ", filename)
         raise IOError("File not exists %s" % filename)
 
     try:
