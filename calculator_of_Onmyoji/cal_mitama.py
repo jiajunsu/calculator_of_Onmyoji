@@ -9,6 +9,15 @@ from calculator_of_Onmyoji import load_data
 from calculator_of_Onmyoji import write_data
 
 
+def str2bool(v):
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
+
 sysstr = platform.system()
 parser = argparse.ArgumentParser()
 parser.add_argument("source_data",
@@ -49,7 +58,7 @@ parser.add_argument("-IG", "--ignore-serial",
                     help=u'忽略的御魂序号关键字，用逗号,间隔'
                          u'例如"-IG 天狗,鸟"为御魂序号包含天狗或鸟则滤除')
 parser.add_argument("-AS", "--all-suit",
-                    type=bool,
+                    type=str2bool,
                     default=True,
                     help=u'是否全为套装，默认为True。'
                          u'"-AS False"为允许非套装的组合出现，如5针女1破势')
@@ -119,5 +128,4 @@ def main():
 
 
 if __name__ == '__main__':
-    # test
     main()
