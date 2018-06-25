@@ -1,7 +1,7 @@
 # coding:utf-8
 
-import Tkinter as tk
 import tkFileDialog
+import Tkinter as tk
 import ttk
 
 from calculator_of_Onmyoji import data_format
@@ -15,10 +15,10 @@ class FileFrame(tk.Frame):
         file_extension = (("Excel files", "*.xls"),)
         if 'Data' in file_type:
             self.dia_open = lambda: tkFileDialog.askopenfilename(filetypes=
-                    file_extension)
+                file_extension)
         else:
             self.dia_open = lambda: tkFileDialog.asksaveasfilename(filetypes=
-                    file_extension)
+                file_extension)
         self.statusbar = tk.Label(self, text="", bd=1,
                                   relief=tk.SUNKEN, anchor=tk.W, width=80)
         self.statusbar.pack(side=tk.BOTTOM, fill=tk.X)

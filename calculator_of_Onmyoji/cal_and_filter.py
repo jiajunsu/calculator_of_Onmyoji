@@ -56,7 +56,6 @@ def filter_mitama(mitama_comb_list, mitama_enhance,
                                          prop_min_value, mitama_enhance)
     print('filter mitama prop value finish')
 
-
     comb_data_list = cal_mitama_comb_prop(mitama_sum_data, mitama_enhance)
     print('cal mitama sum prop finish')
 
@@ -83,8 +82,8 @@ def fit_mitama_type(mitama_comb_list, expect_mitama_type, min_num, all_suit):
             if not is_suit:
                 continue
 
-        if (not expect_mitama_type) or (expect_mitama_type
-                and mitama_type_count.get(expect_mitama_type) >= min_num):
+        if not expect_mitama_type or (expect_mitama_type and
+                mitama_type_count.get(expect_mitama_type) >= min_num):
             comb_data = {'sum': {u'御魂计数': mitama_type_count},
                          'info': mitama_comb}
             yield comb_data
@@ -147,28 +146,6 @@ def sum_prop(mitama_comb, mitama_type_count, mitama_enhance):
             prop_type = mitama_enhance[m_type].get(u'加成类型')
             if prop_type:
                 sum_result[prop_type] += (
-                        multi_times * mitama_enhance[m_type].get(u'加成数值'))
+                    multi_times * mitama_enhance[m_type].get(u'加成数值'))
 
     return sum_result
-
-
-if __name__ == '__main__':
-    # test
-    import load_data
-    test_file = './example/data_Template.xls'
-    d = load_data.get_mitama_data(test_file)
-    l_d = load_data.sep_mitama_by_loc(d)
-    m_e = load_data.get_mitama_enhance(test_file)
-
-    comb = make_combination(l_d)
-    f_t = filter_mitama(comb, m_e, mitama_type=u'针女', type_min_num=4)
-    print(len(list(f_t)))
-
-    comb = make_combination(l_d)
-    f_p = filter_mitama(comb, m_e, prop_type=u'暴击', prop_min_value=90)
-    print(len(list(f_p)))
-
-    comb = make_combination(l_d)
-    f_t_p = filter_mitama(comb, m_e, mitama_type=u'针女', type_min_num=4,
-                          prop_type=u'暴击', prop_min_value=90)
-    print(len(list(f_t_p)))
