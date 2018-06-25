@@ -40,3 +40,6 @@ optional arguments:
 
 ## Cal example
 ```python calculator_of_Onmyoji/cal_mitama.py example/victor.xls data/v_result.xls -M 针女,4 -P 暴击,90.暴击伤害,50 -2P 攻击加成,55 -4P 攻击加成,55 -6P 暴击,55 -IG 天狗```
+
+## Make tar
+```tar zcf calculator.tar.gz calculator_of_Onmyoji example dist LICENSE README.md requirements.txt setup.* win_compile.txt```
