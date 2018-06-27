@@ -29,8 +29,9 @@ parser.add_argument("output_file",
 parser.add_argument("-M", "--mitama-suit",
                     type=str,
                     default=',0',
-                    help=u'期望的御魂x件套类型，'
-                         u'例如"-M 针女,4"为针女至少4件')
+                    help=u'期望的御魂x件套类型，多个限制用英文句号.间隔，'
+                         u'例如"-M 针女,4"为针女至少4件，'
+                         u'"-M 针女,4.破势,2"为针女4件+破势2件')
 parser.add_argument("-P", "--prop-limit",
                     type=str,
                     default=',0',
@@ -76,27 +77,27 @@ def sep_utf_str(utf_str):
         return [uni_str]
 
 
-def format_prop_limit(utf_str):
+def sep_utf_str_to_dict(utf_str):
     if sysstr == 'Windows':
         uni_str = utf_str.decode('gbk')
     else:
         uni_str = utf_str.decode('utf8')
-    prop_limit_list = uni_str.split('.')
-    prop_limit = dict()
-    for limit in prop_limit_list:
+    limit_list = uni_str.split('.')
+    formated_dict = dict()
+    for limit in limit_list:
         if ',' not in limit:
             continue
-        prop, value = limit.split(',')
-        prop_limit[prop] = int(value)
-    return prop_limit
+        key, value = limit.split(',')
+        formated_dict[key] = int(value)
+    return formated_dict
 
 
 def main():
     args = parser.parse_args()
     file_name = args.source_data
 
-    mitama_type, type_min_num = sep_utf_str(args.mitama_suit)
-    prop_limit = format_prop_limit(args.prop_limit)
+    mitama_type_limit = sep_utf_str_to_dict(args.mitama_suit)
+    prop_limit = sep_utf_str_to_dict(args.prop_limit)
 
     l2_prop, l2_prop_value = sep_utf_str(args.sec_prop_value)
     l4_prop, l4_prop_value = sep_utf_str(args.fth_prop_value)
@@ -118,9 +119,8 @@ def main():
     print('make combination finish')
 
     filter_result = cal.filter_mitama(mitama_comb, suit_enhance,
-                                      mitama_type=mitama_type,
-                                      type_min_num=int(type_min_num),
-                                      prop_limit=prop_limit,
+                                      mitama_type_limit,
+                                      prop_limit,
                                       all_suit=args.all_suit)
     print('filter mitama finish')
 

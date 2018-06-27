@@ -19,7 +19,8 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -M MITAMA_SUIT, --mitama-suit MITAMA_SUIT
-                        期望的御魂x件套类型，例如"-M 针女,4"为针女至少4件
+                        期望的御魂x件套类型，多个限制用英文句号.间隔，例如"-M 针女,4"为针女至少4件，"-M
+                        针女,4.破势,2"为针女4件+破势2件
   -P PROP_LIMIT, --prop-limit PROP_LIMIT
                         期望限制的属性类型，多个属性条件用英文句号.间隔, 例如"-P
                         暴击,90.暴击伤害,70"为暴击至少90且暴击伤害至少70

@@ -42,10 +42,10 @@ def filter_loc_prop(data_list, prop_type, prop_min_value):
 
 
 def filter_mitama(mitama_comb_list, mitama_enhance,
-                  mitama_type='', type_min_num=0,
-                  prop_limit=None, all_suit=True):
+                  mitama_type_limit,
+                  prop_limit, all_suit=True):
     mitama_sum_data = fit_mitama_type(mitama_comb_list,
-                                      mitama_type, type_min_num, all_suit)
+                                      mitama_type_limit, all_suit)
     print('filter mitama type finish')
 
     if prop_limit is None:
@@ -62,7 +62,7 @@ def filter_mitama(mitama_comb_list, mitama_enhance,
     return comb_data_list
 
 
-def fit_mitama_type(mitama_comb_list, expect_mitama_type, min_num, all_suit):
+def fit_mitama_type(mitama_comb_list, mitama_type_limit, all_suit):
     for mitama_comb in mitama_comb_list:
         mitama_type_count = {}
         for mitama in mitama_comb:
@@ -82,11 +82,17 @@ def fit_mitama_type(mitama_comb_list, expect_mitama_type, min_num, all_suit):
             if not is_suit:
                 continue
 
-        if not expect_mitama_type or (expect_mitama_type and
-                mitama_type_count.get(expect_mitama_type) >= min_num):
-            comb_data = {'sum': {u'御魂计数': mitama_type_count},
-                         'info': mitama_comb}
-            yield comb_data
+        if mitama_type_limit:
+            fit_type_limit = True
+            for expect_type, expect_num in mitama_type_limit.items():
+                if mitama_type_count.get(expect_type, 0) < expect_num:
+                    fit_type_limit = False
+            if not fit_type_limit:
+                continue
+
+        comb_data = {'sum': {u'御魂计数': mitama_type_count},
+                     'info': mitama_comb}
+        yield comb_data
 
 
 def fit_prop_value(mitama_sum_data, prop_type, min_value, mitama_enhance):
