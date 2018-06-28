@@ -120,6 +120,27 @@ def fit_prop_value(mitama_sum_data, prop_type, min_value, mitama_enhance):
             yield mitama_data
 
 
+def fil_mitama_lambda(mitama_comb_list, filter_func):
+    """Filter the mitama combination by a customized function
+    
+    Args:
+        mitama_comb_list (function): mitama combination list
+        filter_func (function): customized function
+    
+    Returns:
+        TYPE: return the filterd mitama combination list
+    """
+    for mitama_comb in mitama_comb_list:
+        try:
+            if filter_func(mitama_comb):
+                yield mitama_comb
+        except Exception as e:
+            print(mitama_comb)
+            print(e.message)
+            pass
+
+
+
 def cal_mitama_comb_prop(mitama_sum_data, mitama_enhance):
     for mitama_data in mitama_sum_data:
         mitama_type_count = mitama_data['sum'].get(u'御魂计数')
