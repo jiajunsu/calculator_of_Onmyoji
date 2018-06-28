@@ -63,6 +63,12 @@ parser.add_argument("-AS", "--all-suit",
                     default=True,
                     help=u'是否全为套装，默认为True。'
                          u'"-AS False"为允许非套装的组合出现，如5针女1破势')
+parser.add_argument("-A", "--total-limit",
+                    type=str,
+                    default='0,0,0',
+                    help=u'期望的攻击*爆伤，'
+                         u'例如"-A 20500,3126,150"，当基础攻击为3216，'
+                         u'基础爆伤为150，攻击*爆伤>20500')
 
 
 def sep_utf_str(utf_str):
@@ -91,6 +97,29 @@ def sep_utf_str_to_dict(utf_str):
         formated_dict[key] = int(value)
     return formated_dict
 
+def parse_total_limit(utf_str):
+    return sep_utf_str(utf_str)
+
+
+def total_damage(mitama_comb, base_att, base_critdamage, total_limit):
+    """Calculate total damage and compare to the limit
+    
+    Args:
+        mitama_comb (dict): Mitama combination
+        base_att (float): base attack
+        base_hitdamage (float): base critical damage
+        total_limit (float): desired total damage
+    
+    Returns:
+        bool: True if over the limit, otherwise False
+    """
+    sum_data = mitama_comb.get('sum', {})
+    datt = float(sum_data[u'攻击'])
+    dattp = float(sum_data[u'攻击加成'])
+    dcritdamage = float(sum_data[u'暴击伤害'])
+    #print(u'攻击: {}, 攻击加成: {}, 暴击伤害: {}'.format(datt, dattp, dcritdamage))
+    total_damage = (base_att*(1+dattp/100.0)+datt)*(base_critdamage+dcritdamage)/100.0
+    return total_damage >= total_limit
 
 def main():
     args = parser.parse_args()
@@ -122,6 +151,14 @@ def main():
                                       mitama_type_limit,
                                       prop_limit,
                                       all_suit=args.all_suit)
+
+    #further filter mitama comb by total damage
+    total_limit, base_att, base_critdamage = map(float, parse_total_limit(args.total_limit))
+    if total_limit:
+        print('fitler total damage...')
+        filter_result = cal.filter_mitama_lambda(filter_result, 
+            lambda x: total_damage(x, base_att, base_critdamage, total_limit))
+    
     print('filter mitama finish')
 
     write_data.write_mitama_result(args.output_file, filter_result)
