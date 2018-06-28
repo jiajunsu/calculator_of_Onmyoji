@@ -133,7 +133,7 @@ def fil_mitama_lambda(mitama_comb_list, filter_func):
     for mitama_comb in mitama_comb_list:
         try:
             if filter_func(mitama_comb):
-            yield mitama_comb
+                yield mitama_comb
         except Exception as e:
             print(mitama_comb)
             print(e.message)
