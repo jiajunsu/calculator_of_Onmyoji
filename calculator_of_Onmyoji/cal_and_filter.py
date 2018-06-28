@@ -138,8 +138,6 @@ def fil_mitama_lambda(mitama_comb_list, filter_func):
             print(mitama_comb)
             print(e.message)
             pass
-        
-    #return filter(filter_func, mitama_comb_list)
 
 
 
