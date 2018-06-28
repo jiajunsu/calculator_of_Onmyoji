@@ -7,6 +7,7 @@ import platform
 from calculator_of_Onmyoji import cal_and_filter as cal
 from calculator_of_Onmyoji import load_data
 from calculator_of_Onmyoji import write_data
+import cal_mitama_analysis
 
 
 def str2bool(v):
@@ -69,6 +70,12 @@ parser.add_argument("-A", "--total-limit",
                     help=u'期望的攻击*爆伤，'
                          u'例如"-A 20500,3126,150"，当基础攻击为3216，'
                          u'基础爆伤为150，攻击*爆伤>20500')
+parser.add_argument("-O", "--non-overlap",
+                    type=int,
+                    default=0,
+                    help=u'生成不重叠御魂的方案，默认为0(即不生成)。'
+                         u'"-O 5"为生成5种不同方案，每套方案里的御魂组合不会'
+                         u'用到相同的御魂，可以同时装给不同的式神')
 
 
 def sep_utf_str(utf_str):
@@ -101,14 +108,13 @@ def parse_total_limit(utf_str):
     return sep_utf_str(utf_str)
 
 
-def total_damage(mitama_comb, base_att, base_critdamage, total_limit):
-    """Calculate total damage and compare to the limit
+def total_damage(mitama_comb, base_att, base_critdamage):
+    """Calculate total damage
     
     Args:
         mitama_comb (dict): Mitama combination
         base_att (float): base attack
         base_hitdamage (float): base critical damage
-        total_limit (float): desired total damage
     
     Returns:
         bool: True if over the limit, otherwise False
@@ -118,7 +124,7 @@ def total_damage(mitama_comb, base_att, base_critdamage, total_limit):
     dattp = float(sum_data[u'攻击加成'])
     dcritdamage = float(sum_data[u'暴击伤害'])
     total_damage = (base_att*(1+dattp/100.0)+datt)*(base_critdamage+dcritdamage)/100.0
-    return total_damage >= total_limit
+    return total_damage
 
 def main():
     args = parser.parse_args()
@@ -156,11 +162,14 @@ def main():
     if total_limit:
         print('fitler total damage...')
         filter_result = cal.filter_mitama_lambda(filter_result, 
-            lambda x: total_damage(x, base_att, base_critdamage, total_limit))
+            lambda x: total_damage(x, base_att, base_critdamage)>=total_limit)
 
     print('filter mitama finish')
+    if args.non_overlap > 0:
+        cal_mitama_analysis.mitama_comb_nonoverlap(filter_result, args.output_file, args.non_overlap)
+    else:
+        write_data.write_mitama_result(args.output_file, filter_result)
 
-    write_data.write_mitama_result(args.output_file, filter_result)
 
 
 if __name__ == '__main__':

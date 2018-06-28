@@ -40,7 +40,16 @@ optional arguments:
 ```python calculator_of_Onmyoji/cal_mitama.py example/data_Template.xls data/result.xls -M 针女,4 -P 暴击,90```
 
 ## Cal example
+攻攻暴针女套装，并且排除已经用在天狗身上的御魂  
 ```python calculator_of_Onmyoji/cal_mitama.py example/victor.xls data/v_result.xls -M 针女,4 -P 暴击,90.暴击伤害,50 -2P 攻击加成,55 -4P 攻击加成,55 -6P 暴击,55 -IG 天狗```
+
+超星茨木（``-A``后面三个数字分别表示想要的攻击*爆伤，式神面板基础攻击和暴击伤害）  
+```python calculator_of_Onmyoji/cal_mitama.py example/victor.xls data/v_result.xls -M 破势,4 -P 暴击,90.暴击伤害,120,速度,16 -2P 攻击加成,55 -4P 攻击加成,55 -6P 暴击伤害,89 -A 20500,3216,150```
+
+多套破势爆伤搭配方案(-O 5, 表示最终生成5种不同的搭配，因为要计算御魂有没有被重复使用，可能会比较慢)  
+```python calculator_of_Onmyoji/cal_mitama.py example/victor.xls data/v_result.xls -M 破势,4 -P 暴击,90.暴击伤害,90 -2P 攻击加成,55 -4P 攻击加成,55 -6P 暴击伤害,89 -O 5```
+
+
 
 ## Make tar
 ```tar zcf calculator.tar.gz calculator_of_Onmyoji example dist LICENSE README.md requirements.txt setup.* win_compile.txt```
