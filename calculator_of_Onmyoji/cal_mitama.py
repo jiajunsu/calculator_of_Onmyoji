@@ -117,7 +117,7 @@ def total_damage(mitama_comb, base_att, base_critdamage, total_limit):
     datt = float(sum_data[u'攻击'])
     dattp = float(sum_data[u'攻击加成'])
     dcritdamage = float(sum_data[u'暴击伤害'])
-    print(u'攻击: {}, 攻击加成: {}, 暴击伤害: {}'.format(datt, dattp, dcritdamage))
+    #print(u'攻击: {}, 攻击加成: {}, 暴击伤害: {}'.format(datt, dattp, dcritdamage))
     total_damage = (base_att*(1+dattp/100.0)+datt)*(base_critdamage+dcritdamage)/100.0
     return total_damage >= total_limit
 
