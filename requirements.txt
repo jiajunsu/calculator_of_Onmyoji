@@ -1,2 +1,4 @@
 xlrd
 xlwt
+requests
+json
