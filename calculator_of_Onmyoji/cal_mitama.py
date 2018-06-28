@@ -73,11 +73,7 @@ parser.add_argument("-A", "--total-limit",
 parser.add_argument("-O", "--non-overlap",
                     type=int,
                     default=0,
-<<<<<<< HEAD
                     help=u'生成不重叠御魂的方案，默认为0(即不生成)。'
-=======
-                    help=u'生成不重叠御魂的方案，默认为False。'
->>>>>>> d4365d1e8bc5d52558edc310c9407a7ea0b3098f
                          u'"-O 5"为生成5种不同方案，每套方案里的御魂组合不会'
                          u'用到相同的御魂，可以同时装给不同的式神')
 
