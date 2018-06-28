@@ -101,14 +101,13 @@ def parse_total_limit(utf_str):
     return sep_utf_str(utf_str)
 
 
-def total_damage(mitama_comb, base_att, base_critdamage, total_limit):
-    """Calculate total damage and compare to the limit
+def total_damage(mitama_comb, base_att, base_critdamage):
+    """Calculate total damage
     
     Args:
         mitama_comb (dict): Mitama combination
         base_att (float): base attack
         base_hitdamage (float): base critical damage
-        total_limit (float): desired total damage
     
     Returns:
         bool: True if over the limit, otherwise False
@@ -118,7 +117,7 @@ def total_damage(mitama_comb, base_att, base_critdamage, total_limit):
     dattp = float(sum_data[u'攻击加成'])
     dcritdamage = float(sum_data[u'暴击伤害'])
     total_damage = (base_att*(1+dattp/100.0)+datt)*(base_critdamage+dcritdamage)/100.0
-    return total_damage >= total_limit
+    return total_damage
 
 def main():
     args = parser.parse_args()
@@ -156,11 +155,11 @@ def main():
     if total_limit:
         print('fitler total damage...')
         filter_result = cal.filter_mitama_lambda(filter_result, 
-            lambda x: total_damage(x, base_att, base_critdamage, total_limit))
+            lambda x: total_damage(x, base_att, base_critdamage)>=total_limit)
 
     print('filter mitama finish')
-
     write_data.write_mitama_result(args.output_file, filter_result)
+ 
 
 
 if __name__ == '__main__':
