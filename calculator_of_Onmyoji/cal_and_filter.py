@@ -120,25 +120,47 @@ def fit_prop_value(mitama_sum_data, prop_type, min_value, mitama_enhance):
             yield mitama_data
 
 
-def fil_mitama_lambda(mitama_comb_list, filter_func):
+def cal_total_damage(mitama_comb, base_att, base_critdamage):
+    """Calculate total damage
+
+    Args:
+        mitama_comb (dict): Mitama combination
+        base_att (float): base attack
+        base_hitdamage (float): base critical damage
+
+    Returns:
+        float: total_damage
+    """
+    sum_data = mitama_comb['sum']
+    datt = float(sum_data[u'攻击'] if sum_data[u'攻击'] else 0)
+    dattp = float(sum_data[u'攻击加成'] if sum_data[u'攻击加成'] else 0)
+    dcritdamage = float(sum_data[u'暴击伤害'] if sum_data[u'暴击伤害'] else 0)
+    total_damage = ((base_att * (1 + dattp / 100) + datt) *
+                    (base_critdamage + dcritdamage) / 100)
+    return total_damage
+
+
+def fit_damage_limit(mitama_comb_list, base_att, base_critdamage,
+                     damage_limit):
+    return fit_mitama_lambda(mitama_comb_list,
+                             lambda x: cal_total_damage(x, base_att,
+                                                        base_critdamage) >=
+                             damage_limit)
+
+
+def fit_mitama_lambda(mitama_comb_list, filter_func):
     """Filter the mitama combination by a customized function
-    
+
     Args:
         mitama_comb_list (function): mitama combination list
         filter_func (function): customized function
-    
+
     Returns:
         TYPE: return the filterd mitama combination list
     """
     for mitama_comb in mitama_comb_list:
-        try:
-            if filter_func(mitama_comb):
-                yield mitama_comb
-        except Exception as e:
-            print(mitama_comb)
-            print(e.message)
-            pass
-
+        if filter_func(mitama_comb):
+            yield mitama_comb
 
 
 def cal_mitama_comb_prop(mitama_sum_data, mitama_enhance):
