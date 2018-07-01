@@ -34,7 +34,7 @@ optional arguments:
   -AS ALL_SUIT, --all-suit ALL_SUIT
                         是否全为套装，默认为True。"-AS False"为允许非套装的组合出现，如5针女1破势
   -DL DAMAGE_LIMIT, --damage-limit DAMAGE_LIMIT
-                        期望的攻击*爆伤，例如"-A
+                        期望的攻击*爆伤，例如"-DL
                         20500,3126,150"，当基础攻击为3126，基础爆伤为150，攻击*爆伤>=20500
 
 ```
