@@ -68,6 +68,8 @@ def generate_mitama_list(acc_id, filename,
         mitama_num = 1
         for mitama_id in mitama_list:
             mitama_info = mitama_list[mitama_id]
+            if int(mitama_info['level']) < 15:
+                continue
             mitama_pos = str(mitama_info['pos'])
             mitama_name = mitama_info['name']
             mitama_attrs = {i[0]:i[1] for i in mitama_info['attrs']}
