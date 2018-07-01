@@ -2,9 +2,7 @@
 
 御魂搭配计算器
 
-## Usage
-
-```python calculator_of_Onmyoji/cal_mitama.py -h```
+## Usage of calculator
 
 ```
 usage: cal_mitama.py [-h] [-M MITAMA_SUIT] [-P PROP_LIMIT]
@@ -39,6 +37,20 @@ optional arguments:
                         期望的攻击*爆伤，例如"-A
                         20500,3126,150"，当基础攻击为3126，基础爆伤为150，攻击*爆伤>=20500
 
+```
+
+## Usage of mitama puller
+
+```
+usage: pull_mitama.py [-h] [-O OUTPUT_FILE] acc_id
+
+positional arguments:
+  acc_id                藏宝阁id，商品详情页面对应的网址中，格式如201806211901616-3-KJ8J8IQOJTOMD8
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -O OUTPUT_FILE, --output-file OUTPUT_FILE
+                        输出文件位置，格式为pathto/filename.xls
 ```
 
 ## Test Command
