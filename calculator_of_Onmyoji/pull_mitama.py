@@ -9,7 +9,6 @@ import requests
 import xlwt
 
 from calculator_of_Onmyoji import data_format
-from calculator_of_Onmyoji.write_data import write_mitama_row
 
 UASTRING = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) "
             "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/11.1.1 "
@@ -28,7 +27,7 @@ parser.add_argument("-O", "--output-file",
 
 def download_data(acc_id):
     server_id = int(acc_id.split('-')[1])
-    post_data = {'serverid':server_id, 'ordersn': acc_id}
+    post_data = {'serverid': server_id, 'ordersn': acc_id}
     post_header = {'User Agent': UASTRING}
     post_url = 'https://yys.cbg.163.com/cgi/api/get_equip_detail'
 
@@ -36,8 +35,8 @@ def download_data(acc_id):
         print(post_url, post_data, post_header)
         req = requests.post(post_url, data=post_data, headers=post_header,
                             verify=False)
-        return req.json()
-    except Exception as e:
+        return json.loads(req.text)
+    except Exception:
         print('Unable to download the data. %s' % traceback.format_exc())
         return None
 
@@ -72,7 +71,7 @@ def generate_mitama_list(acc_id, filename,
                 continue
             mitama_pos = str(mitama_info['pos'])
             mitama_name = mitama_info['name']
-            mitama_attrs = {i[0]:i[1] for i in mitama_info['attrs']}
+            mitama_attrs = {i[0]: i[1] for i in mitama_info['attrs']}
             mitama_sheet.write(mitama_num, 0, label=mitama_id)
             mitama_sheet.write(mitama_num, 1, label=mitama_name)
             mitama_sheet.write(mitama_num, 2, label=mitama_pos)
