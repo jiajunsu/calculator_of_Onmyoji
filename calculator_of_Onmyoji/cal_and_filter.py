@@ -41,8 +41,7 @@ def filter_loc_prop(data_list, prop_type, prop_min_value):
     return filter(prop_value_le_min, data_list)
 
 
-def filter_mitama(mitama_comb_list, mitama_enhance,
-                  mitama_type_limit,
+def filter_mitama(mitama_comb_list, mitama_type_limit,
                   prop_limit, all_suit=True):
     mitama_sum_data = fit_mitama_type(mitama_comb_list,
                                       mitama_type_limit, all_suit)
@@ -53,10 +52,10 @@ def filter_mitama(mitama_comb_list, mitama_enhance,
 
     for prop_type, prop_min_value in prop_limit.items():
         mitama_sum_data = fit_prop_value(mitama_sum_data, prop_type,
-                                         prop_min_value, mitama_enhance)
+                                         prop_min_value)
     print('filter mitama prop value finish')
 
-    comb_data_list = cal_mitama_comb_prop(mitama_sum_data, mitama_enhance)
+    comb_data_list = cal_mitama_comb_prop(mitama_sum_data)
     print('cal mitama sum prop finish')
 
     return comb_data_list
@@ -95,7 +94,9 @@ def fit_mitama_type(mitama_comb_list, mitama_type_limit, all_suit):
         yield comb_data
 
 
-def fit_prop_value(mitama_sum_data, prop_type, min_value, mitama_enhance):
+def fit_prop_value(mitama_sum_data, prop_type, min_value):
+    mitama_enhance = data_format.MITAMA_ENHANCE
+
     for mitama_data in mitama_sum_data:
         mitama_type_count = mitama_data['sum'].get(u'御魂计数')
         mitama_comb = mitama_data['info']
@@ -163,21 +164,22 @@ def fit_mitama_lambda(mitama_comb_list, filter_func):
             yield mitama_comb
 
 
-def cal_mitama_comb_prop(mitama_sum_data, mitama_enhance):
+def cal_mitama_comb_prop(mitama_sum_data):
     for mitama_data in mitama_sum_data:
         mitama_type_count = mitama_data['sum'].get(u'御魂计数')
         mitama_comb = mitama_data['info']
 
-        comb_sum = sum_prop(mitama_comb, mitama_type_count, mitama_enhance)
+        comb_sum = sum_prop(mitama_comb, mitama_type_count)
 
         comb_data = {'sum': comb_sum,
                      'info': mitama_comb}
         yield comb_data
 
 
-def sum_prop(mitama_comb, mitama_type_count, mitama_enhance):
+def sum_prop(mitama_comb, mitama_type_count):
     prop_type_list = data_format.MITAMA_COL_NAME_ZH[3::]
     sum_result = {k: 0 for k in prop_type_list}
+    mitama_enhance = data_format.MITAMA_ENHANCE
 
     for mitama in mitama_comb:
         mitama_info = mitama.values()[0]

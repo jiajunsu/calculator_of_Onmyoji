@@ -133,7 +133,6 @@ def main():
     ignore_serial = sep_utf_str(args.ignore_serial)
 
     origin_data = load_data.get_mitama_data(file_name, ignore_serial)
-    suit_enhance = load_data.get_mitama_enhance(file_name)
     print('load data finish')
 
     locate_sep_data = load_data.sep_mitama_by_loc(origin_data)
@@ -145,7 +144,7 @@ def main():
                                                   l6_prop, int(l6_prop_value))
     print('make combination finish')
 
-    filter_result = cal.filter_mitama(mitama_comb, suit_enhance,
+    filter_result = cal.filter_mitama(mitama_comb,
                                       mitama_type_limit,
                                       prop_limit,
                                       all_suit=args.all_suit)

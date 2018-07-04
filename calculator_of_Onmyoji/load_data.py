@@ -51,20 +51,6 @@ def skip_serial(serial, ignore_list):
     return False
 
 
-def get_mitama_enhance(filename):
-    rows_data = _get_sheet_rows(filename, sheet_name=u'御魂类别')
-    mitama_en_prop = dict()
-
-    rows_data.next()  # skip first row
-    for r_data in rows_data:
-        mitama_name = r_data[0].value
-        data = {u'加成类型': r_data[1].value,
-                u'加成数值': r_data[2].value}
-        mitama_en_prop[mitama_name] = data
-
-    return mitama_en_prop
-
-
 def sep_mitama_by_loc(mitama_data):
     mitama_loc_data = {1: [], 2: [], 3: [],
                        4: [], 5: [], 6: []}
