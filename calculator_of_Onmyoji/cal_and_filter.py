@@ -45,7 +45,6 @@ def filter_mitama(mitama_comb_list, mitama_type_limit,
                   prop_limit, all_suit=True):
     mitama_sum_data = fit_mitama_type(mitama_comb_list,
                                       mitama_type_limit, all_suit)
-    print('filter mitama type finish')
 
     if prop_limit is None:
         prop_limit = dict()
@@ -53,10 +52,8 @@ def filter_mitama(mitama_comb_list, mitama_type_limit,
     for prop_type, prop_min_value in prop_limit.items():
         mitama_sum_data = fit_prop_value(mitama_sum_data, prop_type,
                                          prop_min_value)
-    print('filter mitama prop value finish')
 
     comb_data_list = cal_mitama_comb_prop(mitama_sum_data)
-    print('cal mitama sum prop finish')
 
     return comb_data_list
 

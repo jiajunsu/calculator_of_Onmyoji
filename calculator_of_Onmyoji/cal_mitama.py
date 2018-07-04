@@ -121,6 +121,8 @@ def total_damage(mitama_comb, base_att, base_critdamage, total_limit):
 
 def main():
     args = parser.parse_args()
+    print('Input args: %s' % args)
+
     file_name = args.source_data
 
     mitama_type_limit = sep_utf_str_to_dict(args.mitama_suit)
@@ -133,16 +135,15 @@ def main():
     ignore_serial = sep_utf_str(args.ignore_serial)
 
     origin_data = load_data.get_mitama_data(file_name, ignore_serial)
-    print('load data finish')
+    print('Loading data finish')
 
     locate_sep_data = load_data.sep_mitama_by_loc(origin_data)
-    print('sep data by loc finish')
 
+    print('Start calculating')
     mitama_comb = cal.filter_loc2make_combination(locate_sep_data,
                                                   l2_prop, int(l2_prop_value),
                                                   l4_prop, int(l4_prop_value),
                                                   l6_prop, int(l6_prop_value))
-    print('make combination finish')
 
     filter_result = cal.filter_mitama(mitama_comb,
                                       mitama_type_limit,
@@ -155,8 +156,6 @@ def main():
     if damage_limit > 0:
         filter_result = cal.fit_damage_limit(filter_result, base_att,
                                              base_critdamage, damage_limit)
-
-    print('filter mitama finish')
 
     write_data.write_mitama_result(args.output_file, filter_result)
 

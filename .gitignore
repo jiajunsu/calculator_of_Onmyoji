@@ -108,3 +108,4 @@ venv.bak/
 /data
 /example
 *.tar.gz
+*.xls
