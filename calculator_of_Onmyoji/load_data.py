@@ -64,12 +64,8 @@ def sep_mitama_by_loc(mitama_data):
 
 if __name__ == '__main__':
     # for test
-    test_file = './example/data_Template.xlsx'
+    test_file = './example/data_Template.xls'
     d = get_mitama_data(test_file)
     print(d)
     l_d = sep_mitama_by_loc(d)
     print(l_d)
-
-    p = get_mitama_enhance(test_file)
-    for k, v in p.items():
-        print(k, v)
