@@ -34,7 +34,7 @@ def get_mitama_data(filename, ignore_serial):
         if skip_serial(serial, ignore_serial):
             continue
 
-        data = {data_format.MITAMA_COL_NAME_ZH[1]: r_data[1]}
+        data = {data_format.MITAMA_COL_NAME_ZH[1]: r_data[1].value}
 
         for i in range(2, data_len):
             prop_name = data_format.MITAMA_COL_NAME_ZH[i]
