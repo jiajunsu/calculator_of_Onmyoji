@@ -71,12 +71,19 @@ def generate_mitama_list(acc_id, filename,
                 continue
             mitama_pos = str(mitama_info['pos'])
             mitama_name = mitama_info['name']
-            mitama_attrs = {i[0]: i[1] for i in mitama_info['attrs']}
+            mitama_attrs = dict()
+            for prop, value in mitama_info['attrs']:
+                value = int(value.replace('%', ''))
+                if prop not in mitama_attrs:
+                    mitama_attrs[prop] = value
+                else:
+                    mitama_attrs[prop] += value
+
             mitama_sheet.write(mitama_num, 0, label=mitama_id)
             mitama_sheet.write(mitama_num, 1, label=mitama_name)
             mitama_sheet.write(mitama_num, 2, label=mitama_pos)
             for i, prop in enumerate(data_format.MITAMA_PROPS):
-                prop_value = mitama_attrs.get(prop, '').replace('%', '')
+                prop_value = mitama_attrs.get(prop, '')
                 mitama_sheet.write(mitama_num, 3+i, label=prop_value)
 
             mitama_num += 1
