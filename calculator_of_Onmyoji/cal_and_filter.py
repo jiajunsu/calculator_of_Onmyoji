@@ -1,7 +1,6 @@
 # coding: utf-8
 
 import itertools
-
 from calculator_of_Onmyoji import data_format
 
 
@@ -27,7 +26,6 @@ def filter_loc(data_dict,
                                                           len(d3), len(d4),
                                                           len(d5), len(d6)))
     return dict(zip(range(1,7), [d1, d2, d3, d4, d5, d6]))
-
 
 
 def make_combination(mitama_data, mitama_type_limit={}, all_suit=True):
@@ -64,12 +62,13 @@ def make_combination(mitama_data, mitama_type_limit={}, all_suit=True):
                 secondary_mitama[i] = filter(lambda x: filter_mitama_by_type(x, secondary_type), mitama_data[i])
 
         res = []
+        #chosen type only
         total_comb += reduce(lambda x,y: x*y, map(len, main_mitama.values()))
         res.append(itertools.product(*main_mitama.values()))
 
         #4+2
         for i in range(1, 7):
-            for j in range(i, 7):
+            for j in range(i+1, 7):
                 mitama_grp = {x: main_mitama[x] for x in range(1,7)}
                 if secondary_type:
                     mitama_grp[i] = secondary_mitama[i]
