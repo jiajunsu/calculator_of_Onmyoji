@@ -63,12 +63,12 @@ parser.add_argument("-AS", "--all-suit",
                     default=True,
                     help=u'是否全为套装，默认为True。'
                          u'"-AS False"为允许非套装的组合出现，如5针女1破势')
-parser.add_argument("-DL", "--damage-limit",
+parser.add_argument("-SKP", "--shikigami-prop",
                     type=str,
-                    default='0,0,0',
-                    help=u'期望的攻击*爆伤，'
-                         u'例如"-DL 20500,3126,150"，当基础攻击为3126，'
-                         u'基础爆伤为150，攻击*爆伤>=20500')
+                    default=',',
+                    help=u'式神名称+计算属性，指定式神后，输出数据会计算 '
+                         u'攻击*暴伤(默认) 或 生命*暴伤。'
+                         u'如"-SKP 书翁,生命"会计算 书翁 生命*暴伤 的数值')
 
 
 def sep_utf_str(utf_str):
@@ -96,27 +96,6 @@ def sep_utf_str_to_dict(utf_str):
         key, value = limit.split(',')
         formated_dict[key] = int(value)
     return formated_dict
-
-
-def total_damage(mitama_comb, base_att, base_critdamage, total_limit):
-    """Calculate total damage and compare to the limit
-
-    Args:
-        mitama_comb (dict): Mitama combination
-        base_att (float): base attack
-        base_hitdamage (float): base critical damage
-        total_limit (float): desired total damage
-
-    Returns:
-        bool: True if over the limit, otherwise False
-    """
-    sum_data = mitama_comb.get('sum', {})
-    datt = float(sum_data[u'攻击'])
-    dattp = float(sum_data[u'攻击加成'])
-    dcritdamage = float(sum_data[u'暴击伤害'])
-    total_damage = ((base_att * (1 + dattp / 100) + datt) *
-                    (base_critdamage + dcritdamage) / 100)
-    return total_damage >= total_limit
 
 
 def main():
@@ -149,13 +128,6 @@ def main():
                                       mitama_type_limit,
                                       prop_limit,
                                       all_suit=args.all_suit)
-
-    # further filter mitama comb by total damage
-    damage_limit, base_att, base_critdamage = \
-        map(float, sep_utf_str(args.damage_limit))
-    if damage_limit > 0:
-        filter_result = cal.fit_damage_limit(filter_result, base_att,
-                                             base_critdamage, damage_limit)
 
     write_data.write_mitama_result(args.output_file, filter_result)
 

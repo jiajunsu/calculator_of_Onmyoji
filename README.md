@@ -33,9 +33,9 @@ optional arguments:
                         忽略的御魂序号关键字，用逗号,间隔例如"-IG 天狗,鸟"为御魂序号包含天狗或鸟则滤除
   -AS ALL_SUIT, --all-suit ALL_SUIT
                         是否全为套装，默认为True。"-AS False"为允许非套装的组合出现，如5针女1破势
-  -DL DAMAGE_LIMIT, --damage-limit DAMAGE_LIMIT
-                        期望的攻击*爆伤，例如"-DL
-                        20500,3126,150"，当基础攻击为3126，基础爆伤为150，攻击*爆伤>=20500
+  -SKP SHIKIGAMI_PROP, --shikigami-prop SHIKIGAMI_PROP
+                        式神名称+计算属性，指定式神后，输出数据会计算 攻击*暴伤(默认) 或 生命*暴伤。如"-SKP
+                        书翁,生命"会计算 书翁 生命*暴伤 的数值
 
 ```
 

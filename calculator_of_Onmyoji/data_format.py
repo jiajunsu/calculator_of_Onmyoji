@@ -59,3 +59,6 @@ MITAMA_ENHANCE = {u"珍珠": {u"加成类型": u"防御加成", u"加成数值":
                   u"地震鲶": {u"加成类型": u"", u"加成数值": 0},
                   u"蜃气楼": {u"加成类型": u"", u"加成数值": 0},
                   }
+# TODO(victor): input all shikigami prop
+SHIKI_PROP = {u"茨木童子": {u"攻击": 3216, u"暴击伤害": 150, u"生命": 10254},
+              }
