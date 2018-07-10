@@ -1,13 +1,14 @@
 # coding: utf-8
 
 import itertools
+
 from calculator_of_Onmyoji import data_format
 
 
 def filter_loc(data_dict,
-                l2_prop, l2_value,
-                l4_prop, l4_value,
-                l6_prop, l6_value):
+               l2_prop, l2_value,
+               l4_prop, l4_value,
+               l6_prop, l6_value):
     if len(data_dict) != 6:
         raise KeyError("combination dict source must have 6 keys")
 
@@ -25,7 +26,7 @@ def filter_loc(data_dict,
     print('after filter by loc prop %s %s %s %s %s %s' % (len(d1), len(d2),
                                                           len(d3), len(d4),
                                                           len(d5), len(d6)))
-    return dict(zip(range(1,7), [d1, d2, d3, d4, d5, d6]))
+    return dict(zip(range(1, 7), [d1, d2, d3, d4, d5, d6]))
 
 
 def make_combination(mitama_data, mitama_type_limit={}, all_suit=True):
@@ -45,46 +46,54 @@ def make_combination(mitama_data, mitama_type_limit={}, all_suit=True):
             return False
 
     if not main_type:
-        total_comb = reduce(lambda x,y: x*y, map(len, mitama_data.values()))
+        total_comb = reduce(lambda x, y: x*y, map(len, mitama_data.values()))
         print("Total combinations: {}".format(total_comb))
         return itertools.product(*mitama_data.values())
     else:
-        #separate the main type mitamas and all other mitamas
-        main_mitama = dict(zip(range(1,7), [None]*6))
-        other_mitama = dict(zip(range(1,7), [None]*6))
+        # separate the main type mitamas and all other mitamas
+        main_mitama = dict(zip(range(1, 7), [None]*6))
+        other_mitama = dict(zip(range(1, 7), [None]*6))
         for i in range(1, 7):
-            main_mitama[i] = filter(lambda x: filter_mitama_by_type(x, main_type), mitama_data[i])
-            other_mitama[i] = filter(lambda x: not filter_mitama_by_type(x, main_type), mitama_data[i])
+            main_mitama[i] = filter(lambda x:
+                                    filter_mitama_by_type(x, main_type),
+                                    mitama_data[i])
+            other_mitama[i] = filter(lambda x:
+                                     not filter_mitama_by_type(x, main_type),
+                                     mitama_data[i])
 
         if secondary_type:
-            secondary_mitama = dict(zip(range(1,7), [None]*6))
+            secondary_mitama = dict(zip(range(1, 7), [None]*6))
             for i in range(1, 7):
-                secondary_mitama[i] = filter(lambda x: filter_mitama_by_type(x, secondary_type), mitama_data[i])
+                secondary_mitama[i] = filter(
+                    lambda x: filter_mitama_by_type(x, secondary_type),
+                    mitama_data[i])
 
         res = []
-        #chosen type only
-        total_comb += reduce(lambda x,y: x*y, map(len, main_mitama.values()))
+        # chosen type only
+        total_comb += reduce(lambda x, y: x*y, map(len, main_mitama.values()))
         res.append(itertools.product(*main_mitama.values()))
 
-        #4+2
+        # 4+2
         for i in range(1, 7):
             for j in range(i+1, 7):
-                mitama_grp = {x: main_mitama[x] for x in range(1,7)}
+                mitama_grp = {x: main_mitama[x] for x in range(1, 7)}
                 if secondary_type:
                     mitama_grp[i] = secondary_mitama[i]
                     mitama_grp[j] = secondary_mitama[j]
                 else:
                     mitama_grp[i] = other_mitama[i]
                     mitama_grp[j] = other_mitama[j]
-                total_comb += reduce(lambda x,y: x*y, map(len, mitama_grp.values()))
+                total_comb += reduce(lambda x, y: x*y,
+                                     map(len, mitama_grp.values()))
                 res.append(itertools.product(*mitama_grp.values()))
 
-        #5+1
+        # 5+1
         if not (all_suit or secondary_type):
             for i in range(1, 7):
-                mitama_grp = {x: main_mitama[x] for x in range(1,7)}
+                mitama_grp = {x: main_mitama[x] for x in range(1, 7)}
                 mitama_grp[i] = other_mitama[i]
-                total_comb += reduce(lambda x,y: x*y, map(len, mitama_grp.values()))
+                total_comb += reduce(lambda x, y: x*y,
+                                     map(len, mitama_grp.values()))
                 res.append(itertools.product(*mitama_grp.values()))
 
         print("Total combinations: {}".format(total_comb))

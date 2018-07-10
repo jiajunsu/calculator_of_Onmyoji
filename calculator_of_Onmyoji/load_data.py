@@ -10,7 +10,6 @@ from calculator_of_Onmyoji import data_format
 
 def _get_sheet_rows(filename, sheet_name):
     if not os.path.exists(filename):
-        print(u"文件不存在 ", filename)
         raise IOError("File not exists %s" % filename)
 
     try:
@@ -38,7 +37,7 @@ def get_mitama_data(filename, ignore_serial):
 
         for i in range(2, data_len):
             prop_name = data_format.MITAMA_COL_NAME_ZH[i]
-            data[prop_name] = int(r_data[i].value) if r_data[i].value else 0
+            data[prop_name] = float(r_data[i].value) if r_data[i].value else 0
 
         mitama_data[serial] = data
 

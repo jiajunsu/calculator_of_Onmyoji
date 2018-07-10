@@ -120,11 +120,12 @@ def main():
 
     print('Start calculating')
     locate_sep_data = cal.filter_loc(locate_sep_data,
-                                  l2_prop, int(l2_prop_value),
-                                  l4_prop, int(l4_prop_value),
-                                  l6_prop, int(l6_prop_value))
+                                     l2_prop, int(l2_prop_value),
+                                     l4_prop, int(l4_prop_value),
+                                     l6_prop, int(l6_prop_value))
 
-    mitama_comb = cal.make_combination(locate_sep_data, mitama_type_limit, args.all_suit)
+    mitama_comb = cal.make_combination(locate_sep_data,
+                                       mitama_type_limit, args.all_suit)
 
     filter_result = cal.filter_mitama(mitama_comb,
                                       mitama_type_limit,
