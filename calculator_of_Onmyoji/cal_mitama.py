@@ -63,12 +63,12 @@ parser.add_argument("-AS", "--all-suit",
                     default=True,
                     help=u'是否全为套装，默认为True。'
                          u'"-AS False"为允许非套装的组合出现，如5针女1破势')
-parser.add_argument("-SKP", "--shikigami-prop",
+parser.add_argument("-DV", "--damage-value",
                     type=str,
                     default=',',
-                    help=u'式神名称+计算属性，指定式神后，输出数据会计算 '
-                         u'攻击*暴伤(默认) 或 生命*暴伤。'
-                         u'如"-SKP 书翁,生命"会计算 书翁 生命*暴伤 的数值')
+                    help=u'基础攻击,基础暴击伤害，'
+                         u'如"-DV 3216,150"会计算基础攻击3216，基础暴伤150'
+                         u'的情况下，最终 攻击*暴伤 的数值')
 
 
 def sep_utf_str(utf_str):

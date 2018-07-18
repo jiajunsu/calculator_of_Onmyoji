@@ -7,6 +7,8 @@ MITAMA_COL_NAME_ZH = [u'御魂序号', u'御魂类型', u'位置', u'攻击',
 
 OUTPUT_HEADER = [u'组合序号'] + MITAMA_COL_NAME_ZH
 
+OUTPUT_EXTEND_HEADER = [u'攻击x暴伤']
+
 MITAMA_TYPES = [u'珍珠', u'骰子鬼', u'蚌精', u'魅妖', u'针女',
                 u'返魂香', u'土蜘蛛', u'胧车', u'荒骷髅', u'地震鲶',
                 u'蜃气楼', u'雪幽魂', u'地藏像', u'蝠翼', u'涅槃之火',
@@ -59,6 +61,3 @@ MITAMA_ENHANCE = {u"珍珠": {u"加成类型": u"防御加成", u"加成数值":
                   u"地震鲶": {u"加成类型": u"", u"加成数值": 0},
                   u"蜃气楼": {u"加成类型": u"", u"加成数值": 0},
                   }
-# TODO(victor): input all shikigami prop
-SHIKI_PROP = {u"茨木童子": {u"攻击": 3216, u"暴击伤害": 150, u"生命": 10254},
-              }
