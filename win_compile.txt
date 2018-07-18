@@ -15,3 +15,12 @@ Change pip.ini in wine
 ```wine ~/.wine/drive_c/Python27/Scripts/pyinstaller.exe -F calculator_of_Onmyoji/cal_mitama.py -p /usr/local/lib/python2.7/dist-packages/```
 
 ```wine ~/.wine/drive_c/Python27/Scripts/pyinstaller.exe -F calculator_of_Onmyoji/pull_mitama.py -p /usr/lib/python2.7/dist-packages/ -p  /usr/local/lib/python2.7/dist-packages/```
+
+
+### For 32bit
+
+```export WINEARCH=win32; export WINEPREFIX=~/.wine32```
+
+```wine ~/.wine32/drive_c/Python27/Scripts/pyinstaller.exe -F calculator_of_Onmyoji/cal_mitama.py -p /usr/local/lib/python2.7/dist-packages/```
+
+```wine ~/.wine32/drive_c/Python27/Scripts/pyinstaller.exe -F calculator_of_Onmyoji/pull_mitama.py -p /usr/lib/python2.7/dist-packages/ -p  /usr/local/lib/python2.7/dist-packages/```
