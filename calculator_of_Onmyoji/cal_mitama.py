@@ -74,7 +74,10 @@ parser.add_argument("-SKP", "--shikigami-prop",
 def sep_utf_str(utf_str):
     # solve problem with get utf8 args from shell
     if sysstr == 'Windows':
-        uni_str = utf_str.decode('gbk')
+        try:
+            uni_str = utf_str.decode('gbk')
+        except UnicodeDecodeError:
+            uni_str = utf_str.decode('big5')
     else:
         uni_str = utf_str.decode('utf8')
     if ',' in uni_str:
@@ -85,7 +88,10 @@ def sep_utf_str(utf_str):
 
 def sep_utf_str_to_dict(utf_str):
     if sysstr == 'Windows':
-        uni_str = utf_str.decode('gbk')
+        try:
+            uni_str = utf_str.decode('gbk')
+        except UnicodeDecodeError:
+            uni_str = utf_str.decode('big5')
     else:
         uni_str = utf_str.decode('utf8')
     limit_list = uni_str.split('.')
