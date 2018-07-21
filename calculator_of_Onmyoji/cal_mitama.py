@@ -63,12 +63,12 @@ parser.add_argument("-AS", "--all-suit",
                     default=True,
                     help=u'是否全为套装，默认为True。'
                          u'"-AS False"为允许非套装的组合出现，如5针女1破势')
-parser.add_argument("-DV", "--damage-value",
+parser.add_argument("-DL", "--damage-limit",
                     type=str,
-                    default=',',
-                    help=u'基础攻击,基础暴击伤害，'
-                         u'如"-DV 3216,150"会计算基础攻击3216，基础暴伤150'
-                         u'的情况下，最终 攻击*暴伤 的数值')
+                    default='0,0,0',
+                    help=u'基础攻击,基础暴伤,期望的攻击*暴伤，'
+                         u'例如"-DL 3126,150，20500"，当基础攻击为3126，'
+                         u'基础暴伤为150，攻击*暴伤>=20500')
 
 
 def sep_utf_str(utf_str):
@@ -119,6 +119,9 @@ def main():
 
     ignore_serial = sep_utf_str(args.ignore_serial)
 
+    base_att, base_critdamage, damage_limit = \
+        map(float, sep_utf_str(args.damage_limit))
+
     origin_data = load_data.get_mitama_data(file_name, ignore_serial)
     print('Loading data finish')
 
@@ -137,6 +140,10 @@ def main():
                                       mitama_type_limit,
                                       prop_limit,
                                       all_suit=args.all_suit)
+
+    if damage_limit > 0:
+        filter_result = cal.fit_damage_limit(filter_result, base_att,
+                                             base_critdamage, damage_limit)
 
     write_data.write_mitama_result(args.output_file, filter_result)
 

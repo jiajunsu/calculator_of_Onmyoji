@@ -33,9 +33,9 @@ optional arguments:
                         忽略的御魂序号关键字，用逗号,间隔例如"-IG 天狗,鸟"为御魂序号包含天狗或鸟则滤除
   -AS ALL_SUIT, --all-suit ALL_SUIT
                         是否全为套装，默认为True。"-AS False"为允许非套装的组合出现，如5针女1破势
-  -DV DAMAGE_VALUE, --damage-value DAMAGE_VALUE
-                        基础攻击,基础暴击伤害，如"-DV 3216,150"会计算基础攻击3216，基础暴伤150的情况下，最终
-                                                攻击*暴伤 的数值
+  -DL DAMAGE_LIMIT, --damage-limit DAMAGE_LIMIT
+                        基础攻击,基础暴伤,期望的攻击*暴伤，例如"-DL
+                        3126,150，20500"，当基础攻击为3126，基础暴伤为150，攻击*暴伤>=20500
 
 ```
 
