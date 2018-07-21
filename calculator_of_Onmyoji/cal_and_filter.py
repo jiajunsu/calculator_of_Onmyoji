@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import itertools
+import sys
 
 from calculator_of_Onmyoji import data_format
 
@@ -113,16 +114,22 @@ def filter_loc_prop(data_list, prop_type, prop_min_value):
 
 
 def filter_mitama(mitama_comb_list, mitama_type_limit,
-                  prop_limit, all_suit=True):
+                  prop_limit, upper_prop_limit, all_suit=True):
+
     mitama_sum_data = fit_mitama_type(mitama_comb_list,
                                       mitama_type_limit, all_suit)
 
-    if prop_limit is None:
-        prop_limit = dict()
-
     for prop_type, prop_min_value in prop_limit.items():
+        if prop_type in upper_prop_limit:
+            prop_max_value = upper_prop_limit.pop(prop_type)
+        else:
+            prop_max_value = sys.maxsize
         mitama_sum_data = fit_prop_value(mitama_sum_data, prop_type,
-                                         prop_min_value)
+                                         prop_min_value, prop_max_value)
+
+    for prop_type, prop_max_value in upper_prop_limit.items():
+        mitama_sum_data = fit_prop_value(mitama_sum_data, prop_type,
+                                         0, prop_max_value)
 
     comb_data_list = cal_mitama_comb_prop(mitama_sum_data)
 
@@ -162,7 +169,7 @@ def fit_mitama_type(mitama_comb_list, mitama_type_limit, all_suit):
         yield comb_data
 
 
-def fit_prop_value(mitama_sum_data, prop_type, min_value):
+def fit_prop_value(mitama_sum_data, prop_type, min_value, max_value):
     mitama_enhance = data_format.MITAMA_ENHANCE
 
     for mitama_data in mitama_sum_data:
@@ -185,7 +192,7 @@ def fit_prop_value(mitama_sum_data, prop_type, min_value):
                     prop_value += (
                         multi_times * mitama_enhance[m_type].get(u'加成数值'))
 
-        if prop_value >= min_value:
+        if min_value <= prop_value <= max_value:
             yield mitama_data
 
 

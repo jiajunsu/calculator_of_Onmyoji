@@ -21,8 +21,11 @@ optional arguments:
                         期望的御魂x件套类型，多个限制用英文句号.间隔，例如"-M 针女,4"为针女至少4件，"-M
                         针女,4.破势,2"为针女4件+破势2件
   -P PROP_LIMIT, --prop-limit PROP_LIMIT
-                        期望限制的属性类型，多个属性条件用英文句号.间隔, 例如"-P
+                        期望限制的属性下限，多个属性条件用英文句号.间隔, 例如"-P
                         暴击,90.暴击伤害,70"为暴击至少90且暴击伤害至少70
+  -UP UPPER_PROP_LIMIT, --upper-prop-limit UPPER_PROP_LIMIT
+                        期望限制的属性上限，多个属性条件用英文句号.间隔，例如"-UP
+                        暴击,95.速度,20"为暴击最多95且速度最多20
   -2P SEC_PROP_VALUE, --sec-prop-value SEC_PROP_VALUE
                         二号位限制的属性类型和数值，例如"-2P 攻击加成,55"为二号位攻击加成至少55
   -4P FTH_PROP_VALUE, --fth-prop-value FTH_PROP_VALUE
