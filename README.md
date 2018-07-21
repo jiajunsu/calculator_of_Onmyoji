@@ -6,9 +6,9 @@
 
 ```
 usage: cal_mitama.py [-h] [-M MITAMA_SUIT] [-P PROP_LIMIT]
-                     [-2P SEC_PROP_VALUE] [-4P FTH_PROP_VALUE]
-                     [-6P STH_PROP_VALUE] [-IG IGNORE_SERIAL] [-AS ALL_SUIT]
-                     [-DL DAMAGE_LIMIT]
+                     [-UP UPPER_PROP_LIMIT] [-2P SEC_PROP_VALUE]
+                     [-4P FTH_PROP_VALUE] [-6P STH_PROP_VALUE]
+                     [-IG IGNORE_SERIAL] [-AS ALL_SUIT] [-DL DAMAGE_LIMIT]
                      source_data output_file
 
 positional arguments:
