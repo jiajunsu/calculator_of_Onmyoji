@@ -6,9 +6,9 @@
 
 ```
 usage: cal_mitama.py [-h] [-M MITAMA_SUIT] [-P PROP_LIMIT]
-                     [-2P SEC_PROP_VALUE] [-4P FTH_PROP_VALUE]
-                     [-6P STH_PROP_VALUE] [-IG IGNORE_SERIAL] [-AS ALL_SUIT]
-                     [-DL DAMAGE_LIMIT]
+                     [-UP UPPER_PROP_LIMIT] [-2P SEC_PROP_VALUE]
+                     [-4P FTH_PROP_VALUE] [-6P STH_PROP_VALUE]
+                     [-IG IGNORE_SERIAL] [-AS ALL_SUIT] [-DL DAMAGE_LIMIT]
                      source_data output_file
 
 positional arguments:
@@ -21,8 +21,11 @@ optional arguments:
                         期望的御魂x件套类型，多个限制用英文句号.间隔，例如"-M 针女,4"为针女至少4件，"-M
                         针女,4.破势,2"为针女4件+破势2件
   -P PROP_LIMIT, --prop-limit PROP_LIMIT
-                        期望限制的属性类型，多个属性条件用英文句号.间隔, 例如"-P
+                        期望限制的属性下限，多个属性条件用英文句号.间隔, 例如"-P
                         暴击,90.暴击伤害,70"为暴击至少90且暴击伤害至少70
+  -UP UPPER_PROP_LIMIT, --upper-prop-limit UPPER_PROP_LIMIT
+                        期望限制的属性上限，多个属性条件用英文句号.间隔，例如"-UP
+                        暴击,95.速度,20"为暴击最多95且速度最多20
   -2P SEC_PROP_VALUE, --sec-prop-value SEC_PROP_VALUE
                         二号位限制的属性类型和数值，例如"-2P 攻击加成,55"为二号位攻击加成至少55
   -4P FTH_PROP_VALUE, --fth-prop-value FTH_PROP_VALUE
@@ -33,9 +36,9 @@ optional arguments:
                         忽略的御魂序号关键字，用逗号,间隔例如"-IG 天狗,鸟"为御魂序号包含天狗或鸟则滤除
   -AS ALL_SUIT, --all-suit ALL_SUIT
                         是否全为套装，默认为True。"-AS False"为允许非套装的组合出现，如5针女1破势
-  -DV DAMAGE_VALUE, --damage-value DAMAGE_VALUE
-                        基础攻击,基础暴击伤害，如"-DV 3216,150"会计算基础攻击3216，基础暴伤150的情况下，最终
-                                                攻击*暴伤 的数值
+  -DL DAMAGE_LIMIT, --damage-limit DAMAGE_LIMIT
+                        基础攻击,基础暴伤,期望的攻击*暴伤，例如"-DL
+                        3126,150，20500"，当基础攻击为3126，基础暴伤为150，攻击*暴伤>=20500
 
 ```
 
