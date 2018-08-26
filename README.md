@@ -9,6 +9,7 @@ usage: cal_mitama.py [-h] [-M MITAMA_SUIT] [-P PROP_LIMIT]
                      [-UP UPPER_PROP_LIMIT] [-2P SEC_PROP_VALUE]
                      [-4P FTH_PROP_VALUE] [-6P STH_PROP_VALUE]
                      [-IG IGNORE_SERIAL] [-AS ALL_SUIT] [-DL DAMAGE_LIMIT]
+                     [-HL HEALTH_LIMIT]
                      source_data output_file
 
 positional arguments:
@@ -39,6 +40,9 @@ optional arguments:
   -DL DAMAGE_LIMIT, --damage-limit DAMAGE_LIMIT
                         基础攻击,基础暴伤,期望的攻击*暴伤，例如"-DL
                         3126,150，20500"，当基础攻击为3126，基础暴伤为150，攻击*暴伤>=20500
+  -HL HEALTH_LIMIT, --health-limit HEALTH_LIMIT
+                        基础生命,基础暴伤,期望的生命*暴伤，例如"-HL
+                        8000,150,60000"，当基础生命为8000，基础暴伤为150，生命*暴伤>=60000
 
 ```
 
