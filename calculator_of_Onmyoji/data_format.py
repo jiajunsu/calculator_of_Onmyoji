@@ -7,7 +7,9 @@ MITAMA_COL_NAME_ZH = [u'御魂序号', u'御魂类型', u'位置', u'攻击',
 
 OUTPUT_HEADER = [u'组合序号'] + MITAMA_COL_NAME_ZH
 
-OUTPUT_EXTEND_HEADER = [u'攻击x暴伤']
+EXTEND_HEADER = [u'式神基础攻击', u'式神基础生命', u'式神基础暴伤',
+                 u'总攻击', u'总生命',
+                 u'攻击x暴伤', u'生命×暴伤']
 
 MITAMA_TYPES = [u'珍珠', u'骰子鬼', u'蚌精', u'魅妖', u'针女',
                 u'返魂香', u'土蜘蛛', u'胧车', u'荒骷髅', u'地震鲶',

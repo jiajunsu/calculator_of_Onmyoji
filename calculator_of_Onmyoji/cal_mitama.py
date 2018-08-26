@@ -75,6 +75,12 @@ parser.add_argument("-DL", "--damage-limit",
                     help=u'基础攻击,基础暴伤,期望的攻击*暴伤，'
                          u'例如"-DL 3126,150，20500"，当基础攻击为3126，'
                          u'基础暴伤为150，攻击*暴伤>=20500')
+parser.add_argument("-HL", "--health-limit",
+                    type=str,
+                    default='0,0,0',
+                    help=u'基础生命,基础暴伤,期望的生命*暴伤，'
+                         u'例如"-HL 8000,150,60000"，当基础生命为8000，'
+                         u'基础暴伤为150，生命*暴伤>=60000')
 
 
 def sep_utf_str(utf_str):
@@ -129,8 +135,20 @@ def main():
 
     ignore_serial = sep_utf_str(args.ignore_serial)
 
-    base_att, base_critdamage, damage_limit = \
+    base_att, base_critdamage_att, damage_limit = \
         map(float, sep_utf_str(args.damage_limit))
+
+    base_hp, base_critdamage_hp, hp_crit_limit = \
+        map(float, sep_utf_str(args.health_limit))
+
+    if (base_critdamage_att and base_critdamage_hp and
+            base_critdamage_att != base_critdamage_hp):
+        print('WARN: crit_damage between DL and HL is different')
+
+    if base_critdamage_att:
+        base_critdamage = base_critdamage_att
+    else:
+        base_critdamage = base_critdamage_hp
 
     origin_data = load_data.get_mitama_data(file_name, ignore_serial)
     print('Loading data finish')
@@ -155,8 +173,12 @@ def main():
     if damage_limit > 0:
         filter_result = cal.fit_damage_limit(filter_result, base_att,
                                              base_critdamage, damage_limit)
+    if hp_crit_limit > 0:
+        filter_result = cal.fit_hp_crit_limit(filter_result, base_hp,
+                                              base_critdamage, hp_crit_limit)
 
-    write_data.write_mitama_result(args.output_file, filter_result)
+    write_data.write_mitama_result(args.output_file, filter_result,
+                                   base_att, base_hp, base_critdamage)
 
 
 if __name__ == '__main__':
