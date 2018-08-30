@@ -104,7 +104,7 @@ def make_combination(mitama_data, mitama_type_limit={}, all_suit=True):
 def filter_loc_prop(data_list, prop_type, prop_min_value):
     def prop_value_le_min(mitama):
         mitama_info = mitama.values()[0]
-        if (mitama_info[prop_type] and
+        if (mitama_info.get(prop_type, 0) and
                 mitama_info[prop_type] >= prop_min_value):
             return True
         else:
@@ -179,7 +179,7 @@ def fit_prop_value(mitama_sum_data, prop_type, min_value, max_value):
 
         for mitama in mitama_comb:
             mitama_info = mitama.values()[0]
-            if mitama_info[prop_type]:
+            if mitama_info.get(prop_type, 0):
                 prop_value += mitama_info[prop_type]
 
         for m_type, m_count in mitama_type_count.items():
@@ -279,7 +279,7 @@ def sum_prop(mitama_comb, mitama_type_count):
 
         # 计算除套装外的总属性
         for prop_type in prop_type_list:
-            if mitama_info[prop_type]:
+            if mitama_info.get(prop_type, 0):
                 sum_result[prop_type] += mitama_info[prop_type]
 
     for m_type, m_count in mitama_type_count.items():

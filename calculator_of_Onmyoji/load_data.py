@@ -21,7 +21,34 @@ def _get_sheet_rows(filename, sheet_name):
         print(traceback.format_exc())
         raise
 
+
 def get_mitama_data_json(filename, ignore_serial):
+    with open(filename) as f:
+        data = json.load(f)
+
+    if isinstance(data, dict):
+        return load_json_from_editor(data, ignore_serial)
+    elif isinstance(data, list):
+        return load_json_from_ocr_editor(data, ignore_serial)
+    else:
+        print('Unsupport format')
+        raise TypeError
+
+
+def load_json_from_ocr_editor(data, ignore_serial):
+    '''从OCR录入器读取数据'''
+    mitama_data = dict()
+    serial = 1
+
+    for d in data:
+        mitama_data[serial] = d
+        serial += 1
+
+    return mitama_data
+
+
+def load_json_from_editor(data, ignore_serial):
+    '''从网页版御魂编辑器读取数据'''
     def mitama_json_to_dict(json_obj):
         MITAMA_COL_MAP = {u'御魂序号': u'id', u'御魂类型': u'name', u'位置': u'pos'}
         serial = json_obj[u'id']
@@ -40,14 +67,9 @@ def get_mitama_data_json(filename, ignore_serial):
 
         return (serial, mitama)
 
-    try:
-        with open(filename) as f:
-            data = json.load(f)
-        mitama_list = map(mitama_json_to_dict, data['data'])
-        return dict(filter(lambda x: x, mitama_list))
-    except Exception as e:
-        print("Error loading json file!")
-        return None
+    mitama_list = map(mitama_json_to_dict, data['data'])
+    return dict(filter(lambda x: x, mitama_list))
+
 
 def get_mitama_data_xls(filename, ignore_serial):
     rows_data = _get_sheet_rows(filename, sheet_name=u'御魂')
@@ -70,6 +92,7 @@ def get_mitama_data_xls(filename, ignore_serial):
         mitama_data[serial] = data
 
     return mitama_data
+
 
 def get_mitama_data(filename, ignore_serial):
     ext_name = os.path.splitext(filename)[1]
