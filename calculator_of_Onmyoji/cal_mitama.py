@@ -9,6 +9,9 @@ from calculator_of_Onmyoji import load_data
 from calculator_of_Onmyoji import write_data
 
 
+ENCODINGS = ['gbk', 'big5', 'cp932']
+
+
 def str2bool(v):
     if v.lower() in ('yes', 'true', 't', 'y', '1'):
         return True
@@ -83,13 +86,24 @@ parser.add_argument("-HL", "--health-limit",
                          u'基础暴伤为150，生命*暴伤>=60000')
 
 
+def win_decode(utf_str):
+    for encoding in ENCODINGS:
+        try:
+            uni_str = utf_str.decode(encoding)
+            break
+        except UnicodeDecodeError:
+            pass
+    else:
+        print('Decode failed %s' % utf_str)
+        raise UnicodeDecodeError
+
+    return uni_str
+
+
 def sep_utf_str(utf_str):
     # solve problem with get utf8 args from shell
     if sysstr == 'Windows':
-        try:
-            uni_str = utf_str.decode('gbk')
-        except UnicodeDecodeError:
-            uni_str = utf_str.decode('big5')
+        uni_str = win_decode(utf_str)
     else:
         uni_str = utf_str.decode('utf8')
     if ',' in uni_str:
@@ -103,10 +117,7 @@ def sep_utf_str_to_dict(utf_str):
         return dict()
 
     if sysstr == 'Windows':
-        try:
-            uni_str = utf_str.decode('gbk')
-        except UnicodeDecodeError:
-            uni_str = utf_str.decode('big5')
+        uni_str = win_decode(utf_str)
     else:
         uni_str = utf_str.decode('utf8')
     limit_list = uni_str.split('.')
