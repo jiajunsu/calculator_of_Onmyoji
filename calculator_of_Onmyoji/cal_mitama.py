@@ -2,7 +2,6 @@
 # coding: utf-8
 
 import argparse
-import locale
 import platform
 
 from calculator_of_Onmyoji import cal_and_filter as cal
@@ -20,8 +19,6 @@ def str2bool(v):
 
 
 sysstr = platform.system()
-encoding = locale.getpreferredencoding()
-
 parser = argparse.ArgumentParser()
 parser.add_argument("source_data",
                     type=str,
@@ -90,10 +87,9 @@ def sep_utf_str(utf_str):
     # solve problem with get utf8 args from shell
     if sysstr == 'Windows':
         try:
-            uni_str = utf_str.decode(encoding)
+            uni_str = utf_str.decode('gbk')
         except UnicodeDecodeError:
-            print('Error in decode %s' % utf_str)
-            raise
+            uni_str = utf_str.decode('big5')
     else:
         uni_str = utf_str.decode('utf8')
     if ',' in uni_str:
@@ -108,10 +104,9 @@ def sep_utf_str_to_dict(utf_str):
 
     if sysstr == 'Windows':
         try:
-            uni_str = utf_str.decode(encoding)
+            uni_str = utf_str.decode('gbk')
         except UnicodeDecodeError:
-            print('Error in decode %s' % utf_str)
-            raise
+            uni_str = utf_str.decode('big5')
     else:
         uni_str = utf_str.decode('utf8')
     limit_list = uni_str.split('.')
@@ -127,7 +122,6 @@ def sep_utf_str_to_dict(utf_str):
 def main():
     args = parser.parse_args()
     print('Input args: %s' % args)
-    print('System encoding=%s' % encoding)
 
     file_name = args.source_data
 
