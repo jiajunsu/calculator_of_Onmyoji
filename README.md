@@ -60,6 +60,13 @@ optional arguments:
                         输出文件位置，格式为pathto/filename.xls
 ```
 
+## Usage of mitama json converter
+
+```
+usage: make sure json files are in the same directory with convert_json2xls.py
+
+python convert_json2xls.py
+
 ## Test Command
 ```python calculator_of_Onmyoji/cal_mitama.py example/data_Template.xls data/result.xls -M 针女,4 -P 暴击,90```
 
