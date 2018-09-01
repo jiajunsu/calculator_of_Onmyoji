@@ -104,7 +104,7 @@ def make_combination(mitama_data, mitama_type_limit={}, all_suit=True):
 def filter_loc_prop(data_list, prop_type, prop_min_value):
     def prop_value_le_min(mitama):
         mitama_info = mitama.values()[0]
-        if (mitama_info[prop_type] and
+        if (mitama_info.get(prop_type, 0) and
                 mitama_info[prop_type] >= prop_min_value):
             return True
         else:
@@ -179,7 +179,7 @@ def fit_prop_value(mitama_sum_data, prop_type, min_value, max_value):
 
         for mitama in mitama_comb:
             mitama_info = mitama.values()[0]
-            if mitama_info[prop_type]:
+            if mitama_info.get(prop_type, 0):
                 prop_value += mitama_info[prop_type]
 
         for m_type, m_count in mitama_type_count.items():
@@ -208,12 +208,22 @@ def cal_total_damage(mitama_comb, base_att, base_critdamage):
         float: total_damage
     """
     sum_data = mitama_comb['sum']
-    datt = float(sum_data[u'攻击'] if sum_data[u'攻击'] else 0)
-    dattp = float(sum_data[u'攻击加成'] if sum_data[u'攻击加成'] else 0)
-    dcritdamage = float(sum_data[u'暴击伤害'] if sum_data[u'暴击伤害'] else 0)
-    total_damage = ((base_att * (1 + dattp / 100) + datt) *
-                    (base_critdamage + dcritdamage) / 100)
+    m_att = float(sum_data[u'攻击'] if sum_data[u'攻击'] else 0)
+    m_att_en = float(sum_data[u'攻击加成'] if sum_data[u'攻击加成'] else 0)
+    m_critdamage = float(sum_data[u'暴击伤害'] if sum_data[u'暴击伤害'] else 0)
+    total_damage = ((base_att * (1 + m_att_en / 100) + m_att) *
+                    (base_critdamage + m_critdamage) / 100)
     return total_damage
+
+
+def cal_hp_crit(mitama_comb, base_hp, base_critdamage):
+    sum_data = mitama_comb['sum']
+    m_hp = float(sum_data[u'生命'] if sum_data[u'生命'] else 0)
+    m_hp_en = float(sum_data[u'生命加成'] if sum_data[u'生命加成'] else 0)
+    m_critdamage = float(sum_data[u'暴击伤害'] if sum_data[u'暴击伤害'] else 0)
+    total_hp_crit = ((base_hp * (1 + m_hp_en / 100) + m_hp) *
+                     (base_critdamage + m_critdamage) / 100)
+    return total_hp_crit
 
 
 def fit_damage_limit(mitama_comb_list, base_att, base_critdamage,
@@ -222,6 +232,14 @@ def fit_damage_limit(mitama_comb_list, base_att, base_critdamage,
                              lambda x: cal_total_damage(x, base_att,
                                                         base_critdamage) >=
                              damage_limit)
+
+
+def fit_hp_crit_limit(mitama_comb_list, base_hp, base_critdamage,
+                      hp_crit_limit):
+    return fit_mitama_lambda(mitama_comb_list,
+                             lambda x: cal_hp_crit(x, base_hp,
+                                                   base_critdamage) >=
+                             hp_crit_limit)
 
 
 def fit_mitama_lambda(mitama_comb_list, filter_func):
@@ -261,7 +279,7 @@ def sum_prop(mitama_comb, mitama_type_count):
 
         # 计算除套装外的总属性
         for prop_type in prop_type_list:
-            if mitama_info[prop_type]:
+            if mitama_info.get(prop_type, 0):
                 sum_result[prop_type] += mitama_info[prop_type]
 
     for m_type, m_count in mitama_type_count.items():

@@ -72,6 +72,11 @@ def generate_mitama_list(acc_id, filename,
             mitama_pos = str(mitama_info['pos'])
             mitama_name = mitama_info['name']
             mitama_attrs = dict()
+            # 获取首领御魂独立属性
+            single_prop = mitama_info.get('single_attr')
+            if single_prop:
+                mitama_attrs[single_prop[0]] = int(
+                    single_prop[1].replace('%', ''))
             for prop, value in mitama_info['attrs']:
                 value = int(value.replace('%', ''))
                 if prop not in mitama_attrs:
