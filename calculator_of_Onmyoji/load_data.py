@@ -129,8 +129,8 @@ def sep_mitama_by_loc(mitama_data):
 
     for d_k, d_v in mitama_data.items():
         loc = int(d_v[u'位置'])
-        if loc not in range(1, 6):
-            print('Mitama location must be 1 to 6, please check you data.')
+        if loc not in mitama_loc_data:
+            print('Mitama location must be 1 to 6, please check your data.')
         mitama_loc_data[loc].append({d_k: d_v})
 
     return mitama_loc_data
