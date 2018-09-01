@@ -70,8 +70,11 @@ def write_mitama_result(filename, comb_data_list,
 def write_header_row(worksheet, sheet_type):
     if sheet_type == 'result':
         header_row = data_format.OUTPUT_HEADER + data_format.EXTEND_HEADER
-    else:
+    elif sheet_type == 'detail':
         header_row = data_format.OUTPUT_HEADER
+    else:
+        header_row = data_format.MITAMA_COL_NAME_ZH
+
     col_nums = len(header_row)
     for c in range(col_nums):
         worksheet.write(0, c, label=header_row[c])
@@ -129,3 +132,19 @@ def write_extend_col(worksheet, row_num, base_att, base_hp, base_critdamage):
                                           base_crit_damage_col_name,
                                           mitama_crit_damage_col_name)
     worksheet.write(row_num, start_col+6, xlwt.Formula(formula_hp_crit))
+
+
+def write_original_mitama_data(filename, data):
+    workbook = xlwt.Workbook(encoding='utf-8')
+
+    data_sheet = workbook.add_sheet(u'御魂')
+    write_header_row(data_sheet, 'data')
+    row = 1
+
+    for serial, prop in data.iteritems():
+        data_sheet.write(row, 0, label=serial)
+        write_mitama_row(data_sheet, prop, row, 1,
+                         header_key=data_format.MITAMA_COL_NAME_ZH)
+        row += 1
+
+    workbook.save(filename)
