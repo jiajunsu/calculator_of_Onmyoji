@@ -39,8 +39,11 @@ def load_json_from_ocr_editor(data, ignore_serial):
     '''从OCR录入器读取数据'''
     mitama_data = dict()
     serial = 1
+    percent = [u'攻击加成', u'防御加成', u'暴击', u'暴击伤害', u'生命加成', u'效果命中', u'效果抵抗']
 
     for d in data:
+        for p in percent:
+            d[p] = d[p] * 100
         mitama_data[serial] = d
         serial += 1
 
