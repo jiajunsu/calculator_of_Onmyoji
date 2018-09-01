@@ -4,8 +4,8 @@
 import os
 import sys
 
-import load_data
-import write_data
+from calculator_of_Onmyoji import load_data
+from calculator_of_Onmyoji import write_data
 
 
 def get_json_files():
