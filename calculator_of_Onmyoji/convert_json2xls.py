@@ -17,7 +17,7 @@ def get_json_files():
         if os.path.isfile(file_path):
             _, file_extension = os.path.splitext(file_path)
 
-            if file_extension == 'json':
+            if file_extension == '.json':
                 json_files.append(file_path)
 
     return json_files

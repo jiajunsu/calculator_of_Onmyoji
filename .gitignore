@@ -106,6 +106,5 @@ venv.bak/
 .mypy_cache/
 
 data/
-example/
 *.tar.gz
 *.xls
