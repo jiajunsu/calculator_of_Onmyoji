@@ -96,7 +96,10 @@ def get_mitama_data_xls(filename, ignore_serial):
             prop_name = data_format.MITAMA_COL_NAME_ZH[i]
             data[prop_name] = float(r_data[i].value) if r_data[i].value else 0
 
-        mitama_data[serial] = data
+        if serial in mitama_data:
+            print('Mitama serial must be unique %s' % serial)
+            raise ValueError
+        mitama_data.setdefault(serial, data)
 
     return mitama_data
 
