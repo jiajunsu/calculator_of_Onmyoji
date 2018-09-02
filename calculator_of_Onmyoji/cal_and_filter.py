@@ -98,7 +98,7 @@ def make_combination(mitama_data, mitama_type_limit={}, all_suit=True):
                 res.append(itertools.product(*mitama_grp.values()))
 
         print("Total combinations: {}".format(total_comb))
-        return itertools.chain(*res)
+        return itertools.chain(*res), total_comb
 
 
 def filter_loc_prop(data_list, prop_type, prop_min_value):
@@ -114,10 +114,11 @@ def filter_loc_prop(data_list, prop_type, prop_min_value):
 
 
 def filter_mitama(mitama_comb_list, mitama_type_limit,
-                  prop_limit, upper_prop_limit, all_suit=True):
+                  prop_limit, upper_prop_limit, total_comb,
+                  all_suit=True):
 
-    mitama_sum_data = fit_mitama_type(mitama_comb_list,
-                                      mitama_type_limit, all_suit)
+    mitama_sum_data = fit_mitama_type(mitama_comb_list, mitama_type_limit,
+                                      total_comb, all_suit)
 
     for prop_type, prop_min_value in prop_limit.items():
         if prop_type in upper_prop_limit:
@@ -136,8 +137,14 @@ def filter_mitama(mitama_comb_list, mitama_type_limit,
     return comb_data_list
 
 
-def fit_mitama_type(mitama_comb_list, mitama_type_limit, all_suit):
+def fit_mitama_type(mitama_comb_list, mitama_type_limit, total_comb,
+                    all_suit):
+    calculated_count = 0
+    printed_rate = 0
+
     for mitama_comb in mitama_comb_list:
+        calculated_count += 1
+
         mitama_type_count = {}
         for mitama in mitama_comb:
             mitama_info = mitama.values()[0]
@@ -166,6 +173,13 @@ def fit_mitama_type(mitama_comb_list, mitama_type_limit, all_suit):
 
         comb_data = {'sum': {u'御魂计数': mitama_type_count},
                      'info': mitama_comb}
+
+        # TODO(jjs): impl cal rate print to decorator
+        cal_rate = int(calculated_count * 100.0 / total_comb)
+        if cal_rate > printed_rate and cal_rate % 5 == 0:
+            print('Calculating rate %s%%' % cal_rate)
+            printed_rate = cal_rate
+
         yield comb_data
 
 

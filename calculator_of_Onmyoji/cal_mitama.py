@@ -172,13 +172,15 @@ def main():
                                      l4_prop, int(l4_prop_value),
                                      l6_prop, int(l6_prop_value))
 
-    mitama_comb = cal.make_combination(locate_sep_data,
-                                       mitama_type_limit, args.all_suit)
+    mitama_comb, total_comb = cal.make_combination(locate_sep_data,
+                                                   mitama_type_limit,
+                                                   args.all_suit)
 
     filter_result = cal.filter_mitama(mitama_comb,
                                       mitama_type_limit,
                                       prop_limit,
                                       upper_prop_limit,
+                                      total_comb,
                                       all_suit=args.all_suit)
 
     if damage_limit > 0:
