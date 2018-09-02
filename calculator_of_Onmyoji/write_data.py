@@ -32,37 +32,41 @@ def write_mitama_result(filename, comb_data_list,
         if result_sheet_num > 2:
             print('Too many results, please enhance restrictive condition.')
             break
-        result_num += 1
-        # first row of each comb_data is sum info
-        sum_data = comb_data.get('sum', {})
-        # first colume of a mitama_comb is serial number
-        result_sheet.write(result_row, 0, label=serial_num)
-        result_sheet.write(result_row, 2, label=u'sum')
-        write_mitama_row(result_sheet, sum_data, result_row, start_col=4)
-        write_extend_col(result_sheet, result_row, base_att, base_hp,
-                         base_critdamage)
-        result_row += 1
-        if result_row > MAX_ROW:
-            result_sheet = workbook.add_sheet(u'result_%s' % result_sheet_num)
-            write_header_row(result_sheet, 'result')
-            result_sheet_num += 1
-            result_row = 1
+        try:
+            result_num += 1
+            # first row of each comb_data is sum info
+            sum_data = comb_data.get('sum', {})
+            # first colume of a mitama_comb is serial number
+            result_sheet.write(result_row, 0, label=serial_num)
+            result_sheet.write(result_row, 2, label=u'sum')
+            write_mitama_row(result_sheet, sum_data, result_row, start_col=4)
+            write_extend_col(result_sheet, result_row, base_att, base_hp,
+                             base_critdamage)
+            result_row += 1
+            if result_row > MAX_ROW:
+                result_sheet = workbook.add_sheet(u'result_%s' % result_sheet_num)
+                write_header_row(result_sheet, 'result')
+                result_sheet_num += 1
+                result_row = 1
 
-        # write each mitama data into detail file
-        mitama_data = comb_data.get('info', set())
-        for mitama in mitama_data:
-            mitama_serial = mitama.keys()[0]
-            mitama_prop = mitama[mitama_serial]
-            detail_sheet.write(detail_row, 0, label=serial_num)
-            detail_sheet.write(detail_row, 1, label=mitama_serial)
-            write_mitama_row(detail_sheet, mitama_prop,
-                             detail_row, start_col=2)
-            detail_row += 1
-        if detail_row > MAX_ROW:
-            detail_sheet = workbook.add_sheet('detail_%s' % detail_sheet_num)
-            write_header_row(detail_sheet, 'detail')
-            detail_sheet_num += 1
-            detail_row = 1
+            # write each mitama data into detail file
+            mitama_data = comb_data.get('info', set())
+            for mitama in mitama_data:
+                mitama_serial = mitama.keys()[0]
+                mitama_prop = mitama[mitama_serial]
+                detail_sheet.write(detail_row, 0, label=serial_num)
+                detail_sheet.write(detail_row, 1, label=mitama_serial)
+                write_mitama_row(detail_sheet, mitama_prop,
+                                 detail_row, start_col=2)
+                detail_row += 1
+            if detail_row > MAX_ROW:
+                detail_sheet = workbook.add_sheet('detail_%s' % detail_sheet_num)
+                write_header_row(detail_sheet, 'detail')
+                detail_sheet_num += 1
+                detail_row = 1
+        except KeyboardInterrupt:
+            print('\nRecieve SIGINT, stop.')
+            break
 
         serial_num += 1
 
