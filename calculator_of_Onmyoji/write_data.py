@@ -28,11 +28,13 @@ def write_mitama_result(filename, comb_data_list,
     result_row = 1
     detail_row = 1
     serial_num = 1
-    for comb_data in comb_data_list:
-        if result_sheet_num > 2:
-            print('Too many results, please enhance restrictive condition.')
-            break
-        try:
+    try:
+        for comb_data in comb_data_list:
+            if result_sheet_num > 2:
+                print('Too many results, please enhance restrictive'
+                      'condition.')
+                break
+
             result_num += 1
             # first row of each comb_data is sum info
             sum_data = comb_data.get('sum', {})
@@ -64,11 +66,10 @@ def write_mitama_result(filename, comb_data_list,
                 write_header_row(detail_sheet, 'detail')
                 detail_sheet_num += 1
                 detail_row = 1
-        except KeyboardInterrupt:
-            print('\nRecieve SIGINT, stop.')
-            break
 
-        serial_num += 1
+            serial_num += 1
+    except KeyboardInterrupt:
+        print('\nRecieve SIGINT, stop.')
 
     workbook.save(filename)
     print("We got %s results" % result_num)
