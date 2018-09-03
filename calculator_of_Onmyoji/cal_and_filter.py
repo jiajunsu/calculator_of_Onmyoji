@@ -141,6 +141,7 @@ def fit_mitama_type(mitama_comb_list, mitama_type_limit, total_comb,
                     all_suit):
     calculated_count = 0
     printed_rate = 0
+    sys.stdout.flush()
 
     for mitama_comb in mitama_comb_list:
         calculated_count += 1
@@ -174,10 +175,11 @@ def fit_mitama_type(mitama_comb_list, mitama_type_limit, total_comb,
         comb_data = {'sum': {u'御魂计数': mitama_type_count},
                      'info': mitama_comb}
 
-        # TODO(jjs): impl cal rate print to decorator
+        # print cal rate in real time
         cal_rate = int(calculated_count * 100.0 / total_comb)
         if cal_rate > printed_rate and cal_rate % 5 == 0:
             print('Calculating rate %s%%' % cal_rate)
+            sys.stdout.flush()
             printed_rate = cal_rate
 
         yield comb_data
