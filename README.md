@@ -66,6 +66,7 @@ optional arguments:
 usage: make sure json files are in the same directory with convert_json2xls.py
 
 python convert_json2xls.py
+```
 
 ## Test Command
 ```python calculator_of_Onmyoji/cal_mitama.py example/data_Template.xls data/result.xls -M 针女,4 -P 暴击,90```
