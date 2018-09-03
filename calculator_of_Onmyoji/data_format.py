@@ -63,3 +63,6 @@ MITAMA_ENHANCE = {u"珍珠": {u"加成类型": u"防御加成", u"加成数值":
                   u"地震鲶": {u"加成类型": u"", u"加成数值": 0},
                   u"蜃气楼": {u"加成类型": u"", u"加成数值": 0},
                   }
+
+ATTACK_MITAMA_TYPE = [t for t, e in MITAMA_ENHANCE.items()
+                      if e[u'加成类型'] in ['', u'攻击加成', u'暴击']]

@@ -6,28 +6,35 @@ import sys
 from calculator_of_Onmyoji import data_format
 
 
-def filter_loc(data_dict,
-               l2_prop, l2_value,
-               l4_prop, l4_value,
-               l6_prop, l6_value):
+def filter_loc_and_type(data_dict,
+                        l2_prop, l2_value,
+                        l4_prop, l4_value,
+                        l6_prop, l6_value,
+                        attack_only):
     if len(data_dict) != 6:
         raise KeyError("combination dict source must have 6 keys")
 
-    d1, d2, d3, d4, d5, d6 = data_dict.values()
-    print('mitama nums by loc is %s %s %s %s %s %s' % (len(d1), len(d2),
-                                                       len(d3), len(d4),
-                                                       len(d5), len(d6)))
-    if l2_prop:
-        d2 = filter_loc_prop(d2, l2_prop, l2_value)
-    if l4_prop:
-        d4 = filter_loc_prop(d4, l4_prop, l4_value)
-    if l6_prop:
-        d6 = filter_loc_prop(d6, l6_prop, l6_value)
+    print('mitama nums by loc is %s'
+          % str([len(d) for d in data_dict.values()]))
 
-    print('after filter by loc prop %s %s %s %s %s %s' % (len(d1), len(d2),
-                                                          len(d3), len(d4),
-                                                          len(d5), len(d6)))
-    return dict(zip(range(1, 7), [d1, d2, d3, d4, d5, d6]))
+    if attack_only:
+        # 只计算输出类御魂
+        for loc, data in data_dict.iteritems():
+            data_dict[loc] = filter_mitama_type(data,
+                                                data_format.ATTACK_MITAMA_TYPE)
+
+    if l2_prop:
+        data_dict[2] = filter_loc_prop(data_dict[2], l2_prop, l2_value)
+    if l4_prop:
+        data_dict[4] = filter_loc_prop(data_dict[4], l4_prop, l4_value)
+    if l6_prop:
+        data_dict[6] = filter_loc_prop(data_dict[6], l6_prop, l6_value)
+
+
+    print('after filter by loc prop and type %s'
+          % str([len(d) for d in data_dict.values()]))
+
+    return dict(zip(range(1, 7), [d for d in data_dict.values()]))
 
 
 def make_combination(mitama_data, mitama_type_limit={}, all_suit=True):
@@ -111,6 +118,17 @@ def filter_loc_prop(data_list, prop_type, prop_min_value):
             return False
 
     return filter(prop_value_le_min, data_list)
+
+
+def filter_mitama_type(data_list, mitama_type_list):
+    def mitama_type_in_list(mitama):
+        mitama_info = mitama.values()[0]
+        if mitama_info.get(u'御魂类型', '') in mitama_type_list:
+            return True
+        else:
+            return False
+
+    return filter(mitama_type_in_list, data_list)
 
 
 def filter_mitama(mitama_comb_list, mitama_type_limit,
