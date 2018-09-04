@@ -84,6 +84,12 @@ parser.add_argument("-HL", "--health-limit",
                     help=u'基础生命,基础暴伤,期望的生命*暴伤，'
                          u'例如"-HL 8000,150,60000"，当基础生命为8000，'
                          u'基础暴伤为150，生命*暴伤>=60000')
+parser.add_argument("-AO", "--attack-only",
+                    type=str2bool,
+                    default=False,
+                    help=u'是否只计算输出类御魂，默认为False。'
+                         u'"-AO True"为只计算套装属性为攻击加成、'
+                         u'暴击和首领御魂的套装组合')
 
 
 def win_decode(utf_str):
@@ -167,18 +173,21 @@ def main():
     locate_sep_data = load_data.sep_mitama_by_loc(origin_data)
 
     print('Start calculating')
-    locate_sep_data = cal.filter_loc(locate_sep_data,
-                                     l2_prop, int(l2_prop_value),
-                                     l4_prop, int(l4_prop_value),
-                                     l6_prop, int(l6_prop_value))
+    locate_sep_data = cal.filter_loc_and_type(locate_sep_data,
+                                              l2_prop, int(l2_prop_value),
+                                              l4_prop, int(l4_prop_value),
+                                              l6_prop, int(l6_prop_value),
+                                              args.attack_only)
 
-    mitama_comb = cal.make_combination(locate_sep_data,
-                                       mitama_type_limit, args.all_suit)
+    mitama_comb, total_comb = cal.make_combination(locate_sep_data,
+                                                   mitama_type_limit,
+                                                   args.all_suit)
 
     filter_result = cal.filter_mitama(mitama_comb,
                                       mitama_type_limit,
                                       prop_limit,
                                       upper_prop_limit,
+                                      total_comb,
                                       all_suit=args.all_suit)
 
     if damage_limit > 0:

@@ -39,8 +39,14 @@ def load_json_from_ocr_editor(data, ignore_serial):
     '''从OCR录入器读取数据'''
     mitama_data = dict()
     serial = 1
+    percent = [u'攻击加成', u'防御加成', u'暴击', u'暴击伤害',
+               u'生命加成', u'效果命中', u'效果抵抗']
 
     for d in data:
+        # 百分比类数据乘100
+        for p in d:
+            if p in percent:
+                d[p] *= 100
         mitama_data[serial] = d
         serial += 1
 
@@ -50,7 +56,8 @@ def load_json_from_ocr_editor(data, ignore_serial):
 def load_json_from_editor(data, ignore_serial):
     '''从网页版御魂编辑器读取数据'''
     def mitama_json_to_dict(json_obj):
-        MITAMA_COL_MAP = {u'御魂序号': u'id', u'御魂类型': u'name', u'位置': u'pos'}
+        MITAMA_COL_MAP = {u'御魂序号': u'id', u'御魂类型': u'name',
+                          u'位置': u'pos'}
         serial = json_obj[u'id']
         if skip_serial(serial, ignore_serial):
             return None
@@ -89,7 +96,10 @@ def get_mitama_data_xls(filename, ignore_serial):
             prop_name = data_format.MITAMA_COL_NAME_ZH[i]
             data[prop_name] = float(r_data[i].value) if r_data[i].value else 0
 
-        mitama_data[serial] = data
+        if serial in mitama_data:
+            print('Mitama serial must be unique %s' % serial)
+            raise ValueError
+        mitama_data.setdefault(serial, data)
 
     return mitama_data
 
@@ -119,6 +129,8 @@ def sep_mitama_by_loc(mitama_data):
 
     for d_k, d_v in mitama_data.items():
         loc = d_v[u'位置']
+        if loc not in mitama_loc_data:
+            print('Mitama location must be 1 to 6, please check your data.')
         mitama_loc_data[loc].append({d_k: d_v})
 
     return mitama_loc_data

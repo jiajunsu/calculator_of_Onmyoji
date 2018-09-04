@@ -9,7 +9,7 @@ usage: cal_mitama.py [-h] [-M MITAMA_SUIT] [-P PROP_LIMIT]
                      [-UP UPPER_PROP_LIMIT] [-2P SEC_PROP_VALUE]
                      [-4P FTH_PROP_VALUE] [-6P STH_PROP_VALUE]
                      [-IG IGNORE_SERIAL] [-AS ALL_SUIT] [-DL DAMAGE_LIMIT]
-                     [-HL HEALTH_LIMIT]
+                     [-HL HEALTH_LIMIT] [-AO ATTACK_ONLY]
                      source_data output_file
 
 positional arguments:
@@ -43,6 +43,9 @@ optional arguments:
   -HL HEALTH_LIMIT, --health-limit HEALTH_LIMIT
                         基础生命,基础暴伤,期望的生命*暴伤，例如"-HL
                         8000,150,60000"，当基础生命为8000，基础暴伤为150，生命*暴伤>=60000
+  -AO ATTACK_ONLY, --attack-only ATTACK_ONLY
+                        是否只计算输出类御魂，默认为False。"-AO
+                        True"为只计算套装属性为攻击加成、暴击和首领御魂的套装组合
 
 ```
 
@@ -58,6 +61,14 @@ optional arguments:
   -h, --help            show this help message and exit
   -O OUTPUT_FILE, --output-file OUTPUT_FILE
                         输出文件位置，格式为pathto/filename.xls
+```
+
+## Usage of mitama json converter
+
+```
+usage: make sure json files are in the same directory with convert_json2xls.py
+
+python convert_json2xls.py
 ```
 
 ## Test Command
