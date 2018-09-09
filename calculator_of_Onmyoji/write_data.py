@@ -56,7 +56,7 @@ def write_mitama_result(filename, comb_data_list,
             serial_keys = []
             for mitama in mitama_data:
                 mitama_serial = mitama.keys()[0]
-                serial_keys.append(str(mitama_serial))
+                serial_keys.append(unicode(mitama_serial))
                 mitama_prop = mitama[mitama_serial]
                 detail_sheet.write(detail_row, 0, label=serial_num)
                 detail_sheet.write(detail_row, 1, label=mitama_serial)
