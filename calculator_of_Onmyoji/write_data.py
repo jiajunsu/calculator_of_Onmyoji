@@ -53,14 +53,21 @@ def write_mitama_result(filename, comb_data_list,
 
             # write each mitama data into detail file
             mitama_data = comb_data.get('info', set())
+            serial_keys = []
             for mitama in mitama_data:
                 mitama_serial = mitama.keys()[0]
+                serial_keys.append(unicode(mitama_serial))
                 mitama_prop = mitama[mitama_serial]
                 detail_sheet.write(detail_row, 0, label=serial_num)
                 detail_sheet.write(detail_row, 1, label=mitama_serial)
                 write_mitama_row(detail_sheet, mitama_prop,
                                  detail_row, start_col=2)
                 detail_row += 1
+
+            # mimata serial in result sheet is the comb of mitama_data serials
+            str_serial_keys = ','.join(serial_keys)
+            result_sheet.write(result_row-1, 1, label=str_serial_keys)
+
             if detail_row > MAX_ROW:
                 detail_sheet = workbook.add_sheet('detail_%s' % detail_sheet_num)
                 write_header_row(detail_sheet, 'detail')

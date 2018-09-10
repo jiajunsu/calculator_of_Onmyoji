@@ -56,7 +56,7 @@ def make_combination(mitama_data, mitama_type_limit={}, all_suit=True):
     if not main_type:
         total_comb = reduce(lambda x, y: x*y, map(len, mitama_data.values()))
         print("Total combinations: {}".format(total_comb))
-        return itertools.product(*mitama_data.values())
+        return itertools.product(*mitama_data.values()), total_comb
     else:
         # separate the main type mitamas and all other mitamas
         main_mitama = dict(zip(range(1, 7), [None]*6))

@@ -117,8 +117,12 @@ def get_mitama_data(filename, ignore_serial):
 
 
 def skip_serial(serial, ignore_list):
+    if not ignore_list:
+        return False
+
+    serial = unicode(serial)
     for ig in ignore_list:
-        if ig and isinstance(serial, (str, unicode)) and ig in serial:
+        if ig and ig in serial:
             return True
     return False
 
