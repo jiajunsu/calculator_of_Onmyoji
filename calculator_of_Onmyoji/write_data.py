@@ -7,19 +7,17 @@ import xlwt
 import data_format
 
 
-MAX_ROW = 60000
+MAX_ROW = 65500
 
 
 def write_mitama_result(filename, comb_data_list,
                         base_att=0, base_hp=0, base_critdamage=0):
     workbook = xlwt.Workbook(encoding='utf-8')
     result_num = 0
-    result_sheet_num = 0
     detail_sheet_num = 0
 
-    result_sheet = workbook.add_sheet('result_%s' % result_sheet_num)
+    result_sheet = workbook.add_sheet('result')
     detail_sheet = workbook.add_sheet('detail_%s' % detail_sheet_num)
-    result_sheet_num += 1
     detail_sheet_num += 1
 
     write_header_row(result_sheet, 'result')
@@ -30,7 +28,7 @@ def write_mitama_result(filename, comb_data_list,
     serial_num = 1
     try:
         for comb_data in comb_data_list:
-            if result_sheet_num > 2:
+            if result_row > MAX_ROW:
                 print('Too many results, please enhance restrictive'
                       'condition.')
                 break
@@ -45,11 +43,6 @@ def write_mitama_result(filename, comb_data_list,
             write_extend_col(result_sheet, result_row, base_att, base_hp,
                              base_critdamage)
             result_row += 1
-            if result_row > MAX_ROW:
-                result_sheet = workbook.add_sheet(u'result_%s' % result_sheet_num)
-                write_header_row(result_sheet, 'result')
-                result_sheet_num += 1
-                result_row = 1
 
             # write each mitama data into detail file
             mitama_data = comb_data.get('info', set())
