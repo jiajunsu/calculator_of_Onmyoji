@@ -7,7 +7,7 @@ import xlwt
 import data_format
 
 
-MAX_ROW = 65500
+MAX_ROW = 65532  # divided by 6 for each result is a combination of 6 details
 
 
 def write_mitama_result(filename, comb_data_list,
