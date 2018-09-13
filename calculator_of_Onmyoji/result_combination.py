@@ -7,7 +7,7 @@ import xlwt
 
 
 def load_result(filename):
-    xls_book = xlrd.open_workbook(filename=filename)
+    xls_book = xlrd.open_workbook(filename=filename, on_demand=True)
     data_sheet = xls_book.sheet_by_name('result')
     rows_data = data_sheet.get_rows()
 
@@ -33,7 +33,13 @@ def write_independent_comb_result(filename, independet_combs):
 
 
 def sort_mitama_combs(mitama_combs, sort_key=u'攻击x暴伤'):
-    pass
+    def cmp_key(comb1, comb2):
+        if comb1.get(sort_key, 0) >= comb2.get(sort_key, 0):
+            return True
+        else:
+            return False
+
+    mitama_combs.sort(cmp=cmp_key)
 
 
 def search_independent_combs(mitama_combs):
@@ -43,4 +49,6 @@ def search_independent_combs(mitama_combs):
 if __name__ == '__main__':
     import sys
 
-    load_result(sys.argv[1])
+    mitama_combs = load_result(sys.argv[1])
+    sort_mitama_combs(mitama_combs)
+    print(mitama_combs)
