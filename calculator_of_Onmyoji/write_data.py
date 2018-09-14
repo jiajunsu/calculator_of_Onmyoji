@@ -77,9 +77,9 @@ def write_mitama_result(filename, comb_data_list,
 
 def write_header_row(worksheet, sheet_type):
     if sheet_type == 'result':
-        header_row = data_format.OUTPUT_HEADER + data_format.EXTEND_HEADER
+        header_row = data_format.RESULT_HEADER + data_format.EXTEND_HEADER
     elif sheet_type == 'detail':
-        header_row = data_format.OUTPUT_HEADER
+        header_row = data_format.RESULT_HEADER
     else:
         header_row = data_format.MITAMA_COL_NAME_ZH
 
@@ -89,7 +89,7 @@ def write_header_row(worksheet, sheet_type):
 
 
 def write_mitama_row(worksheet, comb_prop, row_num, start_col,
-                     header_key=data_format.OUTPUT_HEADER):
+                     header_key=data_format.RESULT_HEADER):
 
     for col in range(start_col, len(header_key)):
         cell_data = comb_prop.get(header_key[col])
@@ -97,7 +97,7 @@ def write_mitama_row(worksheet, comb_prop, row_num, start_col,
 
 
 def write_extend_col(worksheet, row_num, base_att, base_hp, base_critdamage):
-    start_col = len(data_format.OUTPUT_HEADER)
+    start_col = len(data_format.RESULT_HEADER)
     str_row_num = str(row_num + 1)  # excel行名称编号比行号大1
     # TODO(victor): improve the code style
     # LIMIT: u'式神基础攻击', u'式神基础生命', u'式神基础暴伤',
