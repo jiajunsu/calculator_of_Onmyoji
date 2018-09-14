@@ -42,8 +42,17 @@ def sort_mitama_combs(mitama_combs, sort_key=u'攻击x暴伤'):
     mitama_combs.sort(cmp=cmp_key)
 
 
-def search_independent_combs(mitama_combs):
-    pass
+def search_independent_comb(mitama_combs):
+    used_mitama = []
+    independent_comb = []
+    for combs_data in mitama_combs:
+        mitama_serials = combs_data.get(u'御魂序号', '').split(',')
+        if not (set(used_mitama) & set(mitama_serials)):
+            # 无重复御魂，即为独立组合
+            independent_comb.append(combs_data)
+            used_mitama.extend(mitama_serials)
+
+    return independent_comb
 
 
 if __name__ == '__main__':
