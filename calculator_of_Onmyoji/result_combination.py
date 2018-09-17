@@ -49,9 +49,29 @@ def search_independent_comb(mitama_combs):
         mitama_serials = combs_data.get(u'御魂序号', '').split(',')
         if not (set(used_mitama) & set(mitama_serials)):
             # 无重复御魂，即为独立组合
+            # Note: 第一个组合永远会加入
             independent_comb.append(combs_data)
             used_mitama.extend(mitama_serials)
 
+    return independent_comb
+
+
+def make_independent_comb(mitama_combs):
+    sort_mitama_combs(mitama_combs)
+
+    independent_comb_list = []
+    while mitama_combs:
+        # 以第一个组合为种子，计算所有的独立套装
+        independent_comb = search_independent_comb(mitama_combs)
+        if len(independent_comb) > 1:
+            result_comb_data = gen_result_comb_data(independent_comb)
+            independent_comb_list.append(result_comb_data)
+        mitama_combs.pop(0)
+    return independent_comb_list
+
+
+def gen_result_comb_data(independent_comb):
+    # TODO: to impl
     return independent_comb
 
 
@@ -59,5 +79,4 @@ if __name__ == '__main__':
     import sys
 
     mitama_combs = load_result(sys.argv[1])
-    sort_mitama_combs(mitama_combs)
-    print(mitama_combs)
+    print(make_independent_comb(mitama_combs))
