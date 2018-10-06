@@ -5,6 +5,8 @@ from xlutils.copy import copy
 import xlrd
 import xlwt
 
+from calculator_of_Onmyoji import load_data
+
 
 def load_result(filename):
     xls_book = xlrd.open_workbook(filename=filename, on_demand=True)
@@ -61,7 +63,7 @@ def make_independent_comb(mitama_combs):
 
     independent_comb_list = []
     while mitama_combs:
-        # 以第一个组合为种子，计算所有的独立套装
+        # 以第一个组合为基础，计算所有的独立套装
         independent_comb = search_independent_comb(mitama_combs)
         if len(independent_comb) > 1:
             result_comb_data = gen_result_comb_data(independent_comb)
@@ -76,7 +78,9 @@ def gen_result_comb_data(independent_comb):
 
 
 if __name__ == '__main__':
-    import sys
+    xls_files = load_data.get_ext_files('.xls')
+    result_files = [f for f in xls_files if '-result' in f]
 
-    mitama_combs = load_result(sys.argv[1])
-    print(make_independent_comb(mitama_combs))
+    for file_name in result_files:
+        mitama_combs = load_result(file_name)
+        print(make_independent_comb(mitama_combs))

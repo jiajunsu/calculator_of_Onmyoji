@@ -8,23 +8,8 @@ from calculator_of_Onmyoji import load_data
 from calculator_of_Onmyoji import write_data
 
 
-def get_json_files():
-    work_path = os.getcwd()
-    json_files = []
-
-    for f in os.listdir(work_path):
-        file_path = os.path.join(work_path, f)
-        if os.path.isfile(file_path):
-            _, file_extension = os.path.splitext(file_path)
-
-            if file_extension == '.json':
-                json_files.append(file_path)
-
-    return json_files
-
-
 if __name__ == '__main__':
-    json_files = get_json_files()
+    json_files = load_data.get_ext_files('.json')
     if not json_files:
         print('There is no json file in current directory, exit.')
         sys.exit(1)

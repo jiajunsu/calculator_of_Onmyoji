@@ -9,6 +9,21 @@ import xlrd
 from calculator_of_Onmyoji import data_format
 
 
+def get_ext_files(file_ext):
+    work_path = os.getcwd()
+    ext_files = []
+
+    for f in os.listdir(work_path):
+        file_path = os.path.join(work_path, f)
+        if os.path.isfile(file_path):
+            _, file_extension = os.path.splitext(file_path)
+
+            if file_extension == file_ext:
+                ext_files.append(file_path)
+
+    return ext_files
+
+
 def _get_sheet_rows(filename, sheet_name):
     if not os.path.exists(filename):
         raise IOError("File not exists %s" % filename)
