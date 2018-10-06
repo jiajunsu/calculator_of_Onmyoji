@@ -71,6 +71,16 @@ usage: make sure json files are in the same directory with convert_json2xls.py
 python convert_json2xls.py
 ```
 
+## Usage of result\_combination
+
+```
+Cal independent combinations of mitama_results
+
+usage: make sure files(*-result.xls) are in current directory
+
+python calculator_of_Onmyoji/result_combination.py
+```
+
 ## Test Command
 ```python calculator_of_Onmyoji/cal_mitama.py example/data_Template.xls result.xls -M 针女,4 -P 暴击,90```
 
