@@ -73,8 +73,19 @@ def make_independent_comb(mitama_combs):
 
 
 def gen_result_comb_data(independent_comb):
-    # TODO: to impl
-    return independent_comb
+    result_serials = []
+    attack_values = []
+
+    for comb_data in independent_comb:
+        result_serials.append(str(comb_data.get(u'组合序号', 0)))
+        attack_values.append(str(comb_data.get(u'攻击x暴伤', 0)))
+
+    result_comb_data = {
+                        u'组合个数': len(independent_comb),
+                        u'result序号': ','.join(result_serials),
+                        u'攻击x暴伤': ','.join(attack_values),
+                        }
+    return result_comb_data
 
 
 if __name__ == '__main__':
