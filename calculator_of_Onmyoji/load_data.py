@@ -1,8 +1,8 @@
 # coding: utf-8
 
+import json
 import os
 import traceback
-import json
 
 import xlrd
 
@@ -83,7 +83,8 @@ def load_json_from_editor(data, ignore_serial):
             else:
                 mitama[col_name] = 0
 
-        for props in [json_obj[u'mainAttr'], json_obj[u'addonAttr']] + json_obj[u'addiAttr']:
+        for props in [json_obj[u'mainAttr'],
+                      json_obj[u'addonAttr']] + json_obj[u'addiAttr']:
             if props[u'attrName'] in data_format.MITAMA_PROPS:
                 mitama[props[u'attrName']] += float(props[u'attrVal'])
 

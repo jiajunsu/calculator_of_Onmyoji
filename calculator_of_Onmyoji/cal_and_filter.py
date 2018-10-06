@@ -30,7 +30,6 @@ def filter_loc_and_type(data_dict,
     if l6_prop:
         data_dict[6] = filter_loc_prop(data_dict[6], l6_prop, l6_value)
 
-
     print('after filter by loc prop and type %s'
           % str([len(d) for d in data_dict.values()]))
 
@@ -193,12 +192,8 @@ def fit_mitama_type(mitama_comb_list, mitama_type_limit, total_comb,
         comb_data = {'sum': {u'御魂计数': mitama_type_count},
                      'info': mitama_comb}
 
-        # print cal rate in real time
-        cal_rate = int(calculated_count * 100.0 / total_comb)
-        if cal_rate > printed_rate and cal_rate % 5 == 0:
-            print('Calculating rate %s%%' % cal_rate)
-            sys.stdout.flush()
-            printed_rate = cal_rate
+        printed_rate = print_cal_rate(calculated_count,
+                                      total_comb, printed_rate)
 
         yield comb_data
 
@@ -327,3 +322,14 @@ def sum_prop(mitama_comb, mitama_type_count):
                     multi_times * mitama_enhance[m_type].get(u'加成数值'))
 
     return sum_result
+
+
+def print_cal_rate(calculated_count, total_comb, printed_rate):
+    '''print cal rate in real time'''
+    cal_rate = int(calculated_count * 100.0 / total_comb)
+    if cal_rate > printed_rate and cal_rate % 5 == 0:
+        print('Calculating rate %s%%' % cal_rate)
+        sys.stdout.flush()
+        return cal_rate
+
+    return printed_rate

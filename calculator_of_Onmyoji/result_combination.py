@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
-from xlutils.copy import copy
-import xlrd
-import xlwt
+import os
+import sys
 
+import xlrd
+from xlutils.copy import copy
+
+from calculator_of_Onmyoji import cal_and_filter
 from calculator_of_Onmyoji import load_data
 from calculator_of_Onmyoji import write_data
 
@@ -45,7 +48,10 @@ def write_independent_comb_result(filename, independent_combs):
         work_sheet.write(row_num, 2, combs[u'攻击x暴伤'])
         row_num += 1
 
-    write_book.save(filename)
+    file_name, file_extension = os.path.splitext(filename)
+    result_file = file_name + '-comb' + file_extension
+
+    write_book.save(result_file)
 
 
 def sort_mitama_combs(mitama_combs, sort_key=u'攻击x暴伤'):
@@ -73,6 +79,11 @@ def search_independent_comb(mitama_combs):
 
 
 def make_independent_comb(mitama_combs):
+    calculated_count = 0
+    printed_rate = 0
+    total_comb = len(mitama_combs)
+    sys.stdout.flush()
+
     sort_mitama_combs(mitama_combs)
 
     independent_comb_list = []
@@ -83,6 +94,11 @@ def make_independent_comb(mitama_combs):
             result_comb_data = gen_result_comb_data(independent_comb)
             independent_comb_list.append(result_comb_data)
         mitama_combs.pop(0)
+
+        calculated_count += 1
+        printed_rate = cal_and_filter.print_cal_rate(calculated_count,
+                                                     total_comb, printed_rate)
+
     return independent_comb_list
 
 
@@ -94,8 +110,7 @@ def gen_result_comb_data(independent_comb):
         result_serials.append(str(comb_data.get(u'组合序号', 0)))
         attack_values.append(str(comb_data.get(u'攻击x暴伤', 0)))
 
-    result_comb_data = {
-                        u'组合个数': len(independent_comb),
+    result_comb_data = {u'组合个数': len(independent_comb),
                         u'result序号': ','.join(result_serials),
                         u'攻击x暴伤': ','.join(attack_values),
                         }

@@ -62,7 +62,8 @@ def write_mitama_result(filename, comb_data_list,
             result_sheet.write(result_row-1, 1, label=str_serial_keys)
 
             if detail_row > MAX_ROW:
-                detail_sheet = workbook.add_sheet('detail_%s' % detail_sheet_num)
+                detail_sheet = workbook.add_sheet('detail_%s'
+                                                  % detail_sheet_num)
                 write_header_row(detail_sheet, 'detail')
                 detail_sheet_num += 1
                 detail_row = 1
