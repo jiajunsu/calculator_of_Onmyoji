@@ -6,6 +6,7 @@ import xlrd
 import xlwt
 
 from calculator_of_Onmyoji import load_data
+from calculator_of_Onmyoji import write_data
 
 
 def load_result(filename):
@@ -30,8 +31,21 @@ def load_result(filename):
     return mitama_combs
 
 
-def write_independent_comb_result(filename, independet_combs):
-    pass
+def write_independent_comb_result(filename, independent_combs):
+    read_book = xlrd.open_workbook(filename=filename)
+    write_book = copy(read_book)
+
+    work_sheet = write_book.add_sheet(u'indepenent_combs')
+    write_data.write_header_row(work_sheet, 'result_combs')
+    row_num = 1
+
+    for combs in independent_combs:
+        work_sheet.write(row_num, 0, combs[u'组合个数'])
+        work_sheet.write(row_num, 1, combs[u'result序号'])
+        work_sheet.write(row_num, 2, combs[u'攻击x暴伤'])
+        row_num += 1
+
+    write_book.save(filename)
 
 
 def sort_mitama_combs(mitama_combs, sort_key=u'攻击x暴伤'):
@@ -93,5 +107,9 @@ if __name__ == '__main__':
     result_files = [f for f in xls_files if '-result' in f]
 
     for file_name in result_files:
+        print('Calculating %s' % file_name)
         mitama_combs = load_result(file_name)
-        print(make_independent_comb(mitama_combs))
+        independent_combs = make_independent_comb(mitama_combs)
+        write_independent_comb_result(file_name, independent_combs)
+        print('Calculating finish, get %s independent combinations'
+              % len(independent_combs))

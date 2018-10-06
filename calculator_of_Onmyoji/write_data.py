@@ -80,6 +80,8 @@ def write_header_row(worksheet, sheet_type):
         header_row = data_format.RESULT_HEADER + data_format.EXTEND_HEADER
     elif sheet_type == 'detail':
         header_row = data_format.RESULT_HEADER
+    elif sheet_type == 'result_combs':
+        header_row = data_format.RESULT_COMB_HEADER
     else:
         header_row = data_format.MITAMA_COL_NAME_ZH
 
