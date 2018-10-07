@@ -46,6 +46,7 @@ def write_independent_comb_result(filename, independent_combs):
         work_sheet.write(row_num, 0, combs[u'组合个数'])
         work_sheet.write(row_num, 1, combs[u'result序号'])
         work_sheet.write(row_num, 2, combs[u'攻击x暴伤'])
+        work_sheet.write(row_num, 3, combs[u'速度'])
         row_num += 1
 
     file_name, file_extension = os.path.splitext(filename)
@@ -105,14 +106,17 @@ def make_independent_comb(mitama_combs):
 def gen_result_comb_data(independent_comb):
     result_serials = []
     attack_values = []
+    speed_values = []
 
     for comb_data in independent_comb:
         result_serials.append(str(comb_data.get(u'组合序号', 0)))
         attack_values.append(str(comb_data.get(u'攻击x暴伤', 0)))
+        speed_values.append(str(comb_data.get(u'速度', 0)))
 
     result_comb_data = {u'组合个数': len(independent_comb),
                         u'result序号': ','.join(result_serials),
                         u'攻击x暴伤': ','.join(attack_values),
+                        u'速度': ','.join(speed_values),
                         }
     return result_comb_data
 

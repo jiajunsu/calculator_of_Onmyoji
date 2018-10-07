@@ -7,7 +7,7 @@ MITAMA_COL_NAME_ZH = [u'御魂序号', u'御魂类型', u'位置', u'攻击',
 
 RESULT_HEADER = [u'组合序号'] + MITAMA_COL_NAME_ZH
 
-RESULT_COMB_HEADER = [u'组合个数', u'result序号', u'攻击x暴伤']
+RESULT_COMB_HEADER = [u'组合个数', u'result序号', u'攻击x暴伤', u'速度']
 
 EXTEND_HEADER = [u'式神基础攻击', u'式神基础生命', u'式神基础暴伤',
                  u'总攻击', u'总生命',
