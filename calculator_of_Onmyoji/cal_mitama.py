@@ -51,17 +51,22 @@ parser.add_argument("-2P", "--sec-prop-value",
                     type=str,
                     default=',0',
                     help=u'二号位限制的属性类型和数值，'
+                         u'多个属性用英文句号.间隔，'
                          u'例如"-2P 攻击加成,55"为二号位攻击加成至少55')
 parser.add_argument("-4P", "--fth-prop-value",
                     type=str,
                     default=',0',
                     help=u'四号位限制的属性类型和数值，'
+                         u'多个属性用英文句号.间隔，'
                          u'例如"-4P 攻击加成,55"为四号位攻击加成至少55')
 parser.add_argument("-6P", "--sth-prop-value",
                     type=str,
                     default=',0',
                     help=u'六号位限制的属性类型和数值，'
-                         u'例如"-6P 暴击,55"为六号位暴击至少55')
+                         u'多个属性用英文句号.间隔，'
+                         u'例如"-6P 暴击,55"为六号位暴击至少55，'
+                         u'"-6P 暴击,55.暴击伤害,89"为六号位暴击至少55'
+                         u'或暴击伤害至少89')
 parser.add_argument("-IG", "--ignore-serial",
                     type=str,
                     default='',
@@ -132,7 +137,8 @@ def sep_utf_str_to_dict(utf_str):
         if ',' not in limit:
             continue
         key, value = limit.split(',')
-        formated_dict[key] = int(value)
+        if key:
+            formated_dict[key] = int(value)
     return formated_dict
 
 
@@ -146,9 +152,9 @@ def main():
     prop_limit = sep_utf_str_to_dict(args.prop_limit)
     upper_prop_limit = sep_utf_str_to_dict(args.upper_prop_limit)
 
-    l2_prop, l2_prop_value = sep_utf_str(args.sec_prop_value)
-    l4_prop, l4_prop_value = sep_utf_str(args.fth_prop_value)
-    l6_prop, l6_prop_value = sep_utf_str(args.sth_prop_value)
+    l2_prop_limit = sep_utf_str_to_dict(args.sec_prop_value)
+    l4_prop_limit = sep_utf_str_to_dict(args.fth_prop_value)
+    l6_prop_limit = sep_utf_str_to_dict(args.sth_prop_value)
 
     ignore_serial = sep_utf_str(args.ignore_serial)
 
@@ -174,9 +180,9 @@ def main():
 
     print('Start calculating')
     locate_sep_data = cal.filter_loc_and_type(locate_sep_data,
-                                              l2_prop, int(l2_prop_value),
-                                              l4_prop, int(l4_prop_value),
-                                              l6_prop, int(l6_prop_value),
+                                              l2_prop_limit,
+                                              l4_prop_limit,
+                                              l6_prop_limit,
                                               args.attack_only)
 
     mitama_comb, total_comb = cal.make_combination(locate_sep_data,
