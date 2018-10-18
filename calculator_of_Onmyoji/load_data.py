@@ -57,13 +57,18 @@ def load_json_from_ocr_editor(data, ignore_serial):
     percent = [u'攻击加成', u'防御加成', u'暴击', u'暴击伤害',
                u'生命加成', u'效果命中', u'效果抵抗']
 
-    for d in data:
-        # 百分比类数据乘100
-        for p in d:
-            if p in percent:
-                d[p] *= 100
-        mitama_data[serial] = d
-        serial += 1
+    if data[0] == u"yuhun_ocr2.0":
+        # TODO: load data with id
+        pass
+    else:
+        serial = 1
+        for d in data:
+            # 百分比类数据乘100
+            for p in d:
+                if p in percent:
+                    d[p] *= 100
+            mitama_data[serial] = d
+            serial += 1
 
     return mitama_data
 
