@@ -158,4 +158,7 @@ def write_original_mitama_data(filename, data):
                          header_key=data_format.MITAMA_COL_NAME_ZH)
         row += 1
 
+    ignore_sheet = workbook.add_sheet(u'已使用')
+    write_header_row(ignore_sheet, 'detail')
+
     workbook.save(filename)
