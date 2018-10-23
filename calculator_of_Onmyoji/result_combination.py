@@ -63,6 +63,7 @@ def write_independent_comb_result(filename, independent_combs):
 
 
 def search_independent_comb(mitama_combs):
+    # FIXME: need to find all independent combs which use first comb as seed
     used_mitama = []
     independent_comb = []
     for combs_data in mitama_combs:
