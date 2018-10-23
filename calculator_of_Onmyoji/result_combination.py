@@ -55,16 +55,6 @@ def write_independent_comb_result(filename, independent_combs):
     write_book.save(result_file)
 
 
-def sort_mitama_combs(mitama_combs, sort_key=u'攻击x暴伤'):
-    def cmp_key(comb1, comb2):
-        if comb1.get(sort_key, 0) >= comb2.get(sort_key, 0):
-            return True
-        else:
-            return False
-
-    mitama_combs.sort(cmp=cmp_key)
-
-
 def search_independent_comb(mitama_combs):
     used_mitama = []
     independent_comb = []
@@ -84,8 +74,6 @@ def make_independent_comb(mitama_combs):
     printed_rate = 0
     total_comb = len(mitama_combs)
     sys.stdout.flush()
-
-    sort_mitama_combs(mitama_combs)
 
     independent_comb_list = []
     while mitama_combs:
