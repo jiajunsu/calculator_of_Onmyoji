@@ -38,7 +38,8 @@ def write_independent_comb_result(filename, independent_combs):
     read_book = xlrd.open_workbook(filename=filename)
     write_book = copy(read_book)
 
-    work_sheet = write_book.add_sheet(u'indepenent_combs')
+    work_sheet_num = 0
+    work_sheet = write_book.add_sheet(u'indepenent_combs_%s' % work_sheet_num)
     write_data.write_header_row(work_sheet, 'result_combs')
     row_num = 1
 
@@ -48,6 +49,12 @@ def write_independent_comb_result(filename, independent_combs):
         work_sheet.write(row_num, 2, combs[u'攻击x暴伤'])
         work_sheet.write(row_num, 3, combs[u'速度'])
         row_num += 1
+
+        if row_num > 65535:
+            work_sheet_num += 1
+            work_sheet = write_book.add_sheet(u'indepenent_combs_%s'
+                                              % work_sheet_num)
+            write_data.write_header_row(work_sheet, 'result_combs')
 
     file_name, file_extension = os.path.splitext(filename)
     result_file = file_name + '-comb' + file_extension
