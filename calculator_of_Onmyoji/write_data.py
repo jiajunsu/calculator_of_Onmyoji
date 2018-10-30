@@ -7,19 +7,17 @@ import xlwt
 import data_format
 
 
-MAX_ROW = 60000
+MAX_ROW = 65532  # divided by 6 for each result is a combination of 6 details
 
 
 def write_mitama_result(filename, comb_data_list,
                         base_att=0, base_hp=0, base_critdamage=0):
     workbook = xlwt.Workbook(encoding='utf-8')
     result_num = 0
-    result_sheet_num = 0
     detail_sheet_num = 0
 
-    result_sheet = workbook.add_sheet('result_%s' % result_sheet_num)
+    result_sheet = workbook.add_sheet('result')
     detail_sheet = workbook.add_sheet('detail_%s' % detail_sheet_num)
-    result_sheet_num += 1
     detail_sheet_num += 1
 
     write_header_row(result_sheet, 'result')
@@ -30,7 +28,7 @@ def write_mitama_result(filename, comb_data_list,
     serial_num = 1
     try:
         for comb_data in comb_data_list:
-            if result_sheet_num > 2:
+            if result_row > MAX_ROW:
                 print('Too many results, please enhance restrictive'
                       'condition.')
                 break
@@ -45,11 +43,6 @@ def write_mitama_result(filename, comb_data_list,
             write_extend_col(result_sheet, result_row, base_att, base_hp,
                              base_critdamage)
             result_row += 1
-            if result_row > MAX_ROW:
-                result_sheet = workbook.add_sheet(u'result_%s' % result_sheet_num)
-                write_header_row(result_sheet, 'result')
-                result_sheet_num += 1
-                result_row = 1
 
             # write each mitama data into detail file
             mitama_data = comb_data.get('info', set())
@@ -69,7 +62,8 @@ def write_mitama_result(filename, comb_data_list,
             result_sheet.write(result_row-1, 1, label=str_serial_keys)
 
             if detail_row > MAX_ROW:
-                detail_sheet = workbook.add_sheet('detail_%s' % detail_sheet_num)
+                detail_sheet = workbook.add_sheet('detail_%s'
+                                                  % detail_sheet_num)
                 write_header_row(detail_sheet, 'detail')
                 detail_sheet_num += 1
                 detail_row = 1
@@ -84,9 +78,11 @@ def write_mitama_result(filename, comb_data_list,
 
 def write_header_row(worksheet, sheet_type):
     if sheet_type == 'result':
-        header_row = data_format.OUTPUT_HEADER + data_format.EXTEND_HEADER
+        header_row = data_format.RESULT_HEADER + data_format.EXTEND_HEADER
     elif sheet_type == 'detail':
-        header_row = data_format.OUTPUT_HEADER
+        header_row = data_format.RESULT_HEADER
+    elif sheet_type == 'result_combs':
+        header_row = data_format.RESULT_COMB_HEADER
     else:
         header_row = data_format.MITAMA_COL_NAME_ZH
 
@@ -96,7 +92,7 @@ def write_header_row(worksheet, sheet_type):
 
 
 def write_mitama_row(worksheet, comb_prop, row_num, start_col,
-                     header_key=data_format.OUTPUT_HEADER):
+                     header_key=data_format.RESULT_HEADER):
 
     for col in range(start_col, len(header_key)):
         cell_data = comb_prop.get(header_key[col])
@@ -104,7 +100,7 @@ def write_mitama_row(worksheet, comb_prop, row_num, start_col,
 
 
 def write_extend_col(worksheet, row_num, base_att, base_hp, base_critdamage):
-    start_col = len(data_format.OUTPUT_HEADER)
+    start_col = len(data_format.RESULT_HEADER)
     str_row_num = str(row_num + 1)  # excel行名称编号比行号大1
     # TODO(victor): improve the code style
     # LIMIT: u'式神基础攻击', u'式神基础生命', u'式神基础暴伤',
@@ -161,5 +157,8 @@ def write_original_mitama_data(filename, data):
         write_mitama_row(data_sheet, prop, row, 1,
                          header_key=data_format.MITAMA_COL_NAME_ZH)
         row += 1
+
+    ignore_sheet = workbook.add_sheet(u'已使用')
+    write_header_row(ignore_sheet, 'detail')
 
     workbook.save(filename)

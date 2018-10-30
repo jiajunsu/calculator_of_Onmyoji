@@ -1,3 +1,4 @@
+xlutils
 xlrd
 xlwt
 requests

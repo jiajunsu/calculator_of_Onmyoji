@@ -28,11 +28,13 @@ optional arguments:
                         期望限制的属性上限，多个属性条件用英文句号.间隔，例如"-UP
                         暴击,95.速度,20"为暴击最多95且速度最多20
   -2P SEC_PROP_VALUE, --sec-prop-value SEC_PROP_VALUE
-                        二号位限制的属性类型和数值，例如"-2P 攻击加成,55"为二号位攻击加成至少55
+                        二号位限制的属性类型和数值，多个属性用英文句号.间隔，例如"-2P 攻击加成,55"为二号位攻击加成至少55
   -4P FTH_PROP_VALUE, --fth-prop-value FTH_PROP_VALUE
-                        四号位限制的属性类型和数值，例如"-4P 攻击加成,55"为四号位攻击加成至少55
+                        四号位限制的属性类型和数值，多个属性用英文句号.间隔，例如"-4P 攻击加成,55"为四号位攻击加成至少55
   -6P STH_PROP_VALUE, --sth-prop-value STH_PROP_VALUE
-                        六号位限制的属性类型和数值，例如"-6P 暴击,55"为六号位暴击至少55
+                        六号位限制的属性类型和数值，多个属性用英文句号.间隔，例如"-6P
+                        暴击,55"为六号位暴击至少55，"-6P
+                        暴击,55.暴击伤害,89"为六号位暴击至少55或暴击伤害至少89
   -IG IGNORE_SERIAL, --ignore-serial IGNORE_SERIAL
                         忽略的御魂序号关键字，用逗号,间隔例如"-IG 天狗,鸟"为御魂序号包含天狗或鸟则滤除
   -AS ALL_SUIT, --all-suit ALL_SUIT
@@ -69,6 +71,16 @@ optional arguments:
 usage: make sure json files are in the same directory with convert_json2xls.py
 
 python convert_json2xls.py
+```
+
+## Usage of result\_combination
+
+```
+Cal independent combinations of mitama_results
+
+usage: make sure files(*-result.xls) are in current directory
+
+python calculator_of_Onmyoji/result_combination.py
 ```
 
 ## Test Command

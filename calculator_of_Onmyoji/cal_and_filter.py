@@ -7,9 +7,9 @@ from calculator_of_Onmyoji import data_format
 
 
 def filter_loc_and_type(data_dict,
-                        l2_prop, l2_value,
-                        l4_prop, l4_value,
-                        l6_prop, l6_value,
+                        l2_prop_limit,
+                        l4_prop_limit,
+                        l6_prop_limit,
                         attack_only):
     if len(data_dict) != 6:
         raise KeyError("combination dict source must have 6 keys")
@@ -23,13 +23,12 @@ def filter_loc_and_type(data_dict,
             data_dict[loc] = filter_mitama_type(data,
                                                 data_format.ATTACK_MITAMA_TYPE)
 
-    if l2_prop:
-        data_dict[2] = filter_loc_prop(data_dict[2], l2_prop, l2_value)
-    if l4_prop:
-        data_dict[4] = filter_loc_prop(data_dict[4], l4_prop, l4_value)
-    if l6_prop:
-        data_dict[6] = filter_loc_prop(data_dict[6], l6_prop, l6_value)
-
+    if l2_prop_limit:
+        data_dict[2] = filter_loc_prop(data_dict[2], l2_prop_limit)
+    if l4_prop_limit:
+        data_dict[4] = filter_loc_prop(data_dict[4], l4_prop_limit)
+    if l6_prop_limit:
+        data_dict[6] = filter_loc_prop(data_dict[6], l6_prop_limit)
 
     print('after filter by loc prop and type %s'
           % str([len(d) for d in data_dict.values()]))
@@ -108,12 +107,13 @@ def make_combination(mitama_data, mitama_type_limit={}, all_suit=True):
         return itertools.chain(*res), total_comb
 
 
-def filter_loc_prop(data_list, prop_type, prop_min_value):
+def filter_loc_prop(data_list, prop_limit):
     def prop_value_le_min(mitama):
         mitama_info = mitama.values()[0]
-        if (mitama_info.get(prop_type, 0) and
-                mitama_info[prop_type] >= prop_min_value):
-            return True
+        for prop_type, prop_min_value in prop_limit.items():
+            if (mitama_info.get(prop_type, 0) and
+                    mitama_info[prop_type] >= prop_min_value):
+                return True
         else:
             return False
 
@@ -193,12 +193,8 @@ def fit_mitama_type(mitama_comb_list, mitama_type_limit, total_comb,
         comb_data = {'sum': {u'御魂计数': mitama_type_count},
                      'info': mitama_comb}
 
-        # print cal rate in real time
-        cal_rate = int(calculated_count * 100.0 / total_comb)
-        if cal_rate > printed_rate and cal_rate % 5 == 0:
-            print('Calculating rate %s%%' % cal_rate)
-            sys.stdout.flush()
-            printed_rate = cal_rate
+        printed_rate = print_cal_rate(calculated_count,
+                                      total_comb, printed_rate)
 
         yield comb_data
 
@@ -327,3 +323,14 @@ def sum_prop(mitama_comb, mitama_type_count):
                     multi_times * mitama_enhance[m_type].get(u'加成数值'))
 
     return sum_result
+
+
+def print_cal_rate(calculated_count, total_comb, printed_rate):
+    '''print cal rate in real time'''
+    cal_rate = int(calculated_count * 100.0 / total_comb)
+    if cal_rate > printed_rate and cal_rate % 5 == 0:
+        print('Calculating rate %s%%' % cal_rate)
+        sys.stdout.flush()
+        return cal_rate
+
+    return printed_rate
