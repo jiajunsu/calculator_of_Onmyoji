@@ -1,15 +1,22 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
+import itertools
 import os
-import sys
 
 import xlrd
 from xlutils.copy import copy
 
-from calculator_of_Onmyoji import cal_and_filter
+from calculator_of_Onmyoji import data_format
 from calculator_of_Onmyoji import load_data
 from calculator_of_Onmyoji import write_data
+
+
+work_sheet = None
+row_num = 0
+
+global work_sheet
+global row_num
 
 
 def load_result(filename):
@@ -39,6 +46,7 @@ def write_independent_comb_result(filename, independent_combs):
     write_book = copy(read_book)
 
     work_sheet_num = 0
+    global work_sheet
     work_sheet = write_book.add_sheet(u'indepenent_combs_%s' % work_sheet_num)
     write_data.write_header_row(work_sheet, 'result_combs')
     row_num = 1
@@ -46,8 +54,9 @@ def write_independent_comb_result(filename, independent_combs):
     for combs in independent_combs:
         work_sheet.write(row_num, 0, combs[u'组合个数'])
         work_sheet.write(row_num, 1, combs[u'result序号'])
-        work_sheet.write(row_num, 2, combs[u'攻击x暴伤'])
-        work_sheet.write(row_num, 3, combs[u'速度'])
+        work_sheet.write(row_num, 2, combs[u'暴击'])
+        work_sheet.write(row_num, 3, combs[u'攻击x暴伤'])
+        work_sheet.write(row_num, 4, combs[u'速度'])
         row_num += 1
 
         if row_num > 65535:
@@ -62,55 +71,57 @@ def write_independent_comb_result(filename, independent_combs):
     write_book.save(result_file)
 
 
-def search_independent_comb(mitama_combs):
-    # FIXME: need to find all independent combs which use first comb as seed
-    used_mitama = []
-    independent_comb = []
+def get_mitama_serials(combs_data):
+    return combs_data.get(u'御魂序号', '').split(',')
+
+
+def is_non_repetitive_comb(mitama_combs):
+    seed_serials = set()
+
     for combs_data in mitama_combs:
-        mitama_serials = combs_data.get(u'御魂序号', '').split(',')
-        if not (set(used_mitama) & set(mitama_serials)):
-            # 无重复御魂，即为独立组合
-            # Note: 第一个组合永远会加入
-            independent_comb.append(combs_data)
-            used_mitama.extend(mitama_serials)
+        mitama_serials = set(get_mitama_serials(combs_data))
+        if seed_serials & mitama_serials:
+            return False
+        else:
+            seed_serials |= mitama_serials
 
-    return independent_comb
+    return True
 
 
-def make_independent_comb(mitama_combs):
-    calculated_count = 0
-    printed_rate = 0
-    total_comb = len(mitama_combs)
-    sys.stdout.flush()
+def make_independent_comb(mitama_combs, sub_comb_length):
+    '''遍历组合，找出独立组合并触发写数据'''
+    for combs in itertools.combinations(mitama_combs, sub_comb_length):
+        if is_non_repetitive_comb(combs):
+            write_single_comb_data(combs)
 
-    independent_comb_list = []
-    while mitama_combs:
-        # 以第一个组合为基础，计算所有的独立套装
-        independent_comb = search_independent_comb(mitama_combs)
-        if len(independent_comb) > 1:
-            result_comb_data = gen_result_comb_data(independent_comb)
-            independent_comb_list.append(result_comb_data)
-        mitama_combs.pop(0)
 
-        calculated_count += 1
-        printed_rate = cal_and_filter.print_cal_rate(calculated_count,
-                                                     total_comb, printed_rate)
+def write_single_comb_data(combs):
+    global row_num
+    row_num += 1
 
-    return independent_comb_list
+    result_comb_data = gen_result_comb_data(combs)
+
+    col_num = 0
+    for col_name in data_format.RESULT_COMB_HEADER:
+        work_sheet.write(row_num, col_num, result_comb_data.get(col_name, ''))
+        col_num += 1
 
 
 def gen_result_comb_data(independent_comb):
     result_serials = []
+    crit_values = []
     attack_values = []
     speed_values = []
 
     for comb_data in independent_comb:
         result_serials.append(str(comb_data.get(u'组合序号', 0)))
+        crit_values.append(str(comb_data.get(u'暴击', 0)))
         attack_values.append(str(comb_data.get(u'攻击x暴伤', 0)))
         speed_values.append(str(comb_data.get(u'速度', 0)))
 
     result_comb_data = {u'组合个数': len(independent_comb),
                         u'result序号': ','.join(result_serials),
+                        u'暴击': ','.join(crit_values),
                         u'攻击x暴伤': ','.join(attack_values),
                         u'速度': ','.join(speed_values),
                         }
@@ -128,3 +139,5 @@ if __name__ == '__main__':
         write_independent_comb_result(file_name, independent_combs)
         print('Calculating finish, get %s independent combinations'
               % len(independent_combs))
+
+    raw_input('Press any key to exit')

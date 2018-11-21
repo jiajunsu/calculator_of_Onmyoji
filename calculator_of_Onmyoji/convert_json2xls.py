@@ -23,3 +23,5 @@ if __name__ == '__main__':
         write_data.write_original_mitama_data(file_name_xls, data)
 
         print('File %s has been converted' % file_path)
+
+    raw_input('Press any key to exit')
