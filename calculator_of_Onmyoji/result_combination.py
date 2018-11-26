@@ -38,7 +38,14 @@ def load_result(filename):
     for r_data in rows_data:
         combs_data = dict()
         for i in range(len(comb_dict_keys)):
-            combs_data[comb_dict_keys[i]] = r_data[i].value
+            k = comb_dict_keys[i]
+            if k == u'组合序号':
+                try:
+                    combs_data[k] = int(r_data[i].value)
+                except ValueError:
+                    combs_data[k] = r_data[i].value
+            else:
+                combs_data[k] = r_data[i].value
 
         mitama_combs.append(combs_data)
 
@@ -88,9 +95,23 @@ def is_non_repetitive_comb(mitama_combs):
 
 def make_independent_comb(mitama_combs, sub_comb_length):
     '''遍历组合，找出独立组合并触发写数据'''
+    found_res = False
     for combs in itertools.combinations(mitama_combs, sub_comb_length):
         if is_non_repetitive_comb(combs):
+            found_res = True
             write_single_comb_data(combs)
+
+    return found_res
+
+
+def find_all_independent_combs(mitama_combs, expect_counts):
+    if expect_counts == 0:
+        for c in xrange(2, len(mitama_combs) - 1):
+            # 从2开始遍历，直至无法再找到独立组合
+            if not make_independent_comb(mitama_combs, c):
+                break
+    else:
+        make_independent_comb(mitama_combs, expect_counts)
 
 
 def write_single_comb_data(combs):
@@ -118,33 +139,33 @@ def gen_result_comb_data(independent_comb):
     return result_comb_data
 
 
-def input_expect_combs_length():
-    input = raw_input('请输入期望的独立套装个数并回车: ')
+def input_expect_combs_counts():
+    input = raw_input('请输入期望的独立套装个数并回车(0为计算所有可能): ')
     try:
-        sub_comb_length = int(input)
-        if sub_comb_length < 2:
+        expect_counts = int(input)
+        if expect_counts < 2 and expect_counts != 0:
             raise ValueError
     except Exception:
-        print('输入必须为大于等于2的整数')
+        print('输入必须为0或大于等于2的整数')
         exit(1)
 
-    return sub_comb_length
+    return expect_counts
 
 
-if __name__ == '__main__':
+def main():
     xls_files = load_data.get_ext_files('.xls')
     result_files = [f for f in xls_files
                     if '-result' in f and 'comb' not in f]
 
     print('将计算以下文件的独立套装组合: %s' % result_files)
-    sub_comb_length = input_expect_combs_length()
+    expect_counts = input_expect_combs_counts()
 
     for file_name in result_files:
         print('Calculating %s' % file_name)
         mitama_combs = load_result(file_name)
 
         init_write_book(file_name)
-        make_independent_comb(mitama_combs, sub_comb_length)
+        find_all_independent_combs(mitama_combs, expect_counts)
         save_write_book(file_name)
 
         if work_sheet_num >= 1:
@@ -157,5 +178,9 @@ if __name__ == '__main__':
 
         print('Calculating finish, get %s independent combinations'
               % independent_combs_num)
+
+
+if __name__ == '__main__':
+    main()
 
     raw_input('Press any key to exit')
