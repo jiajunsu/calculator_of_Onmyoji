@@ -12,15 +12,15 @@ from calculator_of_Onmyoji import load_data
 from calculator_of_Onmyoji import write_data
 
 
-write_book = None
-work_sheet = None
-work_sheet_num = 0
-row_num = 0
-
 global write_book
 global work_sheet
 global work_sheet_num
 global row_num
+
+write_book = None
+work_sheet = None
+work_sheet_num = 0
+row_num = 0
 
 
 def load_result(filename):
@@ -94,6 +94,7 @@ def make_independent_comb(mitama_combs, sub_comb_length):
 
 
 def write_single_comb_data(combs):
+    global row_num
     if not work_sheet or row_num > write_data.MAX_ROW:
         init_work_sheet()
 
@@ -104,7 +105,6 @@ def write_single_comb_data(combs):
         work_sheet.write(row_num, col_num, result_comb_data.get(col_name, ''))
         col_num += 1
 
-    global row_num
     row_num += 1
 
 
@@ -118,7 +118,22 @@ def gen_result_comb_data(independent_comb):
     return result_comb_data
 
 
+def input_expect_combs_length():
+    input = raw_input('请输入期望的独立套装个数并回车: ')
+    try:
+        sub_comb_length = int(input)
+        if sub_comb_length < 0:
+            raise ValueError
+    except Exception:
+        print('输入必须为非负整数')
+        exit(1)
+
+    return sub_comb_length
+
+
 if __name__ == '__main__':
+    sub_comb_length = input_expect_combs_length()
+
     xls_files = load_data.get_ext_files('.xls')
     result_files = [f for f in xls_files if '-result' in f]
 
@@ -127,7 +142,7 @@ if __name__ == '__main__':
         mitama_combs = load_result(file_name)
 
         init_write_book(file_name)
-        make_independent_comb(mitama_combs)
+        make_independent_comb(mitama_combs, sub_comb_length)
         save_write_book(file_name)
 
         independent_combs_num = (write_data.MAX_ROW * (work_sheet_num - 1)
