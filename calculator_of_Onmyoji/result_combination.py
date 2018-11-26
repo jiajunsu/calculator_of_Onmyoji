@@ -12,10 +12,14 @@ from calculator_of_Onmyoji import load_data
 from calculator_of_Onmyoji import write_data
 
 
+write_book = None
 work_sheet = None
+work_sheet_num = 0
 row_num = 0
 
+global write_book
 global work_sheet
+global work_sheet_num
 global row_num
 
 
@@ -41,30 +45,24 @@ def load_result(filename):
     return mitama_combs
 
 
-def write_independent_comb_result(filename, independent_combs):
+def init_write_book(filename):
+    global write_book
     read_book = xlrd.open_workbook(filename=filename)
     write_book = copy(read_book)
 
-    work_sheet_num = 0
+
+def init_work_sheet():
     global work_sheet
+    global work_sheet_num
+    global row_num
     work_sheet = write_book.add_sheet(u'indepenent_combs_%s' % work_sheet_num)
+    work_sheet_num += 1
+
     write_data.write_header_row(work_sheet, 'result_combs')
     row_num = 1
 
-    for combs in independent_combs:
-        work_sheet.write(row_num, 0, combs[u'组合个数'])
-        work_sheet.write(row_num, 1, combs[u'result序号'])
-        work_sheet.write(row_num, 2, combs[u'暴击'])
-        work_sheet.write(row_num, 3, combs[u'攻击x暴伤'])
-        work_sheet.write(row_num, 4, combs[u'速度'])
-        row_num += 1
 
-        if row_num > 65535:
-            work_sheet_num += 1
-            work_sheet = write_book.add_sheet(u'indepenent_combs_%s'
-                                              % work_sheet_num)
-            write_data.write_header_row(work_sheet, 'result_combs')
-
+def save_write_book(filename):
     file_name, file_extension = os.path.splitext(filename)
     result_file = file_name + '-comb' + file_extension
 
@@ -96,8 +94,8 @@ def make_independent_comb(mitama_combs, sub_comb_length):
 
 
 def write_single_comb_data(combs):
-    global row_num
-    row_num += 1
+    if not work_sheet or row_num > write_data.MAX_ROW:
+        init_work_sheet()
 
     result_comb_data = gen_result_comb_data(combs)
 
@@ -105,6 +103,9 @@ def write_single_comb_data(combs):
     for col_name in data_format.RESULT_COMB_HEADER:
         work_sheet.write(row_num, col_num, result_comb_data.get(col_name, ''))
         col_num += 1
+
+    global row_num
+    row_num += 1
 
 
 def gen_result_comb_data(independent_comb):
@@ -124,9 +125,15 @@ if __name__ == '__main__':
     for file_name in result_files:
         print('Calculating %s' % file_name)
         mitama_combs = load_result(file_name)
-        independent_combs = make_independent_comb(mitama_combs)
-        write_independent_comb_result(file_name, independent_combs)
+
+        init_write_book(file_name)
+        make_independent_comb(mitama_combs)
+        save_write_book(file_name)
+
+        independent_combs_num = (write_data.MAX_ROW * (work_sheet_num - 1)
+                                 + row_num - 1)
+
         print('Calculating finish, get %s independent combinations'
-              % len(independent_combs))
+              % len(independent_combs_num))
 
     raw_input('Press any key to exit')
