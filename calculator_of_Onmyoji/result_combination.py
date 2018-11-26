@@ -149,6 +149,6 @@ if __name__ == '__main__':
                                  + row_num - 1)
 
         print('Calculating finish, get %s independent combinations'
-              % len(independent_combs_num))
+              % independent_combs_num)
 
     raw_input('Press any key to exit')
