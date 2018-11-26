@@ -132,11 +132,12 @@ def input_expect_combs_length():
 
 
 if __name__ == '__main__':
-    sub_comb_length = input_expect_combs_length()
-
     xls_files = load_data.get_ext_files('.xls')
     result_files = [f for f in xls_files
                     if '-result' in f and 'comb' not in f]
+
+    print('将计算以下文件的独立套装组合: %s' % result_files)
+    sub_comb_length = input_expect_combs_length()
 
     for file_name in result_files:
         print('Calculating %s' % file_name)
