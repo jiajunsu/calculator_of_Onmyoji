@@ -108,23 +108,12 @@ def write_single_comb_data(combs):
 
 
 def gen_result_comb_data(independent_comb):
-    result_serials = []
-    crit_values = []
-    attack_values = []
-    speed_values = []
+    result_comb_data = {u'组合个数': len(independent_comb)}
 
-    for comb_data in independent_comb:
-        result_serials.append(str(comb_data.get(u'组合序号', 0)))
-        crit_values.append(str(comb_data.get(u'暴击', 0)))
-        attack_values.append(str(comb_data.get(u'攻击x暴伤', 0)))
-        speed_values.append(str(comb_data.get(u'速度', 0)))
+    for key in data_format.RESULT_COMB_HEADER[1:]:
+        result_comb_data[key] = ','.join([str(d.get(key, 0))
+                                          for d in independent_comb])
 
-    result_comb_data = {u'组合个数': len(independent_comb),
-                        u'result序号': ','.join(result_serials),
-                        u'暴击': ','.join(crit_values),
-                        u'攻击x暴伤': ','.join(attack_values),
-                        u'速度': ','.join(speed_values),
-                        }
     return result_comb_data
 
 
