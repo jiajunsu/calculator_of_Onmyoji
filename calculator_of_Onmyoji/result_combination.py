@@ -122,10 +122,10 @@ def input_expect_combs_length():
     input = raw_input('请输入期望的独立套装个数并回车: ')
     try:
         sub_comb_length = int(input)
-        if sub_comb_length < 0:
+        if sub_comb_length < 2:
             raise ValueError
     except Exception:
-        print('输入必须为非负整数')
+        print('输入必须为大于等于2的整数')
         exit(1)
 
     return sub_comb_length
@@ -146,8 +146,13 @@ if __name__ == '__main__':
         make_independent_comb(mitama_combs, sub_comb_length)
         save_write_book(file_name)
 
-        independent_combs_num = (write_data.MAX_ROW * (work_sheet_num - 1)
-                                 + row_num - 1)
+        if work_sheet_num >= 1:
+            independent_combs_num = (write_data.MAX_ROW * (work_sheet_num - 1)
+                                     + row_num - 1)
+        elif row_num >= 1:
+            independent_combs_num = row_num - 1
+        else:
+            independent_combs_num = row_num
 
         print('Calculating finish, get %s independent combinations'
               % independent_combs_num)
