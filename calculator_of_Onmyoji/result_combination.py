@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
+import locale
 import itertools
 import os
 
@@ -21,6 +22,8 @@ write_book = None
 work_sheet = None
 work_sheet_num = 0
 row_num = 0
+
+code_t = locale.getpreferredencoding()
 
 
 def load_result(filename):
@@ -140,16 +143,23 @@ def gen_result_comb_data(independent_comb):
 
 
 def input_expect_combs_counts():
-    input = raw_input('请输入期望的独立套装个数并回车(0为计算所有可能): ')
+    prompt = get_encode_str(u'请输入期望的独立套装个数并回车'
+                            u'(0为计算所有可能): ')
+    input = raw_input(prompt)
     try:
         expect_counts = int(input)
         if expect_counts < 2 and expect_counts != 0:
             raise ValueError
     except Exception:
-        print('输入必须为0或大于等于2的整数')
+        exc_prompt = get_encode_str(u'输入必须为0或大于等于2的整数')
+        print(exc_prompt)
         exit(1)
 
     return expect_counts
+
+
+def get_encode_str(ustr):
+    return ustr.encode(code_t)
 
 
 def main():
@@ -157,7 +167,7 @@ def main():
     result_files = [f for f in xls_files
                     if '-result' in f and 'comb' not in f]
 
-    print('将计算以下文件的独立套装组合: %s' % result_files)
+    print('Files below will be calculated:\n%s\n' % result_files)
     expect_counts = input_expect_combs_counts()
 
     for file_name in result_files:
