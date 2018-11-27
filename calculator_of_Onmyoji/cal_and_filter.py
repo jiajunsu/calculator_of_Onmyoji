@@ -325,10 +325,10 @@ def sum_prop(mitama_comb, mitama_type_count):
     return sum_result
 
 
-def print_cal_rate(calculated_count, total_comb, printed_rate):
+def print_cal_rate(calculated_count, total_comb, printed_rate, rate=5):
     '''print cal rate in real time'''
     cal_rate = int(calculated_count * 100.0 / total_comb)
-    if cal_rate > printed_rate and cal_rate % 5 == 0:
+    if cal_rate > printed_rate and cal_rate % rate == 0:
         print('Calculating rate %s%%' % cal_rate)
         sys.stdout.flush()
         return cal_rate
