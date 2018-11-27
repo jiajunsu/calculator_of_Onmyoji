@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
+import itertools
 import locale
 from math import factorial
-import itertools
 import os
 
 import xlrd
