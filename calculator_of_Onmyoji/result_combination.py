@@ -2,11 +2,14 @@
 # -*- coding:utf-8 -*-
 
 import itertools
+import locale
+from math import factorial
 import os
 
 import xlrd
 from xlutils.copy import copy
 
+from calculator_of_Onmyoji.cal_and_filter import print_cal_rate
 from calculator_of_Onmyoji import data_format
 from calculator_of_Onmyoji import load_data
 from calculator_of_Onmyoji import write_data
@@ -21,6 +24,8 @@ write_book = None
 work_sheet = None
 work_sheet_num = 0
 row_num = 0
+
+code_t = locale.getpreferredencoding()
 
 
 def load_result(filename):
@@ -95,18 +100,39 @@ def is_non_repetitive_comb(mitama_combs):
 
 def make_independent_comb(mitama_combs, sub_comb_length):
     '''遍历组合，找出独立组合并触发写数据'''
+    n = len(mitama_combs)
+    total = cal_comb_num(n, sub_comb_length)
+    count = 0
+    printed_rate = 0
+    print('Calculating C(%s, %s) = %s' % (n, sub_comb_length, total))
+
     found_res = False
     for combs in itertools.combinations(mitama_combs, sub_comb_length):
         if is_non_repetitive_comb(combs):
             found_res = True
             write_single_comb_data(combs)
+        count += 1
+        printed_rate = print_cal_rate(count, total, printed_rate, rate=10)
 
     return found_res
 
 
+def cal_comb_num(n, m):
+    '''计算组合数
+
+    C(n, m) = n!/((n-m)! * m!)
+    '''
+    x = 1
+    for i in xrange(n, m, -1):
+        x *= i
+    x /= factorial(n - m)
+
+    return x
+
+
 def find_all_independent_combs(mitama_combs, expect_counts):
     if expect_counts == 0:
-        for c in xrange(2, len(mitama_combs) - 1):
+        for c in xrange(2, len(mitama_combs)):
             # 从2开始遍历，直至无法再找到独立组合
             if not make_independent_comb(mitama_combs, c):
                 break
@@ -140,16 +166,23 @@ def gen_result_comb_data(independent_comb):
 
 
 def input_expect_combs_counts():
-    input = raw_input('请输入期望的独立套装个数并回车(0为计算所有可能): ')
+    prompt = get_encode_str(u'请输入期望的独立套装个数并回车'
+                            u'(0为计算所有可能): ')
+    input = raw_input(prompt)
     try:
         expect_counts = int(input)
         if expect_counts < 2 and expect_counts != 0:
             raise ValueError
     except Exception:
-        print('输入必须为0或大于等于2的整数')
+        exc_prompt = get_encode_str(u'输入必须为0或大于等于2的整数')
+        print(exc_prompt)
         exit(1)
 
     return expect_counts
+
+
+def get_encode_str(ustr):
+    return ustr.encode(code_t)
 
 
 def main():
@@ -157,7 +190,7 @@ def main():
     result_files = [f for f in xls_files
                     if '-result' in f and 'comb' not in f]
 
-    print('将计算以下文件的独立套装组合: %s' % result_files)
+    print('Files below will be calculated:\n%s\n' % result_files)
     expect_counts = input_expect_combs_counts()
 
     for file_name in result_files:
