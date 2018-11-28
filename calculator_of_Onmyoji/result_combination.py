@@ -49,6 +49,9 @@ def load_result(filename):
                     combs_data[k] = int(r_data[i].value)
                 except ValueError:
                     combs_data[k] = r_data[i].value
+            elif k == u'御魂序号':
+                # 直接转换为set，减少循环内的计算
+                combs_data[k] = set(r_data[i].value.split(','))
             else:
                 combs_data[k] = r_data[i].value
 
@@ -81,15 +84,11 @@ def save_write_book(filename):
     write_book.save(result_file)
 
 
-def get_mitama_serials(combs_data):
-    return combs_data.get(u'御魂序号', '').split(',')
-
-
 def is_non_repetitive_comb(mitama_combs):
     seed_serials = set()
 
     for combs_data in mitama_combs:
-        mitama_serials = set(get_mitama_serials(combs_data))
+        mitama_serials = combs_data.get(u'御魂序号')
         if seed_serials & mitama_serials:
             return False
         else:
