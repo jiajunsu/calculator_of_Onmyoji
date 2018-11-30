@@ -86,7 +86,7 @@ def save_write_book(filename):
     write_book.save(result_file)
 
 
-def get_non_repetitive_comb(mitama_combs):
+def get_independent_comb_data(mitama_combs):
     seed_serials = set()
 
     for combs_data in mitama_combs:
@@ -96,7 +96,7 @@ def get_non_repetitive_comb(mitama_combs):
         else:
             seed_serials |= mitama_serials
 
-    return mitama_combs
+    return gen_result_comb_data(mitama_combs)
 
 
 def make_independent_comb(mitama_combs, sub_comb_length, cores):
@@ -110,23 +110,24 @@ def make_independent_comb(mitama_combs, sub_comb_length, cores):
     if cores > 1:
         p = multiprocessing.Pool(processes=cores)
         found_res = False
-        # TODO: 将更多步骤放到imap里面去做，不仅仅是判断是否独立
-        for combs in tqdm(p.imap_unordered(get_non_repetitive_comb,
-                                           combinations(mitama_combs,
-                                                        sub_comb_length)),
-                          desc='Calculating', total=total, unit='comb'):
-            if combs:
+        # TODO: 将更多步骤放到imap里面去做
+        for comb_data in tqdm(p.imap_unordered(get_independent_comb_data,
+                                               combinations(mitama_combs,
+                                                            sub_comb_length)),
+                              desc='Calculating', total=total, unit='comb'):
+            if comb_data:
                 found_res = True
-                write_single_comb_data(combs)
+                write_single_comb_data(comb_data)
         p.close()
         p.join()
         del p
     else:
         for combs in tqdm(combinations(mitama_combs, sub_comb_length),
                           desc='Calculating', total=total, unit='comb'):
-            if get_non_repetitive_comb(combs):
+            comb_data = get_independent_comb_data(combs)
+            if comb_data:
                 found_res = True
-                write_single_comb_data(combs)
+                write_single_comb_data(comb_data)
 
     return found_res
 
@@ -161,16 +162,14 @@ def find_all_independent_combs(mitama_combs, expect_counts,
         make_independent_comb(mitama_combs, expect_counts, cores)
 
 
-def write_single_comb_data(combs):
+def write_single_comb_data(comb_data):
     global row_num
     if not work_sheet or row_num > write_data.MAX_ROW:
         init_work_sheet()
 
-    result_comb_data = gen_result_comb_data(combs)
-
     col_num = 0
     for col_name in data_format.RESULT_COMB_HEADER:
-        work_sheet.write(row_num, col_num, result_comb_data.get(col_name, ''))
+        work_sheet.write(row_num, col_num, comb_data.get(col_name, ''))
         col_num += 1
 
     row_num += 1
