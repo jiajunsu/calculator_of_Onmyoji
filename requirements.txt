@@ -2,3 +2,4 @@ xlutils
 xlrd
 xlwt
 requests
+tqdm

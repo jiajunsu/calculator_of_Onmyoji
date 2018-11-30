@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
-import itertools
+from itertools import combinations
 import locale
 from math import factorial
+import multiprocessing
 import os
+import traceback
 
+from tqdm import tqdm
 import xlrd
 from xlutils.copy import copy
 
-from calculator_of_Onmyoji.cal_and_filter import print_cal_rate
 from calculator_of_Onmyoji import data_format
 from calculator_of_Onmyoji import load_data
 from calculator_of_Onmyoji import write_data
@@ -84,34 +86,47 @@ def save_write_book(filename):
     write_book.save(result_file)
 
 
-def is_non_repetitive_comb(mitama_combs):
+def get_non_repetitive_comb(mitama_combs):
     seed_serials = set()
 
     for combs_data in mitama_combs:
         mitama_serials = combs_data.get(u'御魂序号')
         if seed_serials & mitama_serials:
-            return False
+            return None
         else:
             seed_serials |= mitama_serials
 
-    return True
+    return mitama_combs
 
 
-def make_independent_comb(mitama_combs, sub_comb_length):
+def make_independent_comb(mitama_combs, sub_comb_length, cores):
     '''遍历组合，找出独立组合并触发写数据'''
     n = len(mitama_combs)
     total = cal_comb_num(n, sub_comb_length)
-    count = 0
-    printed_rate = 0
     print('Calculating C(%s, %s) = %s' % (n, sub_comb_length, total))
 
     found_res = False
-    for combs in itertools.combinations(mitama_combs, sub_comb_length):
-        if is_non_repetitive_comb(combs):
-            found_res = True
-            write_single_comb_data(combs)
-        count += 1
-        printed_rate = print_cal_rate(count, total, printed_rate, rate=10)
+
+    if cores > 1:
+        p = multiprocessing.Pool(processes=cores)
+        found_res = False
+        # TODO: 将更多步骤放到imap里面去做，不仅仅是判断是否独立
+        for combs in tqdm(p.imap_unordered(get_non_repetitive_comb,
+                                           combinations(mitama_combs,
+                                                        sub_comb_length)),
+                          desc='Calculating', total=total, unit='comb'):
+            if combs:
+                found_res = True
+                write_single_comb_data(combs)
+        p.close()
+        p.join()
+        del p
+    else:
+        for combs in tqdm(combinations(mitama_combs, sub_comb_length),
+                          desc='Calculating', total=total, unit='comb'):
+            if get_non_repetitive_comb(combs):
+                found_res = True
+                write_single_comb_data(combs)
 
     return found_res
 
@@ -129,14 +144,21 @@ def cal_comb_num(n, m):
     return x
 
 
-def find_all_independent_combs(mitama_combs, expect_counts):
+def find_all_independent_combs(mitama_combs, expect_counts,
+                               use_multi_process):
+    if use_multi_process:
+        cores = multiprocessing.cpu_count()
+    else:
+        cores = 1
+
+    print('Use CPU cores number %s' % cores)
     if expect_counts == 0:
         for c in xrange(2, len(mitama_combs)):
             # 从2开始遍历，直至无法再找到独立组合
-            if not make_independent_comb(mitama_combs, c):
+            if not make_independent_comb(mitama_combs, c, cores):
                 break
     else:
-        make_independent_comb(mitama_combs, expect_counts)
+        make_independent_comb(mitama_combs, expect_counts, cores)
 
 
 def write_single_comb_data(combs):
@@ -175,9 +197,18 @@ def input_expect_combs_counts():
     except Exception:
         exc_prompt = get_encode_str(u'输入必须为0或大于等于2的整数')
         print(exc_prompt)
-        exit(1)
+        os.exit(1)
 
     return expect_counts
+
+
+def input_use_multi_process():
+    prompt = get_encode_str(u'是否使用多进程计算(电脑会比较卡) y/n: ')
+    input = raw_input(prompt)
+    if input.strip().lower() == 'y':
+        return True
+    else:
+        return False
 
 
 def get_encode_str(ustr):
@@ -189,15 +220,23 @@ def main():
     result_files = [f for f in xls_files
                     if '-result' in f and 'comb' not in f]
 
+    if not result_files:
+        print('No files with postfix "-result.xls" found.')
+        return
+
     print('Files below will be calculated:\n%s\n' % result_files)
     expect_counts = input_expect_combs_counts()
+    # TODO: 将更多步骤放到imap里面去做，然后再打开多进程开关
+#    use_multi_process = input_use_multi_process()
+    use_multi_process = False
 
     for file_name in result_files:
         print('Calculating %s' % file_name)
         mitama_combs = load_result(file_name)
 
         init_write_book(file_name)
-        find_all_independent_combs(mitama_combs, expect_counts)
+        find_all_independent_combs(mitama_combs, expect_counts,
+                                   use_multi_process)
         save_write_book(file_name)
 
         if work_sheet_num >= 1:
@@ -213,6 +252,11 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    multiprocessing.freeze_support()  # For windows platform
 
-    raw_input('Press any key to exit')
+    try:
+        main()
+    except Exception:
+        print(traceback.format_exc())
+    finally:
+        raw_input('\nPress any key to exit')
