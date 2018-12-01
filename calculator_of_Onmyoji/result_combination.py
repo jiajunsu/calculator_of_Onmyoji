@@ -17,20 +17,50 @@ from calculator_of_Onmyoji import load_data
 from calculator_of_Onmyoji import write_data
 
 
-global write_book
-global work_sheet
-global work_sheet_num
-global row_num
-
-write_book = None
-work_sheet = None
-work_sheet_num = 0
-row_num = 0
-
 code_t = locale.getpreferredencoding()
 
 
-def load_result(filename):
+class ResultBook(object):
+    def __init__(self, filename):
+        self.filename = filename
+
+        read_book = xlrd.open_workbook(filename=self.filename)
+        self.write_book = copy(read_book)
+
+        self.work_sheet = None
+        self.work_sheet_num = 0
+        self.row_num = 0
+        self.count = 0
+
+    def init_work_sheet(self):
+        self.work_sheet = self.write_book.add_sheet(u'independent_combs_%s'
+                                                    % self.work_sheet_num)
+        self.work_sheet_num += 1
+
+        write_data.write_header_row(self.work_sheet, 'result_combs')
+        self.row_num = 1
+
+    def write(self, comb_data):
+        if not self.work_sheet or self.row_num > write_data.MAX_ROW:
+            self.init_work_sheet()
+
+        col_num = 0
+        for col_name in data_format.RESULT_COMB_HEADER:
+            self.work_sheet.write(self.row_num, col_num,
+                                  comb_data.get(col_name, ''))
+            col_num += 1
+
+        self.row_num += 1
+        self.count += 1
+
+    def save(self):
+        file_name, file_extension = os.path.splitext(self.filename)
+        result_file = file_name + '-comb' + file_extension
+
+        self.write_book.save(result_file)
+
+
+def load_result_sheet(filename):
     xls_book = xlrd.open_workbook(filename=filename, on_demand=True)
     data_sheet = xls_book.sheet_by_name('result')
     rows_data = data_sheet.get_rows()
@@ -62,30 +92,6 @@ def load_result(filename):
     return mitama_combs
 
 
-def init_write_book(filename):
-    global write_book
-    read_book = xlrd.open_workbook(filename=filename)
-    write_book = copy(read_book)
-
-
-def init_work_sheet():
-    global work_sheet
-    global work_sheet_num
-    global row_num
-    work_sheet = write_book.add_sheet(u'indepenent_combs_%s' % work_sheet_num)
-    work_sheet_num += 1
-
-    write_data.write_header_row(work_sheet, 'result_combs')
-    row_num = 1
-
-
-def save_write_book(filename):
-    file_name, file_extension = os.path.splitext(filename)
-    result_file = file_name + '-comb' + file_extension
-
-    write_book.save(result_file)
-
-
 def get_independent_comb_data(mitama_combs):
     seed_serials = set()
 
@@ -99,7 +105,7 @@ def get_independent_comb_data(mitama_combs):
     return gen_result_comb_data(mitama_combs)
 
 
-def make_independent_comb(mitama_combs, sub_comb_length, cores):
+def make_independent_comb(result_book, mitama_combs, sub_comb_length, cores):
     '''遍历组合，找出独立组合并触发写数据'''
     n = len(mitama_combs)
     total = cal_comb_num(n, sub_comb_length)
@@ -110,14 +116,14 @@ def make_independent_comb(mitama_combs, sub_comb_length, cores):
     if cores > 1:
         p = multiprocessing.Pool(processes=cores)
         found_res = False
-        # TODO: 将更多步骤放到imap里面去做
+        # TODO(jjs): 将更多步骤放到imap里面去做
         for comb_data in tqdm(p.imap_unordered(get_independent_comb_data,
                                                combinations(mitama_combs,
                                                             sub_comb_length)),
                               desc='Calculating', total=total, unit='comb'):
             if comb_data:
                 found_res = True
-                write_single_comb_data(comb_data)
+                result_book.write(comb_data)
         p.close()
         p.join()
         del p
@@ -127,7 +133,7 @@ def make_independent_comb(mitama_combs, sub_comb_length, cores):
             comb_data = get_independent_comb_data(combs)
             if comb_data:
                 found_res = True
-                write_single_comb_data(comb_data)
+                result_book.write(comb_data)
 
     return found_res
 
@@ -145,7 +151,7 @@ def cal_comb_num(n, m):
     return x
 
 
-def find_all_independent_combs(mitama_combs, expect_counts,
+def find_all_independent_combs(result_book, mitama_combs, expect_counts,
                                use_multi_process):
     if use_multi_process:
         cores = multiprocessing.cpu_count()
@@ -156,23 +162,10 @@ def find_all_independent_combs(mitama_combs, expect_counts,
     if expect_counts == 0:
         for c in xrange(2, len(mitama_combs)):
             # 从2开始遍历，直至无法再找到独立组合
-            if not make_independent_comb(mitama_combs, c, cores):
+            if not make_independent_comb(result_book, mitama_combs, c, cores):
                 break
     else:
-        make_independent_comb(mitama_combs, expect_counts, cores)
-
-
-def write_single_comb_data(comb_data):
-    global row_num
-    if not work_sheet or row_num > write_data.MAX_ROW:
-        init_work_sheet()
-
-    col_num = 0
-    for col_name in data_format.RESULT_COMB_HEADER:
-        work_sheet.write(row_num, col_num, comb_data.get(col_name, ''))
-        col_num += 1
-
-    row_num += 1
+        make_independent_comb(result_book, mitama_combs, expect_counts, cores)
 
 
 def gen_result_comb_data(independent_comb):
@@ -225,29 +218,22 @@ def main():
 
     print('Files below will be calculated:\n%s\n' % result_files)
     expect_counts = input_expect_combs_counts()
-    # TODO: 将更多步骤放到imap里面去做，然后再打开多进程开关
+    # TODO(jjs): 将更多步骤放到imap里面去做，然后再打开多进程开关
 #    use_multi_process = input_use_multi_process()
     use_multi_process = False
 
     for file_name in result_files:
         print('Calculating %s' % file_name)
-        mitama_combs = load_result(file_name)
+        mitama_combs = load_result_sheet(file_name)
 
-        init_write_book(file_name)
-        find_all_independent_combs(mitama_combs, expect_counts,
+        result_book = ResultBook(file_name)
+        find_all_independent_combs(result_book,
+                                   mitama_combs, expect_counts,
                                    use_multi_process)
-        save_write_book(file_name)
-
-        if work_sheet_num >= 1:
-            independent_combs_num = (write_data.MAX_ROW * (work_sheet_num - 1)
-                                     + row_num - 1)
-        elif row_num >= 1:
-            independent_combs_num = row_num - 1
-        else:
-            independent_combs_num = row_num
+        result_book.save()
 
         print('Calculating finish, get %s independent combinations'
-              % independent_combs_num)
+              % result_book.count)
 
 
 if __name__ == '__main__':
