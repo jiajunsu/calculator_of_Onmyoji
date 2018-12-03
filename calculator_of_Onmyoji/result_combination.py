@@ -56,9 +56,44 @@ class ResultBook(object):
 
     def save(self):
         file_name, file_extension = os.path.splitext(self.filename)
-        result_file = file_name + '-comb' + self.postfix + file_extension
+        result_file = ''.join([file_name, '-comb', '_', self.postfix,
+                               file_extension])
 
         self.write_book.save(result_file)
+
+
+class MakeResultInPool(object):
+    def __init__(self, filename, postfix):
+        self.filename = filename
+        self.postfix = str(postfix)
+
+        self.result_book = dict()
+
+    def _get_result_book(self):
+        pid = os.getpid()
+        res_book = self.result_book.get(pid)
+        if not res_book:
+            res_book = ResultBook(self.filename,
+                                  ''.join([str(pid), '_', self.postfix]))
+            self.result_book[pid] = res_book
+        return res_book
+
+    def __call__(self, mitama_combs):
+        comb_data = get_independent_comb_data(mitama_combs)
+        if comb_data:
+            res_book = self._get_result_book()
+            res_book.write(comb_data)
+
+    def save(self):
+        for res_book in self.result_book.itervalues():
+            res_book.save()
+
+    @property
+    def count(self):
+        count = 0
+        for res_book in self.result_book.itervalues():
+            count += res_book.count
+        return count
 
 
 def load_result_sheet(filename):
@@ -108,23 +143,24 @@ def get_independent_comb_data(mitama_combs):
 
 def make_independent_comb(file_name, mitama_combs, sub_comb_length, cores):
     '''遍历组合，找出独立组合并触发写数据'''
-    result_book = ResultBook(file_name, sub_comb_length)
     n = len(mitama_combs)
     total = cal_comb_num(n, sub_comb_length)
     print('Calculating C(%s, %s) = %s' % (n, sub_comb_length, total))
 
     if cores > 1:
         p = multiprocessing.Pool(processes=cores)
-        # TODO(jjs): 将更多步骤放到imap里面去做
-        for comb_data in tqdm(p.imap_unordered(get_independent_comb_data,
-                                               combinations(mitama_combs,
-                                                            sub_comb_length)),
-                              desc='Calculating', total=total, unit='comb'):
-            if comb_data:
-                result_book.write(comb_data)
+        # TODO(jjs): 这种方式性能太差，改用Queue模式试试看
+        make_comb_data_parallel = MakeResultInPool(file_name, sub_comb_length)
+        for _ in tqdm(p.imap_unordered(make_comb_data_parallel,
+                                       combinations(mitama_combs,
+                                                    sub_comb_length)),
+                      desc='Calculating', total=total, unit='comb'):
+            pass
         p.close()
         p.join()
         del p
+        make_comb_data_parallel.save()
+        return make_comb_data_parallel.count
     else:
         result_book = ResultBook(file_name, sub_comb_length)
         for combs in tqdm(combinations(mitama_combs, sub_comb_length),
@@ -133,8 +169,8 @@ def make_independent_comb(file_name, mitama_combs, sub_comb_length, cores):
             if comb_data:
                 result_book.write(comb_data)
 
-    result_book.save()
-    return result_book.count
+        result_book.save()
+        return result_book.count
 
 
 def cal_comb_num(n, m):
@@ -225,8 +261,8 @@ def main():
     print('Files below will be calculated:\n%s\n' % result_files)
     expect_counts = input_expect_combs_counts()
     # TODO(jjs): 将更多步骤放到imap里面去做，然后再打开多进程开关
-#    use_multi_process = input_use_multi_process()
-    use_multi_process = False
+    use_multi_process = input_use_multi_process()
+#    use_multi_process = False
 
     for file_name in result_files:
         print('Calculating %s' % file_name)
