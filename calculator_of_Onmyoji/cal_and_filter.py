@@ -138,10 +138,11 @@ def filter_effective_secondary_prop(data_list, es_prop, es_prop_num):
         mitama_info = mitama.values()[0]
         prop_num = 0
         for prop in es_prop:
-            prop_value = mitama_info.get(prop, 0)
-            if prop_value >= mitama_growth[prop][u"主属性"]:
-                prop_value -= mitama_growth[prop][u"主属性"]
-            prop_num += prop_value / mitama_growth[prop].get(u"最小成长值")
+            prop_value = mitama_info.get(prop, 0.0)
+            main_prop_value = mitama_growth[prop][u"主属性"]
+            if prop_value >= main_prop_value:
+                prop_value -= main_prop_value
+            prop_num += prop_value / mitama_growth[prop][u"最小成长值"]
 
         if prop_num >= es_prop_num:
             return True
