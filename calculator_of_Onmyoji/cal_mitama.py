@@ -4,7 +4,7 @@
 import argparse
 import platform
 
-import cal_and_filter as cal
+from calculator_of_Onmyoji import cal_and_filter as cal
 from calculator_of_Onmyoji import load_data
 from calculator_of_Onmyoji import write_data
 
@@ -190,8 +190,12 @@ def main():
     l4_prop_limit = sep_utf_str_to_dict(args.fth_prop_value)
     l6_prop_limit = sep_utf_str_to_dict(args.sth_prop_value)
 
-    es_prop = sep_utf_str(args.effective_secondary_prop)
-    es_prop_num = map(int, sep_utf_str(args.effective_secondary_prop_num))
+    if args.effective_secondary_prop:
+        es_prop = sep_utf_str(args.effective_secondary_prop)
+        es_prop_num = map(int, sep_utf_str(args.effective_secondary_prop_num))
+    else:
+        es_prop = None
+        es_prop_num = None
 
     ignore_serial = sep_utf_str(args.ignore_serial)
 
