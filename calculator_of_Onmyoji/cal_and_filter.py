@@ -143,7 +143,7 @@ def make_combination(mitama_data, mitama_type_limit=None, all_suit=True):
 
     def filter_mitama_by_type(mitama, desired_type):
         mitama_info = mitama.values()[0]
-        if (mitama_info[u'御魂类型'] == desired_type):
+        if mitama_info[u'御魂类型'] == desired_type:
             return True
         else:
             return False
@@ -258,7 +258,6 @@ def fit_mitama_type(mitama_comb_list, mitama_type_limit, total_comb,
         calculated_count += 1
 
         mitama_type_count = {}
-        mitama_enhance_count = {}
         for mitama in mitama_comb:
             mitama_info = mitama.values()[0]
 
