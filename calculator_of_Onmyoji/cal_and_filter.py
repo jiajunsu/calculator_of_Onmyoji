@@ -60,30 +60,34 @@ def find_mtype_candidates(mitama_type='ALL'):
     return candidates
 
 
-def gen_mitama_combos(mitama_type_limit={}, all_suit=True):
+def gen_mitama_combos(mitama_type_limit=None, all_suit=True):
+    if mitama_type_limit is None:
+        mitama_type_limit = []
     main_type, secondary_type = None, []
     fixed_pos = 0
-    for m_type in mitama_type_limit:
-        if mitama_type_limit[m_type] == 4:
+    for m_type, limit_count in mitama_type_limit:
+        if m_type not in data_format.MITAMA_TYPES and\
+           m_type not in data_format.MITAMA_PROPS:
+            continue
+        if limit_count == 4:
             main_type = m_type
             fixed_pos += 4
-        elif mitama_type_limit[m_type] == 2:
+        elif limit_count == 2:
             secondary_type.append(m_type)
             fixed_pos += 2
 
-    if main_type is not None:   # 4+2
+    if main_type is not None:
         main_candidates = find_mtype_candidates(main_type)
-        if fixed_pos == 6:
-            secondary_candidates = find_mtype_candidates(secondary_type[0])
+        if fixed_pos == 6 or all_suit:  # 4+2
+            if secondary_type:
+                secondary_candidates = find_mtype_candidates(secondary_type[0])
+            elif all_suit:
+                secondary_candidates = find_mtype_candidates()
             for m_type in main_candidates:
                 for s_type in secondary_candidates:
                     yield [m_type] * 4 + [s_type] * 2
-        else:                   # 4+1+1
-            secondary_candidates = find_mtype_candidates()
-            for m_type in main_candidates:
-                for s_type in secondary_candidates:
-                    for s_type2 in secondary_candidates:
-                        yield [m_type] * 4 + [s_type, s_type2]
+        else:       # 4+1+1
+            yield [m_type] * 4 + ['ALL', 'ALL']
 
     elif fixed_pos == 6 or (all_suit and fixed_pos >= 2):    # 2+2+2, 2+2+any, 2+any+any
         candidates = []
@@ -93,44 +97,53 @@ def gen_mitama_combos(mitama_type_limit={}, all_suit=True):
             candidates.append(find_mtype_candidates())
         generated = {}
         for t1, t2, t3 in itertools.product(*candidates):
-            if frozenset((t1, t2, t3)) not in generated and t1 != t2 and t2 != t3:
+            if frozenset((t1, t2, t3)) not in generated and\
+               t1 != t2 and t2 != t3 and t1 != t3:
                 generated[frozenset((t1, t2, t3))] = True
                 yield [t1, t2, t3]*2
     elif fixed_pos >= 2:
         candidates = []
         for m_type in secondary_type:
             candidates.append(find_mtype_candidates(m_type))
-            candidates.append(find_mtype_candidates(m_type))
+
         for i in range(6-fixed_pos):
-            candidates.append(find_mtype_candidates())
+            candidates.append(["ALL"])
         generated = {}
-        for t1, t2, t3, t4, t5, t6 in itertools.product(*candidates):
+        for combo in itertools.product(*candidates):
+            if len(set(combo[:fixed_pos//2])) != fixed_pos//2:
+                continue
+            t1, t2, t3, t4, t5, t6 = combo[:fixed_pos//2]*2 + combo[fixed_pos//2:]
             if frozenset((t1, t2, t3, t4, t5, t6)) not in generated:
                 generated[frozenset((t1, t2, t3, t4, t5, t6))] = True
-                yield [t1, t2, t3, t4, t5, t6]*2
+                yield [t1, t2, t3, t4, t5, t6]
     else:
         yield None
 
 
-def gen_mitama_permutations(mitama_type_limit={}, all_suit=True):
+def gen_mitama_permutations(mitama_type_limit=None, all_suit=True):
+    if mitama_type_limit is None:
+        mitama_type_limit = []
     generated = {}
     for m_combos in gen_mitama_combos(mitama_type_limit, all_suit):
         if m_combos is None:
             yield None
         else:
+            print(",".join(m_combos))
             for m_permu in itertools.permutations(m_combos):
                 if tuple(m_permu) not in generated:
                     generated[tuple(m_permu)] = True
                     yield m_permu
 
 
-def make_combination(mitama_data, mitama_type_limit={}, all_suit=True):
+def make_combination(mitama_data, mitama_type_limit=None, all_suit=True):
+    if mitama_type_limit is None:
+        mitama_type_limit = []
     main_type, secondary_type = None, None
     total_comb = 0
 
     def filter_mitama_by_type(mitama, desired_type):
         mitama_info = mitama.values()[0]
-        if mitama_info[u'御魂类型'] == desired_type:
+        if (mitama_info[u'御魂类型'] == desired_type):
             return True
         else:
             return False
@@ -156,7 +169,7 @@ def make_combination(mitama_data, mitama_type_limit={}, all_suit=True):
         else:
             if mitama_data_by_type is None:
                 mitama_data_by_type = classify_by_type()
-            mitama_grp = {x: mitama_data_by_type[m_type][x]
+            mitama_grp = {x: mitama_data[x] if m_type == 'ALL' else mitama_data_by_type[m_type][x]
                           for x, m_type in zip(range(1, 7), m_combos)}
             total_comb += reduce(lambda x, y: x*y,
                                  map(len, mitama_grp.values()))
@@ -255,30 +268,12 @@ def fit_mitama_type(mitama_comb_list, mitama_type_limit, total_comb,
             else:
                 mitama_type_count[mitama_type] += 1
 
-            mitama_enhance_type =\
-                data_format.MITAMA_ENHANCE[mitama_type][u"加成类型"]
-            if not mitama_enhance_type:
-                pass
-            elif mitama_enhance_type not in mitama_type_count:
-                mitama_enhance_count[mitama_enhance_type] = 1
-            else:
-                mitama_enhance_count[mitama_enhance_type] += 1
-
         if all_suit:
             is_suit = True
             for _, count in mitama_type_count.items():
                 if count < 2:
                     is_suit = False
             if not is_suit:
-                continue
-
-        if mitama_type_limit:
-            fit_type_limit = True
-            for expect_type, expect_num in mitama_type_limit.items():
-                if mitama_type_count.get(expect_type, 0) < expect_num and\
-                   mitama_enhance_count.get(expect_type, 0) < expect_num:
-                    fit_type_limit = False
-            if not fit_type_limit:
                 continue
 
         comb_data = {'sum': {u'御魂计数': mitama_type_count},
@@ -384,6 +379,7 @@ def cal_mitama_comb_prop(mitama_sum_data):
         mitama_comb = mitama_data['info']
 
         comb_sum = sum_prop(mitama_comb, mitama_type_count)
+
         comb_data = {'sum': comb_sum,
                      'info': mitama_comb}
         yield comb_data
