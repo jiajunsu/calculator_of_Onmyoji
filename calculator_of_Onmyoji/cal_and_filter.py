@@ -10,7 +10,9 @@ def filter_loc_and_type(data_dict,
                         l2_prop_limit,
                         l4_prop_limit,
                         l6_prop_limit,
-                        attack_only):
+                        attack_only,
+                        es_prop,
+                        es_prop_num):
     if len(data_dict) != 6:
         raise KeyError("combination dict source must have 6 keys")
 
@@ -23,12 +25,21 @@ def filter_loc_and_type(data_dict,
             data_dict[loc] = filter_mitama_type(data,
                                                 data_format.ATTACK_MITAMA_TYPE)
 
+    # 246号位主属性过滤
     if l2_prop_limit:
         data_dict[2] = filter_loc_prop(data_dict[2], l2_prop_limit)
     if l4_prop_limit:
         data_dict[4] = filter_loc_prop(data_dict[4], l4_prop_limit)
     if l6_prop_limit:
         data_dict[6] = filter_loc_prop(data_dict[6], l6_prop_limit)
+
+    # 全位置副属性过滤
+    if es_prop and es_prop_num:
+        for loc, data_list in data_dict.iteritems():
+            data_dict[loc] = \
+                filter_effective_secondary_prop(data_list,
+                                                es_prop,
+                                                es_prop_num[loc-1])
 
     print('after filter by loc prop and type %s'
           % str([len(d) for d in data_dict.values()]))
@@ -119,7 +130,7 @@ def make_combination(mitama_data, mitama_type_limit={}, all_suit=True):
 
     def filter_mitama_by_type(mitama, desired_type):
         mitama_info = mitama.values()[0]
-        if (mitama_info[u'御魂类型'] == desired_type):
+        if mitama_info[u'御魂类型'] == desired_type:
             return True
         else:
             return False
@@ -166,6 +177,27 @@ def filter_loc_prop(data_list, prop_limit):
             return False
 
     return filter(prop_value_le_min, data_list)
+
+
+def filter_effective_secondary_prop(data_list, es_prop, es_prop_num):
+    mitama_growth = data_format.MITAMA_GROWTH
+
+    def es_prop_num_le_min(mitama):
+        mitama_info = mitama.values()[0]
+        prop_num = 0
+        for prop in es_prop:
+            prop_value = mitama_info.get(prop, 0.0)
+            main_prop_value = mitama_growth[prop][u"主属性"]
+            if prop_value >= main_prop_value:
+                prop_value -= main_prop_value
+            prop_num += prop_value / mitama_growth[prop][u"最小成长值"]
+
+        if prop_num >= es_prop_num:
+            return True
+        else:
+            return False
+
+    return filter(es_prop_num_le_min, data_list)
 
 
 def filter_mitama_type(data_list, mitama_type_list):
@@ -352,7 +384,6 @@ def cal_mitama_comb_prop(mitama_sum_data):
         mitama_comb = mitama_data['info']
 
         comb_sum = sum_prop(mitama_comb, mitama_type_count)
-
         comb_data = {'sum': comb_sum,
                      'info': mitama_comb}
         yield comb_data

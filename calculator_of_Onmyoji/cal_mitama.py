@@ -95,6 +95,20 @@ parser.add_argument("-AO", "--attack-only",
                     help=u'是否只计算输出类御魂，默认为False。'
                          u'"-AO True"为只计算套装属性为攻击加成、'
                          u'暴击和首领御魂的套装组合')
+parser.add_argument("-ESP", "--effective-secondary-prop",
+                    type=str,
+                    default='',
+                    help=u'设定御魂的有效副属性，用逗号,间隔'
+                         u'例如"-ESP 暴击,暴击伤害,速度,攻击加成"'
+                         u'意味着有效副属性定位为暴击、暴击伤害、速度、攻击加成')
+parser.add_argument("-ESPN", "--effective-secondary-prop-num",
+                    type=str,
+                    default='',
+                    help=u'限定1-6号位御魂的有效副属性加成次数，用逗号,间隔'
+                         u'与-ESP配合使用'
+                         u'例如"-ESP 暴击 -ESPN 5,3,5,3,5,0"'
+                         u'意味着1~6号位各自的有效副属性加成次数依次不少于5,3,5,3,5,0'
+                         u'1号位副属性暴击加成次数不少于5即暴击不低于12(2.4*5)')
 
 
 def win_decode(utf_str):
@@ -156,6 +170,9 @@ def main():
     l4_prop_limit = sep_utf_str_to_dict(args.fth_prop_value)
     l6_prop_limit = sep_utf_str_to_dict(args.sth_prop_value)
 
+    es_prop = sep_utf_str(args.effective_secondary_prop)
+    es_prop_num = map(int, sep_utf_str(args.effective_secondary_prop_num))
+
     ignore_serial = sep_utf_str(args.ignore_serial)
 
     base_att, base_critdamage_att, damage_limit = \
@@ -183,7 +200,9 @@ def main():
                                               l2_prop_limit,
                                               l4_prop_limit,
                                               l6_prop_limit,
-                                              args.attack_only)
+                                              args.attack_only,
+                                              es_prop,
+                                              es_prop_num)
 
     mitama_comb, total_comb = cal.make_combination(locate_sep_data,
                                                    mitama_type_limit,

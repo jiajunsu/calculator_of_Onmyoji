@@ -1,34 +1,102 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
-import itertools
+from itertools import combinations
 import locale
 from math import factorial
+import multiprocessing
 import os
+import traceback
 
+from tqdm import tqdm
 import xlrd
 from xlutils.copy import copy
 
-from calculator_of_Onmyoji.cal_and_filter import print_cal_rate
 from calculator_of_Onmyoji import data_format
 from calculator_of_Onmyoji import load_data
 from calculator_of_Onmyoji import write_data
 
 
-global write_book
-global work_sheet
-global work_sheet_num
-global row_num
-
-write_book = None
-work_sheet = None
-work_sheet_num = 0
-row_num = 0
-
 code_t = locale.getpreferredencoding()
 
 
-def load_result(filename):
+class ResultBook(object):
+    def __init__(self, filename, postfix):
+        self.filename = filename
+        self.postfix = str(postfix)
+
+        read_book = xlrd.open_workbook(filename=self.filename)
+        self.write_book = copy(read_book)
+
+        self.work_sheet = None
+        self.work_sheet_num = 0
+        self.row_num = 0
+        self.count = 0
+
+    def init_work_sheet(self):
+        self.work_sheet = self.write_book.add_sheet(u'independent_combs_%s'
+                                                    % self.work_sheet_num)
+        self.work_sheet_num += 1
+
+        write_data.write_header_row(self.work_sheet, 'result_combs')
+        self.row_num = 1
+
+    def write(self, comb_data):
+        if not self.work_sheet or self.row_num > write_data.MAX_ROW:
+            self.init_work_sheet()
+
+        col_num = 0
+        for col_name in data_format.RESULT_COMB_HEADER:
+            self.work_sheet.write(self.row_num, col_num,
+                                  comb_data.get(col_name, ''))
+            col_num += 1
+
+        self.row_num += 1
+        self.count += 1
+
+    def save(self):
+        file_name, file_extension = os.path.splitext(self.filename)
+        result_file = ''.join([file_name, '-comb', '_', self.postfix,
+                               file_extension])
+
+        self.write_book.save(result_file)
+
+
+class MakeResultInPool(object):
+    def __init__(self, filename, postfix):
+        self.filename = filename
+        self.postfix = str(postfix)
+
+        self.result_book = dict()
+
+    def _get_result_book(self):
+        pid = os.getpid()
+        res_book = self.result_book.get(pid)
+        if not res_book:
+            res_book = ResultBook(self.filename,
+                                  ''.join([str(pid), '_', self.postfix]))
+            self.result_book[pid] = res_book
+        return res_book
+
+    def __call__(self, mitama_combs):
+        comb_data = get_independent_comb_data(mitama_combs)
+        if comb_data:
+            res_book = self._get_result_book()
+            res_book.write(comb_data)
+
+    def save(self):
+        for res_book in self.result_book.itervalues():
+            res_book.save()
+
+    @property
+    def count(self):
+        count = 0
+        for res_book in self.result_book.itervalues():
+            count += res_book.count
+        return count
+
+
+def load_result_sheet(filename):
     xls_book = xlrd.open_workbook(filename=filename, on_demand=True)
     data_sheet = xls_book.sheet_by_name('result')
     rows_data = data_sheet.get_rows()
@@ -49,6 +117,9 @@ def load_result(filename):
                     combs_data[k] = int(r_data[i].value)
                 except ValueError:
                     combs_data[k] = r_data[i].value
+            elif k == u'御魂序号':
+                # 直接转换为set，减少循环内的计算
+                combs_data[k] = set(r_data[i].value.split(','))
             else:
                 combs_data[k] = r_data[i].value
 
@@ -57,64 +128,49 @@ def load_result(filename):
     return mitama_combs
 
 
-def init_write_book(filename):
-    global write_book
-    read_book = xlrd.open_workbook(filename=filename)
-    write_book = copy(read_book)
-
-
-def init_work_sheet():
-    global work_sheet
-    global work_sheet_num
-    global row_num
-    work_sheet = write_book.add_sheet(u'indepenent_combs_%s' % work_sheet_num)
-    work_sheet_num += 1
-
-    write_data.write_header_row(work_sheet, 'result_combs')
-    row_num = 1
-
-
-def save_write_book(filename):
-    file_name, file_extension = os.path.splitext(filename)
-    result_file = file_name + '-comb' + file_extension
-
-    write_book.save(result_file)
-
-
-def get_mitama_serials(combs_data):
-    return combs_data.get(u'御魂序号', '').split(',')
-
-
-def is_non_repetitive_comb(mitama_combs):
+def get_independent_comb_data(mitama_combs):
     seed_serials = set()
 
     for combs_data in mitama_combs:
-        mitama_serials = set(get_mitama_serials(combs_data))
+        mitama_serials = combs_data.get(u'御魂序号')
         if seed_serials & mitama_serials:
-            return False
+            return None
         else:
             seed_serials |= mitama_serials
 
-    return True
+    return gen_result_comb_data(mitama_combs)
 
 
-def make_independent_comb(mitama_combs, sub_comb_length):
+def make_independent_comb(file_name, mitama_combs, sub_comb_length, cores):
     '''遍历组合，找出独立组合并触发写数据'''
     n = len(mitama_combs)
     total = cal_comb_num(n, sub_comb_length)
-    count = 0
-    printed_rate = 0
     print('Calculating C(%s, %s) = %s' % (n, sub_comb_length, total))
 
-    found_res = False
-    for combs in itertools.combinations(mitama_combs, sub_comb_length):
-        if is_non_repetitive_comb(combs):
-            found_res = True
-            write_single_comb_data(combs)
-        count += 1
-        printed_rate = print_cal_rate(count, total, printed_rate, rate=10)
+    if cores > 1:
+        p = multiprocessing.Pool(processes=cores)
+        # TODO(jjs): 这种方式性能太差，改用Queue模式试试看
+        make_comb_data_parallel = MakeResultInPool(file_name, sub_comb_length)
+        for _ in tqdm(p.imap_unordered(make_comb_data_parallel,
+                                       combinations(mitama_combs,
+                                                    sub_comb_length)),
+                      desc='Calculating', total=total, unit='comb'):
+            pass
+        p.close()
+        p.join()
+        del p
+        make_comb_data_parallel.save()
+        return make_comb_data_parallel.count
+    else:
+        result_book = ResultBook(file_name, sub_comb_length)
+        for combs in tqdm(combinations(mitama_combs, sub_comb_length),
+                          desc='Calculating', total=total, unit='comb'):
+            comb_data = get_independent_comb_data(combs)
+            if comb_data:
+                result_book.write(comb_data)
 
-    return found_res
+        result_book.save()
+        return result_book.count
 
 
 def cal_comb_num(n, m):
@@ -130,29 +186,28 @@ def cal_comb_num(n, m):
     return x
 
 
-def find_all_independent_combs(mitama_combs, expect_counts):
+def make_all_independent_combs(file_name, mitama_combs, expect_counts,
+                               use_multi_process):
+    if use_multi_process:
+        cores = multiprocessing.cpu_count()
+    else:
+        cores = 1
+
+    print('Use CPU cores number %s' % cores)
     if expect_counts == 0:
+        combs_count = 0
         for c in xrange(2, len(mitama_combs)):
             # 从2开始遍历，直至无法再找到独立组合
-            if not make_independent_comb(mitama_combs, c):
+            res_count = make_independent_comb(file_name,
+                                              mitama_combs, c, cores)
+            if res_count == 0:
                 break
+            combs_count += res_count
     else:
-        make_independent_comb(mitama_combs, expect_counts)
+        combs_count = make_independent_comb(file_name,
+                                            mitama_combs, expect_counts, cores)
 
-
-def write_single_comb_data(combs):
-    global row_num
-    if not work_sheet or row_num > write_data.MAX_ROW:
-        init_work_sheet()
-
-    result_comb_data = gen_result_comb_data(combs)
-
-    col_num = 0
-    for col_name in data_format.RESULT_COMB_HEADER:
-        work_sheet.write(row_num, col_num, result_comb_data.get(col_name, ''))
-        col_num += 1
-
-    row_num += 1
+    return combs_count
 
 
 def gen_result_comb_data(independent_comb):
@@ -176,9 +231,18 @@ def input_expect_combs_counts():
     except Exception:
         exc_prompt = get_encode_str(u'输入必须为0或大于等于2的整数')
         print(exc_prompt)
-        exit(1)
+        os.exit(1)
 
     return expect_counts
+
+
+def input_use_multi_process():
+    prompt = get_encode_str(u'是否使用多进程计算(电脑会比较卡) y/n: ')
+    input = raw_input(prompt)
+    if input.strip().lower() == 'y':
+        return True
+    else:
+        return False
 
 
 def get_encode_str(ustr):
@@ -190,30 +254,33 @@ def main():
     result_files = [f for f in xls_files
                     if '-result' in f and 'comb' not in f]
 
+    if not result_files:
+        print('No files with postfix "-result.xls" found.')
+        return
+
     print('Files below will be calculated:\n%s\n' % result_files)
     expect_counts = input_expect_combs_counts()
+    # TODO(jjs): 将更多步骤放到imap里面去做，然后再打开多进程开关
+    use_multi_process = input_use_multi_process()
+#    use_multi_process = False
 
     for file_name in result_files:
         print('Calculating %s' % file_name)
-        mitama_combs = load_result(file_name)
-
-        init_write_book(file_name)
-        find_all_independent_combs(mitama_combs, expect_counts)
-        save_write_book(file_name)
-
-        if work_sheet_num >= 1:
-            independent_combs_num = (write_data.MAX_ROW * (work_sheet_num - 1)
-                                     + row_num - 1)
-        elif row_num >= 1:
-            independent_combs_num = row_num - 1
-        else:
-            independent_combs_num = row_num
+        mitama_combs = load_result_sheet(file_name)
+        combs_count = make_all_independent_combs(file_name,
+                                                 mitama_combs, expect_counts,
+                                                 use_multi_process)
 
         print('Calculating finish, get %s independent combinations'
-              % independent_combs_num)
+              % combs_count)
 
 
 if __name__ == '__main__':
-    main()
+    multiprocessing.freeze_support()  # For windows platform
 
-    raw_input('Press any key to exit')
+    try:
+        main()
+    except Exception:
+        print(traceback.format_exc())
+    finally:
+        raw_input('\nPress any key to exit')
