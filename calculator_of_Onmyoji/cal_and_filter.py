@@ -11,8 +11,8 @@ def filter_loc_and_type(data_dict,
                         l4_prop_limit,
                         l6_prop_limit,
                         attack_only,
-                        jipindu_type,
-                        jipindu_score):
+                        es_prop,
+                        es_prop_num):
     if len(data_dict) != 6:
         raise KeyError("combination dict source must have 6 keys")
 
@@ -25,6 +25,7 @@ def filter_loc_and_type(data_dict,
             data_dict[loc] = filter_mitama_type(data,
                                                 data_format.ATTACK_MITAMA_TYPE)
 
+    # 246号位主属性过滤
     if l2_prop_limit:
         data_dict[2] = filter_loc_prop(data_dict[2], l2_prop_limit)
     if l4_prop_limit:
@@ -32,20 +33,13 @@ def filter_loc_and_type(data_dict,
     if l6_prop_limit:
         data_dict[6] = filter_loc_prop(data_dict[6], l6_prop_limit)
 
-    #example:
-    #prop_type =  [u'攻击加成',  u'暴击', u'暴击伤害', u'速度']
-    #prop_score = [5,3,5,3,5,0]
-
-    if jipindu_type:
-        prop_type = jipindu_type
-        prop_score = jipindu_score
-
-        data_dict[1] = filter_loc_prop2(data_dict[1], prop_type, prop_score[0])
-        data_dict[2] = filter_loc_prop2(data_dict[2], prop_type, prop_score[1])
-        data_dict[3] = filter_loc_prop2(data_dict[3], prop_type, prop_score[2])
-        data_dict[4] = filter_loc_prop2(data_dict[4], prop_type, prop_score[3])
-        data_dict[5] = filter_loc_prop2(data_dict[5], prop_type, prop_score[4])
-        data_dict[6] = filter_loc_prop2(data_dict[6], prop_type, prop_score[5])
+    # 全位置副属性过滤
+    if es_prop and es_prop_num:
+        for loc, data_list in data_dict.iteritems():
+            data_dict[loc] = \
+                filter_effective_secondary_prop(data_list,
+                                                es_prop,
+                                                es_prop_num[loc-1])
 
     print('after filter by loc prop and type %s'
           % str([len(d) for d in data_dict.values()]))
@@ -64,7 +58,7 @@ def make_combination(mitama_data, mitama_type_limit={}, all_suit=True):
 
     def filter_mitama_by_type(mitama, desired_type):
         mitama_info = mitama.values()[0]
-        if (mitama_info[u'御魂类型'] == desired_type):
+        if mitama_info[u'御魂类型'] == desired_type:
             return True
         else:
             return False
@@ -137,23 +131,24 @@ def filter_loc_prop(data_list, prop_limit):
     return filter(prop_value_le_min, data_list)
 
 
-def filter_loc_prop2(data_list, prop_type, prop_score):
-    def prop_value_le_min2(mitama):
-        mitama_info = mitama.values()[0]
-        sum_score = 0
-        for mi in prop_type :
-            sum_score = sum_score + mitama_info.get(mi) / data_format.MITAMA_GROWTH[mi].get(u"最小成长值")
-            if mitama_info.get(mi) > data_format.MITAMA_GROWTH[mi].get(u"副属性最大值"):
-                sum_score = sum_score - data_format.MITAMA_GROWTH[mi].get(u"主属性") / data_format.MITAMA_GROWTH[mi].get(u"最小成长值")
+def filter_effective_secondary_prop(data_list, es_prop, es_prop_num):
+    mitama_growth = data_format.MITAMA_GROWTH
 
-        if sum_score > prop_score:
+    def es_prop_num_le_min(mitama):
+        mitama_info = mitama.values()[0]
+        prop_num = 0
+        for prop in es_prop:
+            prop_value = mitama_info.get(prop, 0)
+            if prop_value >= mitama_growth[prop][u"主属性"]:
+                prop_value -= mitama_growth[prop][u"主属性"]
+            prop_num += prop_value / mitama_growth[prop].get(u"最小成长值")
+
+        if prop_num >= es_prop_num:
             return True
         else:
             return False
 
-
-
-    return filter(prop_value_le_min2, data_list)
+    return filter(es_prop_num_le_min, data_list)
 
 
 def filter_mitama_type(data_list, mitama_type_list):
@@ -329,7 +324,6 @@ def cal_mitama_comb_prop(mitama_sum_data):
         mitama_comb = mitama_data['info']
 
         comb_sum = sum_prop(mitama_comb, mitama_type_count)
-
         comb_data = {'sum': comb_sum,
                      'info': mitama_comb}
         yield comb_data
