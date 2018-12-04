@@ -10,7 +10,9 @@ def filter_loc_and_type(data_dict,
                         l2_prop_limit,
                         l4_prop_limit,
                         l6_prop_limit,
-                        attack_only):
+                        attack_only,
+                        jipindu_type,
+                        jipindu_score):
     if len(data_dict) != 6:
         raise KeyError("combination dict source must have 6 keys")
 
@@ -29,6 +31,21 @@ def filter_loc_and_type(data_dict,
         data_dict[4] = filter_loc_prop(data_dict[4], l4_prop_limit)
     if l6_prop_limit:
         data_dict[6] = filter_loc_prop(data_dict[6], l6_prop_limit)
+
+    #example:
+    #prop_type =  [u'攻击加成',  u'暴击', u'暴击伤害', u'速度']
+    #prop_score = [5,3,5,3,5,0]
+
+    if jipindu_type:
+        prop_type = jipindu_type
+        prop_score = jipindu_score
+
+        data_dict[1] = filter_loc_prop2(data_dict[1], prop_type, prop_score[0])
+        data_dict[2] = filter_loc_prop2(data_dict[2], prop_type, prop_score[1])
+        data_dict[3] = filter_loc_prop2(data_dict[3], prop_type, prop_score[2])
+        data_dict[4] = filter_loc_prop2(data_dict[4], prop_type, prop_score[3])
+        data_dict[5] = filter_loc_prop2(data_dict[5], prop_type, prop_score[4])
+        data_dict[6] = filter_loc_prop2(data_dict[6], prop_type, prop_score[5])
 
     print('after filter by loc prop and type %s'
           % str([len(d) for d in data_dict.values()]))
@@ -118,6 +135,25 @@ def filter_loc_prop(data_list, prop_limit):
             return False
 
     return filter(prop_value_le_min, data_list)
+
+
+def filter_loc_prop2(data_list, prop_type, prop_score):
+    def prop_value_le_min2(mitama):
+        mitama_info = mitama.values()[0]
+        sum_score = 0
+        for mi in prop_type :
+            sum_score = sum_score + mitama_info.get(mi) / data_format.MITAMA_GROWTH[mi].get(u"最小成长值")
+            if mitama_info.get(mi) > data_format.MITAMA_GROWTH[mi].get(u"副属性最大值"):
+                sum_score = sum_score - data_format.MITAMA_GROWTH[mi].get(u"主属性") / data_format.MITAMA_GROWTH[mi].get(u"最小成长值")
+
+        if sum_score > prop_score:
+            return True
+        else:
+            return False
+
+
+
+    return filter(prop_value_le_min2, data_list)
 
 
 def filter_mitama_type(data_list, mitama_type_list):
