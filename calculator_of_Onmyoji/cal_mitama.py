@@ -95,14 +95,20 @@ parser.add_argument("-AO", "--attack-only",
                     help=u'是否只计算输出类御魂，默认为False。'
                          u'"-AO True"为只计算套装属性为攻击加成、'
                          u'暴击和首领御魂的套装组合')
-parser.add_argument("-J", "--jipindu_input",
+parser.add_argument("-ESP", "--effective-secondary-prop",
                     type=str,
                     default='',
-                    help=u'限定御魂的有效属性和每个位置分别的有效属性条数要求'
-                         u'例如"-J 暴击,暴击伤害,速度,攻击加成.5,3,5,3,5,0"'
-                         u'意味着有效属性定位为暴击、暴击伤害、速度、攻击加成这几类'
-                         u'且1~6号位各自的有效条数分别不低于5条、3条、5条、3条、5条、0条'
-                         u'有效属性的定义范围可以是1个或者多个甚至超过4个，有效条数不应该超过9')
+                    help=u'设定御魂的有效副属性，用逗号,间隔'
+                         u'例如"-ESP 暴击,暴击伤害,速度,攻击加成"'
+                         u'意味着有效副属性定位为暴击、暴击伤害、速度、攻击加成')
+parser.add_argument("-ESPN", "--effective-secondary-prop-num",
+                    type=str,
+                    default='',
+                    help=u'限定1-6号位御魂的有效副属性加成次数，用逗号,间隔'
+                         u'与-ESP配合使用'
+                         u'例如"-ESP 暴击 -ESPN 5,3,5,3,5,0"'
+                         u'意味着1~6号位各自的有效副属性加成次数依次不少于5,3,5,3,5,0'
+                         u'1号位副属性暴击加成次数不少于5即暴击不低于12(2.4*5)')
 
 
 def win_decode(utf_str):
@@ -150,35 +156,6 @@ def sep_utf_str_to_dict(utf_str):
     return formated_dict
 
 
-def get_jipindu_type(utf_str):
-    if not utf_str:
-        return dict()
-
-    if sysstr == 'Windows':
-        uni_str = win_decode(utf_str)
-    else:
-        uni_str = utf_str.decode('utf8')
-
-    a_list = uni_str.split('.')
-    temp_a = a_list[0]
-    return temp_a.split(',')
-
-def get_jipindu_score(utf_str):
-    if not utf_str:
-        return dict()
-
-    if sysstr == 'Windows':
-        uni_str = win_decode(utf_str)
-    else:
-        uni_str = utf_str.decode('utf8')
-
-    a_list = uni_str.split('.')
-    temp_a = a_list[1]
-    return temp_a.split(',')
-
-
-
-
 def main():
     args = parser.parse_args()
     print('Input args: %s' % args)
@@ -193,12 +170,9 @@ def main():
     l4_prop_limit = sep_utf_str_to_dict(args.fth_prop_value)
     l6_prop_limit = sep_utf_str_to_dict(args.sth_prop_value)
 
+    es_prop = sep_utf_str(args.effective_secondary_prop)
+    es_prop_num = map(int, sep_utf_str(args.effective_secondary_prop_num))
 
-    jipindu_type = get_jipindu_type(args.jipindu_input)
-    jipindu_score = map(float, get_jipindu_score(args.jipindu_input))
-
-    print "jipindu_type  =%s" % jipindu_type
-    print "jipindu_score  =%s" % jipindu_score
     ignore_serial = sep_utf_str(args.ignore_serial)
 
     base_att, base_critdamage_att, damage_limit = \
@@ -227,8 +201,8 @@ def main():
                                               l4_prop_limit,
                                               l6_prop_limit,
                                               args.attack_only,
-                                              jipindu_type,
-                                              jipindu_score)
+                                              es_prop,
+                                              es_prop_num)
 
     mitama_comb, total_comb = cal.make_combination(locate_sep_data,
                                                    mitama_type_limit,
@@ -248,7 +222,7 @@ def main():
         filter_result = cal.fit_hp_crit_limit(filter_result, base_hp,
                                               base_critdamage, hp_crit_limit)
 
-    write_data.write_mitama_result(args.output_file, filter_result,jipindu_type,
+    write_data.write_mitama_result(args.output_file, filter_result,
                                    base_att, base_hp, base_critdamage)
 
 

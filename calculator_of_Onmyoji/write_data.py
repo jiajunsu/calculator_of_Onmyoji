@@ -10,7 +10,7 @@ import data_format
 MAX_ROW = 65532  # divided by 6 for each result is a combination of 6 details
 
 
-def write_mitama_result(filename, comb_data_list,jipindu_type,
+def write_mitama_result(filename, comb_data_list,
                         base_att=0, base_hp=0, base_critdamage=0):
     workbook = xlwt.Workbook(encoding='utf-8')
     result_num = 0
@@ -21,10 +21,6 @@ def write_mitama_result(filename, comb_data_list,jipindu_type,
     detail_sheet_num += 1
 
     write_header_row(result_sheet, 'result')
-    
-    if jipindu_type:
-        detail_sheet.write(0, 15, label=u'极品度')
-
     write_header_row(detail_sheet, 'detail')
 
     result_row = 1
@@ -59,14 +55,6 @@ def write_mitama_result(filename, comb_data_list,jipindu_type,
                 detail_sheet.write(detail_row, 1, label=mitama_serial)
                 write_mitama_row(detail_sheet, mitama_prop,
                                  detail_row, start_col=2)
-                if jipindu_type:
-                    sum_score = 0
-                    for mi in jipindu_type :
-                        sum_score = sum_score + mitama_prop.get(mi) / data_format.MITAMA_GROWTH[mi].get(u"最小成长值")
-                        if mitama_prop.get(mi) > data_format.MITAMA_GROWTH[mi].get(u"副属性最大值"):
-                            sum_score = sum_score - data_format.MITAMA_GROWTH[mi].get(u"主属性") / data_format.MITAMA_GROWTH[mi].get(u"最小成长值") 
-                    detail_sheet.write(detail_row, 15, label=sum_score)
-                    
                 detail_row += 1
 
             # mimata serial in result sheet is the comb of mitama_data serials
