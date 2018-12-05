@@ -19,8 +19,10 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -M MITAMA_SUIT, --mitama-suit MITAMA_SUIT
-                        期望的御魂x件套类型，多个限制用英文句号.间隔，例如"-M 针女,4"为针女至少4件，"-M
-                        针女,4.破势,2"为针女4件+破势2件
+                        期望的御魂x件套类型，多个限制用英文句号.间隔，例如
+                        "-M 针女,4"为针女至少4件，
+                        "-M 针女,4.破势,2"为针女4件+破势2件，
+                        "-M 暴击,2.暴击,2.暴击,2"为3个暴击两件套
   -P PROP_LIMIT, --prop-limit PROP_LIMIT
                         期望限制的属性下限，多个属性条件用英文句号.间隔, 例如"-P
                         暴击,90.暴击伤害,70"为暴击至少90且暴击伤害至少70
@@ -55,8 +57,6 @@ optional arguments:
                         限定1-6号位御魂的有效副属性加成次数，用逗号,间隔与-ESP配合使用例如"-ESP 暴击 -ESPN 5,
                         3,5,3,5,0"意味着1~6号位各自的有效副属性加成次数依次不少于5,3,5,3,5,01号位副属性暴击
                         加成次数不少于5即暴击不低于12(2.4*5)
-
-
 ```
 
 ## Usage of mitama puller
@@ -105,6 +105,9 @@ python calculator_of_Onmyoji/result_combination.py
 
 ## Cal example for 辉夜姬蚌精盾（90+5=95暴，未满暴）
 ```python calculator_of_Onmyoji/cal_mitama.py example/victor.xls v_result.xls -M 蚌精,4 -P 暴击,90 -2P 生命加成,54 -4P 生命加成,54 -6P 暴击,55  -HL 13785,150,40000 -AS False -ESP 暴击,暴击伤害,生命加成,速度 -ESPN 5,3,5,3,5,0```
+
+## Cal example for 散件爆伤面灵气
+```python calculator_of_Onmyoji/cal_mitama.py example/victor.xls v_result.xls -M 暴击,2.暴击,2.暴击,2 -P 暴击,92 -2P 攻击加成,54 -4P 攻击加成,54 -6P 暴击伤害,88```
 
 ## Make tar
 ```tar zcf calculator.tar.gz calculator_of_Onmyoji example dist LICENSE README.md requirements.txt setup.* win_compile.txt```

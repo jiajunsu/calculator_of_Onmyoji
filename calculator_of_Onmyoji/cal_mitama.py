@@ -32,9 +32,10 @@ parser.add_argument("output_file",
 parser.add_argument("-M", "--mitama-suit",
                     type=str,
                     default=',0',
-                    help=u'期望的御魂x件套类型，多个限制用英文句号.间隔，'
+                    help=u'期望的x件套御魂类型或者加成类型，多个限制用英文句号.间隔，'
                          u'例如"-M 针女,4"为针女至少4件，'
-                         u'"-M 针女,4.破势,2"为针女4件+破势2件')
+                         u'"-M 针女,4.破势,2"为针女4件+破势2件，'
+                         u'"-M 生命加成,2.生命加成,2.生命加成,2"为3个生命加成两件套')
 parser.add_argument("-P", "--prop-limit",
                     type=str,
                     default='',
@@ -137,6 +138,25 @@ def sep_utf_str(utf_str):
         return [uni_str]
 
 
+def sep_utf_str_to_list(utf_str):
+    if not utf_str:
+        return dict()
+
+    if sysstr == 'Windows':
+        uni_str = win_decode(utf_str)
+    else:
+        uni_str = utf_str.decode('utf8')
+    limit_list = uni_str.split('.')
+    formated_list = list()
+    for limit in limit_list:
+        if ',' not in limit:
+            continue
+        key, value = limit.split(',')
+        if key:
+            formated_list.append((key, int(value)))
+    return formated_list
+
+
 def sep_utf_str_to_dict(utf_str):
     if not utf_str:
         return dict()
@@ -162,7 +182,7 @@ def main():
 
     file_name = args.source_data
 
-    mitama_type_limit = sep_utf_str_to_dict(args.mitama_suit)
+    mitama_type_limit = sep_utf_str_to_list(args.mitama_suit)
     prop_limit = sep_utf_str_to_dict(args.prop_limit)
     upper_prop_limit = sep_utf_str_to_dict(args.upper_prop_limit)
 
@@ -170,8 +190,12 @@ def main():
     l4_prop_limit = sep_utf_str_to_dict(args.fth_prop_value)
     l6_prop_limit = sep_utf_str_to_dict(args.sth_prop_value)
 
-    es_prop = sep_utf_str(args.effective_secondary_prop)
-    es_prop_num = map(int, sep_utf_str(args.effective_secondary_prop_num))
+    if args.effective_secondary_prop:
+        es_prop = sep_utf_str(args.effective_secondary_prop)
+        es_prop_num = map(int, sep_utf_str(args.effective_secondary_prop_num))
+    else:
+        es_prop = None
+        es_prop_num = None
 
     ignore_serial = sep_utf_str(args.ignore_serial)
 
