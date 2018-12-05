@@ -128,7 +128,6 @@ def gen_mitama_permutations(mitama_type_limit=None, all_suit=True):
         if m_combos is None:
             yield None
         else:
-            print(",".join(m_combos))
             for m_permu in itertools.permutations(m_combos):
                 if tuple(m_permu) not in generated:
                     generated[tuple(m_permu)] = True
