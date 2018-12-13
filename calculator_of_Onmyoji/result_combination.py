@@ -149,7 +149,7 @@ def make_independent_comb(file_name, mitama_combs, sub_comb_length, cores):
 
     if cores > 1:
         p = multiprocessing.Pool(processes=cores)
-        # TODO(jjs): 这种方式性能太差，改用Queue模式试试看
+        # TODO(jjs): 这种方式性能太差，改用Queue模式
         make_comb_data_parallel = MakeResultInPool(file_name, sub_comb_length)
         for _ in tqdm(p.imap_unordered(make_comb_data_parallel,
                                        combinations(mitama_combs,
@@ -261,8 +261,8 @@ def main():
     print('Files below will be calculated:\n%s\n' % result_files)
     expect_counts = input_expect_combs_counts()
     # TODO(jjs): 将更多步骤放到imap里面去做，然后再打开多进程开关
-    use_multi_process = input_use_multi_process()
-#    use_multi_process = False
+#    use_multi_process = input_use_multi_process()
+    use_multi_process = False
 
     for file_name in result_files:
         print('Calculating %s' % file_name)
