@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 
 from itertools import combinations
+from collections import defaultdict
 import locale
 from math import factorial
 import multiprocessing
@@ -130,11 +131,10 @@ def load_result_sheet(filename):
 
 def get_independent_comb_data(mitama_combs):
     seed_serials = set()
-    # print("seed_serials="+seed_serials)
-    print(seed_serials)
 
     for combs_data in mitama_combs:
-        mitama_serials = combs_data.get(u'御魂序号')
+        # print(combs_data)
+        mitama_serials = combs_data.get(u'御魂序号') # set(123456)
         if seed_serials & mitama_serials:
             return None
         else:
@@ -143,11 +143,12 @@ def get_independent_comb_data(mitama_combs):
     return gen_result_comb_data(mitama_combs)
 
 
-def make_independent_comb(file_name, mitama_combs, sub_comb_length, cores):
+def make_independent_comb(file_name, mitama_combs, last_result_combs, sub_comb_length, cores, allMitamaSet, invertMitamaSet):
     '''遍历组合，找出独立组合并触发写数据'''
     n = len(mitama_combs)
-    total = cal_comb_num(n, sub_comb_length)
-    print('Calculating C(%s, %s) = %s' % (n, sub_comb_length, total))
+    # total = cal_comb_num(n, sub_comb_length)
+    total = 0
+    # print('Calculating C(%s, %s) = %s' % (n, sub_comb_length, total))
 
     if cores > 1:
         p = multiprocessing.Pool(processes=cores)
@@ -164,15 +165,53 @@ def make_independent_comb(file_name, mitama_combs, sub_comb_length, cores):
         make_comb_data_parallel.save()
         return make_comb_data_parallel.count
     else:
+        print("Loading mitamas...")
         result_book = ResultBook(file_name, sub_comb_length)
-        for combs in tqdm(combinations(mitama_combs, sub_comb_length),
-                          desc='Calculating', total=total, unit='comb'):
-            comb_data = get_independent_comb_data(combs)
-            if comb_data:
-                result_book.write(comb_data)
+        mitama_combs_next = []
+
+        print('Calculating %d combo results...' %sub_comb_length)
+
+        if sub_comb_length==2:
+            for midx in tqdm(xrange(len(mitama_combs)),
+                              desc='Calculating', total=n, unit='comb'):
+                comb = mitama_combs[midx]
+                mitama_serials = comb.get(u'御魂序号')
+                available_combs = reduce(lambda x,y:x-y, [allMitamaSet]+[invertMitamaSet[ms] for ms in mitama_serials])
+
+                for ac in available_combs:
+                    if ac>midx:
+                        comb_data = gen_result_comb_data([comb, mitama_combs[ac]])
+                        mitama_combs_next.append(comb_data)
+                        # print(comb_data)
+                        # result_book.write(comb_data)
+        else:
+            for midx in tqdm(xrange(len(last_result_combs)),
+                              desc='Calculating', total=n, unit='comb'):
+                rcomb = last_result_combs[midx]
+                last_comb_serials = rcomb.get(u'组合序号').split(',')
+                comb = [mitama_combs[int(i)-1] for i in last_comb_serials]
+                mitama_serials = reduce(lambda x,y:x|y, map(lambda x:x.get(u'御魂序号'), comb))
+                # print(mitama_serials)
+                available_combs = reduce(lambda x,y:x-y, [allMitamaSet]+[invertMitamaSet[ms] for ms in mitama_serials])
+                # print('available_combs')
+                # print(available_combs)
+
+                max_idx = int(max(last_comb_serials))-1
+                # print(max_idx)
+                for ac in available_combs:
+                    if ac>max_idx:
+                        comb_data = gen_result_comb_data(comb + [mitama_combs[ac]])
+                        mitama_combs_next.append(comb_data)
+                        # print(comb_data)
+                        # result_book.write(comb_data)
+
+        print("Writing results...")
+        for comb_data in tqdm(mitama_combs_next, 
+                            desc='Writing', total=len(mitama_combs_next), unit='comb'):
+            result_book.write(comb_data)
 
         result_book.save()
-        return result_book.count
+        return result_book.count, mitama_combs_next
 
 
 def cal_comb_num(n, m):
@@ -206,8 +245,24 @@ def make_all_independent_combs(file_name, mitama_combs, expect_counts,
                 break
             combs_count += res_count
     else:
-        combs_count = make_independent_comb(file_name,
-                                            mitama_combs, expect_counts, cores)
+        invertMitamaSet = defaultdict(set)
+        allMitamaSet = set()
+        for midx in tqdm(xrange(len(mitama_combs)), desc='Initializing', total=len(mitama_combs), unit='comb'):
+            mitama_comb = mitama_combs[midx]
+            mitama_serials = mitama_comb.get(u'御魂序号') # set(123456)
+            for mitama in mitama_serials:
+                invertMitamaSet[mitama] |= set([midx])
+                allMitamaSet |= set([midx])
+        # print(invertMitamaSet)
+        combs_count = 0
+        result_combs = []
+        for expect in xrange(2,expect_counts+1):
+            # print(expect)
+            # print(result_combs)
+            combs_count,result_combs = make_independent_comb(file_name,
+                                            mitama_combs, result_combs, expect, cores, allMitamaSet, invertMitamaSet)
+            if combs_count==0:
+                break
 
     return combs_count
 
@@ -285,4 +340,5 @@ if __name__ == '__main__':
     except Exception:
         print(traceback.format_exc())
     finally:
-        raw_input('\nPress any key to exit')
+        pass
+        # raw_input('\nPress any key to exit')
