@@ -1,3 +1,6 @@
+# notes by zep
+这里为了尝试大文件中result_combination的可行性，初步尝试两个问题：写文件速度过慢和暂存结果的开销过大，好像确实无解啊。。
+
 # calculator\_of\_Onmyoji
 
 御魂搭配计算器
