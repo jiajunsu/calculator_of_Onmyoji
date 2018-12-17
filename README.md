@@ -1,5 +1,10 @@
 # notes by zep
 这里为了尝试大文件中result_combination的可行性，初步尝试两个问题：写文件速度过慢和暂存结果的开销过大，好像确实无解啊。。
+- 不暂存结果，先不考虑，大不了直接读文件。
+- 不执行gen_result_comb_data（也就是只算结果完全不处理和保存）: 大概300it/s;
+- 执行gen_result_comb_data，不存硬盘：10~30it/s，因为他只检查序号比自己大的套装，所以是越来越快（不写文件）：
+  - github放图太麻烦，懒得放了。
+- 写文件暂时没看那个库，留着先。
 
 # calculator\_of\_Onmyoji
 
