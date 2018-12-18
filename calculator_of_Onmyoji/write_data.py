@@ -25,7 +25,8 @@ def write_mitama_result(filename, comb_data_list, es_prop,
 
 
     if es_prop:
-        detail_sheet.write(0, 15, label=u'极品度')
+        es_col = len(data_format.RESULT_HEADER)
+        detail_sheet.write(0, es_col, label=u'极品度')
         mitama_growth = data_format.MITAMA_GROWTH
 
 
