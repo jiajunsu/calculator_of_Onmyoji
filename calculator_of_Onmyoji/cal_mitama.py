@@ -247,7 +247,7 @@ def main():
                                               base_critdamage, hp_crit_limit)
 
     write_data.write_mitama_result(args.output_file, filter_result, es_prop,
-                                   base_att, base_hp, base_critdamage )
+                                   base_att, base_hp, base_critdamage)
 
 
 if __name__ == '__main__':

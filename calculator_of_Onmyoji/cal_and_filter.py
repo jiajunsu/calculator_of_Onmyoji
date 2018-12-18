@@ -55,7 +55,8 @@ def find_mtype_candidates(mitama_type='ALL'):
         candidates.append(mitama_type)
     elif mitama_type in data_format.MITAMA_PROPS:
         for m_type in data_format.MITAMA_TYPES:
-            if data_format.MITAMA_ENHANCE[m_type][u"加成类型"] == mitama_type or not data_format.MITAMA_ENHANCE[m_type][u"加成类型"]:
+            if (data_format.MITAMA_ENHANCE[m_type][u"加成类型"] == mitama_type
+                    or not data_format.MITAMA_ENHANCE[m_type][u"加成类型"]):
                 candidates.append(m_type)
     return candidates
 
@@ -89,7 +90,8 @@ def gen_mitama_combos(mitama_type_limit=None, all_suit=True):
         else:       # 4+1+1
             yield [m_type] * 4 + ['ALL', 'ALL']
 
-    elif fixed_pos == 6 or (all_suit and fixed_pos >= 2):    # 2+2+2, 2+2+any, 2+any+any
+    elif fixed_pos == 6 or (all_suit and fixed_pos >= 2):
+        # 2+2+2, 2+2+any, 2+any+any
         candidates = []
         for m_type in secondary_type:
             candidates.append(find_mtype_candidates(m_type))
@@ -112,7 +114,8 @@ def gen_mitama_combos(mitama_type_limit=None, all_suit=True):
         for combo in itertools.product(*candidates):
             if len(set(combo[:fixed_pos//2])) != fixed_pos//2:
                 continue
-            t1, t2, t3, t4, t5, t6 = combo[:fixed_pos//2]*2 + combo[fixed_pos//2:]
+            t1, t2, t3, t4, t5, t6 = (combo[:fixed_pos//2]*2 +
+                                      combo[fixed_pos//2:])
             if frozenset((t1, t2, t3, t4, t5, t6)) not in generated:
                 generated[frozenset((t1, t2, t3, t4, t5, t6))] = True
                 yield [t1, t2, t3, t4, t5, t6]
@@ -137,7 +140,6 @@ def gen_mitama_permutations(mitama_type_limit=None, all_suit=True):
 def make_combination(mitama_data, mitama_type_limit=None, all_suit=True):
     if mitama_type_limit is None:
         mitama_type_limit = []
-    main_type, secondary_type = None, None
     total_comb = 0
 
     def filter_mitama_by_type(mitama, desired_type):
@@ -168,7 +170,8 @@ def make_combination(mitama_data, mitama_type_limit=None, all_suit=True):
         else:
             if mitama_data_by_type is None:
                 mitama_data_by_type = classify_by_type()
-            mitama_grp = {x: mitama_data[x] if m_type == 'ALL' else mitama_data_by_type[m_type][x]
+            mitama_grp = {x: mitama_data[x] if m_type == 'ALL' else
+                          mitama_data_by_type[m_type][x]
                           for x, m_type in zip(range(1, 7), m_combos)}
             total_comb += reduce(lambda x, y: x*y,
                                  map(len, mitama_grp.values()))
