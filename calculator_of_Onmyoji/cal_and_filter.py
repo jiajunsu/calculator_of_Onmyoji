@@ -55,7 +55,7 @@ def find_mtype_candidates(mitama_type='ALL'):
         candidates.append(mitama_type)
     elif mitama_type in data_format.MITAMA_PROPS:
         for m_type in data_format.MITAMA_TYPES:
-            if data_format.MITAMA_ENHANCE[m_type][u"加成类型"] == mitama_type:
+            if data_format.MITAMA_ENHANCE[m_type][u"加成类型"] == mitama_type or not data_format.MITAMA_ENHANCE[m_type][u"加成类型"]:
                 candidates.append(m_type)
     return candidates
 

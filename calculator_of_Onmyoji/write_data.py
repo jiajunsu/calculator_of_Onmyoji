@@ -10,7 +10,7 @@ from calculator_of_Onmyoji import data_format
 MAX_ROW = 65532  # divided by 6 for each result is a combination of 6 details
 
 
-def write_mitama_result(filename, comb_data_list,
+def write_mitama_result(filename, comb_data_list, es_prop,
                         base_att=0, base_hp=0, base_critdamage=0):
     workbook = xlwt.Workbook(encoding='utf-8')
     result_num = 0
@@ -22,6 +22,13 @@ def write_mitama_result(filename, comb_data_list,
 
     write_header_row(result_sheet, 'result')
     write_header_row(detail_sheet, 'detail')
+
+
+    if es_prop:
+        es_col = len(data_format.RESULT_HEADER)
+        detail_sheet.write(0, es_col, label=u'极品度')
+        mitama_growth = data_format.MITAMA_GROWTH
+
 
     result_row = 1
     detail_row = 1
@@ -55,6 +62,25 @@ def write_mitama_result(filename, comb_data_list,
                 detail_sheet.write(detail_row, 1, label=mitama_serial)
                 write_mitama_row(detail_sheet, mitama_prop,
                                  detail_row, start_col=2)
+
+
+                if es_prop:
+                    prop_num = 0
+                    for select_prop in es_prop :
+                        prop_value = mitama_prop.get(select_prop, 0.0)
+                        main_prop_value = mitama_growth[select_prop][u"主属性"]
+                        max_prop_value = mitama_growth[select_prop][u"副属性最大值"]
+                        if prop_value >= max_prop_value:
+                            prop_value -= main_prop_value
+                        prop_num += prop_value / mitama_growth[select_prop][u"最小成长值"]
+
+                    if prop_num < 0:
+                        prop_num =0
+
+                    col_result_esp = len(data_format.RESULT_HEADER)
+                    detail_sheet.write(detail_row, col_result_esp, label=prop_num)
+
+
                 detail_row += 1
 
             # mimata serial in result sheet is the comb of mitama_data serials
@@ -83,6 +109,8 @@ def write_header_row(worksheet, sheet_type):
         header_row = data_format.RESULT_HEADER
     elif sheet_type == 'result_combs':
         header_row = data_format.RESULT_COMB_HEADER
+    elif sheet_type == 'data_with_esp':
+        header_row = data_format.MITAMA_COL_NAME_ZH + data_format.MITAMA_EPS_EXTEND_HEADER
     else:
         header_row = data_format.MITAMA_COL_NAME_ZH
 
@@ -145,17 +173,45 @@ def write_extend_col(worksheet, row_num, base_att, base_hp, base_critdamage):
     worksheet.write(row_num, start_col+6, xlwt.Formula(formula_hp_crit))
 
 
-def write_original_mitama_data(filename, data):
+
+def write_original_mitama_data(filename, data, esps_show = False):
     workbook = xlwt.Workbook(encoding='utf-8')
 
     data_sheet = workbook.add_sheet(u'御魂')
-    write_header_row(data_sheet, 'data')
+    if esps_show:
+        write_header_row(data_sheet, 'data_with_esp')
+        mitama_growth = data_format.MITAMA_GROWTH
+        mitama_esp_head = data_format.MITAMA_EPS_EXTEND_HEADER
+        mitama_esp_type = data_format.MITAMA_EPS
+    else:
+        write_header_row(data_sheet, 'data')
+
     row = 1
 
     for serial, prop in data.iteritems():
         data_sheet.write(row, 0, label=serial)
         write_mitama_row(data_sheet, prop, row, 1,
                          header_key=data_format.MITAMA_COL_NAME_ZH)
+
+        col_esp_extend = len(data_format.MITAMA_COL_NAME_ZH)
+        if esps_show:
+            for esp_main in mitama_esp_head :
+                es_prop = mitama_esp_type.get(esp_main)
+           
+                prop_num = 0
+                for select_prop in es_prop:
+                    prop_value = prop.get(select_prop, 0.0)
+                    main_prop_value = mitama_growth[select_prop][u"主属性"]
+                    max_prop_value = mitama_growth[select_prop][u"副属性最大值"]
+                    if prop_value >= max_prop_value:
+                        prop_value -= main_prop_value
+                    prop_num += prop_value / mitama_growth[select_prop][u"最小成长值"]
+
+                if prop_num < 0:
+                    prop_num =0
+                data_sheet.write(row, col_esp_extend, label=prop_num)
+                col_esp_extend += 1
+
         row += 1
 
     ignore_sheet = workbook.add_sheet(u'已使用')
