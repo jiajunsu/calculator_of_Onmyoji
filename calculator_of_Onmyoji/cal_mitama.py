@@ -246,8 +246,8 @@ def main():
         filter_result = cal.fit_hp_crit_limit(filter_result, base_hp,
                                               base_critdamage, hp_crit_limit)
 
-    write_data.write_mitama_result(args.output_file, filter_result,
-                                   base_att, base_hp, base_critdamage)
+    write_data.write_mitama_result(args.output_file, filter_result, es_prop,
+                                   base_att, base_hp, base_critdamage )
 
 
 if __name__ == '__main__':
