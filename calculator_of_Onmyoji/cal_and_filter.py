@@ -10,6 +10,7 @@ def filter_loc_and_type(data_dict,
                         l2_prop_limit,
                         l4_prop_limit,
                         l6_prop_limit,
+                        mitama_type_limit,
                         attack_only,
                         es_prop,
                         es_prop_num):
@@ -20,10 +21,11 @@ def filter_loc_and_type(data_dict,
           % str([len(d) for d in data_dict.values()]))
 
     if attack_only:
-        # 只计算输出类御魂
+        # 只计算输出类御魂,已选定的御魂套装不过滤
+        selected_types = [t for t, _ in mitama_type_limit]
+        filter_types = selected_types + data_format.ATTACK_MITAMA_TYPE
         for loc, data in data_dict.iteritems():
-            data_dict[loc] = filter_mitama_type(data,
-                                                data_format.ATTACK_MITAMA_TYPE)
+            data_dict[loc] = filter_mitama_type(data, filter_types)
 
     # 246号位主属性过滤
     if l2_prop_limit:

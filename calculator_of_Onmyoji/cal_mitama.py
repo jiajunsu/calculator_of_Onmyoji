@@ -224,6 +224,7 @@ def main():
                                               l2_prop_limit,
                                               l4_prop_limit,
                                               l6_prop_limit,
+                                              mitama_type_limit,
                                               args.attack_only,
                                               es_prop,
                                               es_prop_num)
