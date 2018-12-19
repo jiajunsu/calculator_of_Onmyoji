@@ -224,6 +224,7 @@ def main():
                                               l2_prop_limit,
                                               l4_prop_limit,
                                               l6_prop_limit,
+                                              mitama_type_limit,
                                               args.attack_only,
                                               es_prop,
                                               es_prop_num)
@@ -247,7 +248,7 @@ def main():
                                               base_critdamage, hp_crit_limit)
 
     write_data.write_mitama_result(args.output_file, filter_result, es_prop,
-                                   base_att, base_hp, base_critdamage )
+                                   base_att, base_hp, base_critdamage)
 
 
 if __name__ == '__main__':

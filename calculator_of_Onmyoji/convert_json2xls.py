@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
+import argparse
 import os
 import sys
-import argparse
 
 from calculator_of_Onmyoji import load_data
 from calculator_of_Onmyoji import write_data
@@ -16,6 +16,7 @@ def str2bool(v):
         return False
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
+
 
 parser = argparse.ArgumentParser()
 
@@ -31,24 +32,21 @@ parser.add_argument("-ESPS", "--effective-secondary-prop-show",
                          u'首领御魂的固有属性也加入计算，首领御魂的满条为12分左右')
 
 
-
 if __name__ == '__main__':
     args = parser.parse_args()
     esps_show = args.effective_secondary_prop_show
     print('Input args: %s' % args)
     json_files = load_data.get_ext_files('.json')
+
     if not json_files:
         print('There is no json file in current directory, exit.')
         sys.exit(1)
-
-
 
     for file_path in json_files:
         data = load_data.get_mitama_data_json(file_path, [])
 
         file_name, _ = os.path.splitext(file_path)
         file_name_xls = file_name + '.xls'
-
 
         write_data.write_original_mitama_data(file_name_xls, data, esps_show)
 

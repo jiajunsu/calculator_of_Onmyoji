@@ -23,12 +23,10 @@ def write_mitama_result(filename, comb_data_list, es_prop,
     write_header_row(result_sheet, 'result')
     write_header_row(detail_sheet, 'detail')
 
+    es_col = len(data_format.RESULT_HEADER)
 
     if es_prop:
-        es_col = len(data_format.RESULT_HEADER)
         detail_sheet.write(0, es_col, label=u'极品度')
-        mitama_growth = data_format.MITAMA_GROWTH
-
 
     result_row = 1
     detail_row = 1
@@ -63,23 +61,9 @@ def write_mitama_result(filename, comb_data_list, es_prop,
                 write_mitama_row(detail_sheet, mitama_prop,
                                  detail_row, start_col=2)
 
-
                 if es_prop:
-                    prop_num = 0
-                    for select_prop in es_prop :
-                        prop_value = mitama_prop.get(select_prop, 0.0)
-                        main_prop_value = mitama_growth[select_prop][u"主属性"]
-                        max_prop_value = mitama_growth[select_prop][u"副属性最大值"]
-                        if prop_value >= max_prop_value:
-                            prop_value -= main_prop_value
-                        prop_num += prop_value / mitama_growth[select_prop][u"最小成长值"]
-
-                    if prop_num < 0:
-                        prop_num =0
-
-                    col_result_esp = len(data_format.RESULT_HEADER)
-                    detail_sheet.write(detail_row, col_result_esp, label=prop_num)
-
+                    prop_num = cal_es_prop_num(mitama_prop, es_prop)
+                    detail_sheet.write(detail_row, es_col, label=prop_num)
 
                 detail_row += 1
 
@@ -110,7 +94,8 @@ def write_header_row(worksheet, sheet_type):
     elif sheet_type == 'result_combs':
         header_row = data_format.RESULT_COMB_HEADER
     elif sheet_type == 'data_with_esp':
-        header_row = data_format.MITAMA_COL_NAME_ZH + data_format.MITAMA_EPS_EXTEND_HEADER
+        header_row = (data_format.MITAMA_COL_NAME_ZH +
+                      data_format.MITAMA_ESP_EXTEND_HEADER)
     else:
         header_row = data_format.MITAMA_COL_NAME_ZH
 
@@ -173,16 +158,12 @@ def write_extend_col(worksheet, row_num, base_att, base_hp, base_critdamage):
     worksheet.write(row_num, start_col+6, xlwt.Formula(formula_hp_crit))
 
 
-
-def write_original_mitama_data(filename, data, esps_show = False):
+def write_original_mitama_data(filename, data, esps_show=False):
     workbook = xlwt.Workbook(encoding='utf-8')
 
     data_sheet = workbook.add_sheet(u'御魂')
     if esps_show:
         write_header_row(data_sheet, 'data_with_esp')
-        mitama_growth = data_format.MITAMA_GROWTH
-        mitama_esp_head = data_format.MITAMA_EPS_EXTEND_HEADER
-        mitama_esp_type = data_format.MITAMA_EPS
     else:
         write_header_row(data_sheet, 'data')
 
@@ -195,20 +176,9 @@ def write_original_mitama_data(filename, data, esps_show = False):
 
         col_esp_extend = len(data_format.MITAMA_COL_NAME_ZH)
         if esps_show:
-            for esp_main in mitama_esp_head :
-                es_prop = mitama_esp_type.get(esp_main)
-           
-                prop_num = 0
-                for select_prop in es_prop:
-                    prop_value = prop.get(select_prop, 0.0)
-                    main_prop_value = mitama_growth[select_prop][u"主属性"]
-                    max_prop_value = mitama_growth[select_prop][u"副属性最大值"]
-                    if prop_value >= max_prop_value:
-                        prop_value -= main_prop_value
-                    prop_num += prop_value / mitama_growth[select_prop][u"最小成长值"]
-
-                if prop_num < 0:
-                    prop_num =0
+            for esp_main in data_format.MITAMA_ESP_EXTEND_HEADER:
+                es_prop = data_format.MITAMA_ESP[esp_main]
+                prop_num = cal_es_prop_num(prop, es_prop)
                 data_sheet.write(row, col_esp_extend, label=prop_num)
                 col_esp_extend += 1
 
@@ -218,3 +188,20 @@ def write_original_mitama_data(filename, data, esps_show = False):
     write_header_row(ignore_sheet, 'detail')
 
     workbook.save(filename)
+
+
+def cal_es_prop_num(mitama_prop, effect_second_prop):
+    mitama_growth = data_format.MITAMA_GROWTH
+    prop_num = 0
+    for select_prop in effect_second_prop:
+        prop_value = mitama_prop.get(select_prop, 0.0)
+        main_prop_value = mitama_growth[select_prop][u"主属性"]
+        max_prop_value = mitama_growth[select_prop][u"副属性最大值"]
+        if prop_value >= max_prop_value:
+            prop_value -= main_prop_value
+        prop_num += prop_value / mitama_growth[select_prop][u"最小成长值"]
+
+    if prop_num < 0:
+        prop_num = 0
+
+    return prop_num
