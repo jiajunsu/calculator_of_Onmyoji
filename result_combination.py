@@ -11,6 +11,7 @@ import traceback
 
 from tqdm import tqdm
 import xlrd
+import xlwt
 from xlutils.copy import copy
 
 from calculator_of_Onmyoji import data_format
@@ -26,8 +27,9 @@ class ResultBook(object):
         self.filename = filename
         self.postfix = str(postfix)
 
-        read_book = xlrd.open_workbook(filename=self.filename)
-        self.write_book = copy(read_book)
+        # read_book = xlrd.open_workbook(filename=self.filename)
+        # self.write_book = copy(read_book)
+        self.write_book = xlwt.Workbook(encoding='utf-8')
 
         self.work_sheet = None
         self.work_sheet_num = 0
@@ -180,8 +182,9 @@ def make_independent_comb(file_name, mitama_combs, last_result_combs, sub_comb_l
 
                 for ac in available_combs:
                     if ac>midx:
+                        # pass
                         comb_data = gen_result_comb_data([comb, mitama_combs[ac]])
-                        mitama_combs_next.append(comb_data)
+                        # mitama_combs_next.append(comb_data)
                         # print(comb_data)
                         # result_book.write(comb_data)
         else:
@@ -200,15 +203,16 @@ def make_independent_comb(file_name, mitama_combs, last_result_combs, sub_comb_l
                 # print(max_idx)
                 for ac in available_combs:
                     if ac>max_idx:
+                        # pass
                         comb_data = gen_result_comb_data(comb + [mitama_combs[ac]])
-                        mitama_combs_next.append(comb_data)
+                        # mitama_combs_next.append(comb_data)
                         # print(comb_data)
                         # result_book.write(comb_data)
 
-        print("Writing results...")
-        for comb_data in tqdm(mitama_combs_next, 
-                            desc='Writing', total=len(mitama_combs_next), unit='comb'):
-            result_book.write(comb_data)
+        # print("Writing results...")
+        # for comb_data in tqdm(mitama_combs_next, 
+        #                     desc='Writing', total=len(mitama_combs_next), unit='comb'):
+        #     result_book.write(comb_data)
 
         result_book.save()
         return result_book.count, mitama_combs_next
@@ -267,12 +271,36 @@ def make_all_independent_combs(file_name, mitama_combs, expect_counts,
     return combs_count
 
 
-def gen_result_comb_data(independent_comb):
-    result_comb_data = {u'组合个数': len(independent_comb)}
+def merge(A, B, f):
+    """merge two dict; py2 style"""
+    # Start with symmetric difference; keys either in A or B, but not both
+    merged = {k: A.get(k, B.get(k)) for k in A.viewkeys() ^ B.viewkeys()}
+    # Update with `f()` applied to the intersection
+    merged.update({k: f(A[k], B[k]) for k in A.viewkeys() & B.viewkeys()})
+    return merged
 
-    for key in data_format.RESULT_COMB_HEADER[1:]:
-        result_comb_data[key] = ','.join([str(d.get(key, 0))
-                                          for d in independent_comb])
+def merge_func(a, b):
+    return ','.join([str(a),str(b)])
+
+def gen_result_comb_data(independent_comb):
+    # A = {k:independent_comb[0][k] for k in data_format.RESULT_COMB_HEADER[1:] if k in independent_comb[0]}
+    # B = {k:independent_comb[1][k] for k in data_format.RESULT_COMB_HEADER[1:] if k in independent_comb[1]}
+    # result_comb_data = merge(A,B, merge_func)
+    # result_comb_data[u'组合个数'] = len(independent_comb)
+
+    result_comb_data = {key:','.join([str(d[key]) for d in independent_comb]) 
+                            for key in data_format.RESULT_COMB_HEADER[1:]}
+    result_comb_data[u'组合个数'] = len(independent_comb)
+    # result_comb_data = {u'组合个数': len(independent_comb)}
+
+
+    # for key in data_format.RESULT_COMB_HEADER[1:]:
+    #     ## result_comb_data[key] = ','.join([str(d.get(key, 0))
+    #     ##                                   for d in independent_comb])
+    #     result_comb_data[key] = ','.join([str(d[key])
+    #                                       for d in independent_comb])
+    #     # result_comb_data[key] = reduce(lambda x,y:x+','+y, [str(d[key])
+    #     #                                   for d in independent_comb])
 
     return result_comb_data
 
