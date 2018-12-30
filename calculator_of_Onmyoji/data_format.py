@@ -1,5 +1,10 @@
 # coding: utf-8
 
+import string
+
+
+COL_INDEX = string.ascii_uppercase
+
 MITAMA_COL_NAME_ZH = [u'御魂序号', u'御魂类型', u'位置', u'攻击',
                       u'攻击加成', u'防御', u'防御加成', u'暴击',
                       u'暴击伤害', u'生命', u'生命加成', u'效果命中',
@@ -7,12 +12,20 @@ MITAMA_COL_NAME_ZH = [u'御魂序号', u'御魂类型', u'位置', u'攻击',
 
 RESULT_HEADER = [u'组合序号'] + MITAMA_COL_NAME_ZH
 
+RESULT_HEADER_LEN = len(RESULT_HEADER)
+
+RESULT_INDEX = {RESULT_HEADER[i]: COL_INDEX[i]
+                for i in range(RESULT_HEADER_LEN)}
+
 RESULT_COMB_HEADER = [u'组合个数', u'组合序号',
                       u'暴击', u'攻击x暴伤', u'速度']
 
 EXTEND_HEADER = [u'式神基础攻击', u'式神基础生命', u'式神基础暴伤',
                  u'总攻击', u'总生命',
                  u'攻击x暴伤', u'生命×暴伤']
+
+EXTEND_INDEX = {EXTEND_HEADER[i]: COL_INDEX[i+RESULT_HEADER_LEN]
+                for i in range(len(EXTEND_HEADER))}
 
 MITAMA_TYPES = [u'珍珠', u'骰子鬼', u'蚌精', u'魅妖', u'针女',
                 u'返魂香', u'土蜘蛛', u'胧车', u'荒骷髅', u'地震鲶',
