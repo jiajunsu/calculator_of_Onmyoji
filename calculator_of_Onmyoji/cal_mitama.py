@@ -2,14 +2,14 @@
 # coding: utf-8
 
 import argparse
-import platform
+import locale
 
 from calculator_of_Onmyoji import cal_and_filter as cal
 from calculator_of_Onmyoji import load_data
 from calculator_of_Onmyoji import write_data
 
 
-ENCODINGS = ['gbk', 'big5', 'cp932']
+code_t = locale.getpreferredencoding()
 
 
 def str2bool(v):
@@ -21,7 +21,6 @@ def str2bool(v):
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
 
-sysstr = platform.system()
 parser = argparse.ArgumentParser()
 parser.add_argument("source_data",
                     type=str,
@@ -112,26 +111,17 @@ parser.add_argument("-ESPN", "--effective-secondary-prop-num",
                          u'1号位副属性暴击加成次数不少于5即暴击不低于12(2.4*5)')
 
 
-def win_decode(utf_str):
-    for encoding in ENCODINGS:
-        try:
-            uni_str = utf_str.decode(encoding)
-            break
-        except UnicodeDecodeError:
-            pass
-    else:
+def locale_decode(utf_str):
+    try:
+        uni_str = utf_str.decode(code_t)
+        return uni_str
+    except UnicodeDecodeError:
         print('Decode failed %s' % utf_str)
         raise UnicodeDecodeError
 
-    return uni_str
-
 
 def sep_utf_str(utf_str):
-    # solve problem with get utf8 args from shell
-    if sysstr == 'Windows':
-        uni_str = win_decode(utf_str)
-    else:
-        uni_str = utf_str.decode('utf8')
+    uni_str = locale_decode(utf_str)
     if ',' in uni_str:
         return uni_str.split(',')
     else:
@@ -142,10 +132,7 @@ def sep_utf_str_to_list(utf_str):
     if not utf_str:
         return dict()
 
-    if sysstr == 'Windows':
-        uni_str = win_decode(utf_str)
-    else:
-        uni_str = utf_str.decode('utf8')
+    uni_str = locale_decode(utf_str)
     limit_list = uni_str.split('.')
     formated_list = list()
     for limit in limit_list:
@@ -161,10 +148,7 @@ def sep_utf_str_to_dict(utf_str):
     if not utf_str:
         return dict()
 
-    if sysstr == 'Windows':
-        uni_str = win_decode(utf_str)
-    else:
-        uni_str = utf_str.decode('utf8')
+    uni_str = locale_decode(utf_str)
     limit_list = uni_str.split('.')
     formated_dict = dict()
     for limit in limit_list:
