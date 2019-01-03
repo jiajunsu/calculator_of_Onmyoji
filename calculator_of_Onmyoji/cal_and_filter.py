@@ -10,6 +10,7 @@ def filter_loc_and_type(data_dict,
                         l2_prop_limit,
                         l4_prop_limit,
                         l6_prop_limit,
+                        mitama_type_limit,
                         attack_only,
                         es_prop,
                         es_prop_num):
@@ -20,10 +21,11 @@ def filter_loc_and_type(data_dict,
           % str([len(d) for d in data_dict.values()]))
 
     if attack_only:
-        # 只计算输出类御魂
+        # 只计算输出类御魂,已选定的御魂套装不过滤
+        selected_types = [t for t, _ in mitama_type_limit]
+        filter_types = selected_types + data_format.ATTACK_MITAMA_TYPE
         for loc, data in data_dict.iteritems():
-            data_dict[loc] = filter_mitama_type(data,
-                                                data_format.ATTACK_MITAMA_TYPE)
+            data_dict[loc] = filter_mitama_type(data, filter_types)
 
     # 246号位主属性过滤
     if l2_prop_limit:
@@ -55,7 +57,8 @@ def find_mtype_candidates(mitama_type='ALL'):
         candidates.append(mitama_type)
     elif mitama_type in data_format.MITAMA_PROPS:
         for m_type in data_format.MITAMA_TYPES:
-            if data_format.MITAMA_ENHANCE[m_type][u"加成类型"] == mitama_type:
+            if (data_format.MITAMA_ENHANCE[m_type][u"加成类型"] == mitama_type
+                    or not data_format.MITAMA_ENHANCE[m_type][u"加成类型"]):
                 candidates.append(m_type)
     return candidates
 
@@ -139,7 +142,6 @@ def gen_mitama_permutations(mitama_type_limit=None, all_suit=True):
 def make_combination(mitama_data, mitama_type_limit=None, all_suit=True):
     if mitama_type_limit is None:
         mitama_type_limit = []
-    main_type, secondary_type = None, None
     total_comb = 0
 
     def filter_mitama_by_type(mitama, desired_type):

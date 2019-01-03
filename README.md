@@ -10,19 +10,19 @@ usage: cal_mitama.py [-h] [-M MITAMA_SUIT] [-P PROP_LIMIT]
                      [-4P FTH_PROP_VALUE] [-6P STH_PROP_VALUE]
                      [-IG IGNORE_SERIAL] [-AS ALL_SUIT] [-DL DAMAGE_LIMIT]
                      [-HL HEALTH_LIMIT] [-AO ATTACK_ONLY]
+                     [-ESP EFFECTIVE_SECONDARY_PROP]
+                     [-ESPN EFFECTIVE_SECONDARY_PROP_NUM]
                      source_data output_file
 
 positional arguments:
-  source_data           御魂数据表格，格式参照example/data_Template.xls
+  source_data           御魂数据，格式参照example/data_Template.xls
   output_file           输出文件位置，格式为pathto/filename.xls
 
 optional arguments:
   -h, --help            show this help message and exit
   -M MITAMA_SUIT, --mitama-suit MITAMA_SUIT
-                        期望的御魂x件套类型，多个限制用英文句号.间隔，例如
-                        "-M 针女,4"为针女至少4件，
-                        "-M 针女,4.破势,2"为针女4件+破势2件，
-                        "-M 暴击,2.暴击,2.暴击,2"为3个暴击两件套
+                        期望的x件套御魂类型或者加成类型，多个限制用英文句号.间隔，例如"-M 针女,4"为针女至少4件，"-M
+                        针女,4.破势,2"为针女4件+破势2件，"-M 生命加成,2.生命加成,2.生命加成,2"为3个生命两件套
   -P PROP_LIMIT, --prop-limit PROP_LIMIT
                         期望限制的属性下限，多个属性条件用英文句号.间隔, 例如"-P
                         暴击,90.暴击伤害,70"为暴击至少90且暴击伤害至少70
@@ -79,6 +79,20 @@ optional arguments:
 usage: make sure json files are in the same directory with convert_json2xls.py
 
 python convert_json2xls.py
+
+or
+
+python convert_json2xls.py -ESPS True
+```
+
+```
+在转换成的excel中的“输出类”、“奶盾类”、“命中类”、“双堆类”下面的值为该类包含有效属性的有效条数，
+其中:
+“输出类”为包含 攻击加成、速度、暴击、暴击伤害的有效条数'
+“奶盾类”为包含 生命加成、速度、暴击、暴击伤害的有效条数'
+“命中类”为包含 效果命中、速度的有效条数'
+“双堆类”为包含 效果命中、效果抵抗、速度的有效条数'
+“说明：首领御魂的固有属性也加入计算，因此最大可能达到12分以上”
 ```
 
 ## Usage of result\_combination
