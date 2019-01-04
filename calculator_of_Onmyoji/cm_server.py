@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
+import traceback
+
 import flask
+
+from calculator_of_Onmyoji import cal_mitama
+
 
 app = flask.Flask(__name__)
 
@@ -11,14 +16,14 @@ def index():
     return flask.render_template('index.html')
 
 
-@app.route('/calculate', methods=['GET', 'POST'])
+@app.route('/calculate', methods=['POST'])
 def calculate():
-    if flask.request.method == 'POST':
-        # TODO(jjs): start calculator
-        return ''
-    else:
-        # TODO(jjs): get the process of calculator
-        return ''
+    try:
+        calculator = cal_mitama.Calculator(flask.request.get_json(force=True))
+        calculator.run()
+        return 'Calculate finished'
+    except Exception:
+        return traceback.format_exc()
 
 
 if __name__ == '__main__':
