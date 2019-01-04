@@ -75,7 +75,7 @@ class Calculator(object):
         if not kwargs:
             self._init_from_args()
         else:
-            self._init_from_kwargs(kwargs)
+            self.init_from_kwargs(kwargs)
 
     def _init_from_args(self):
         args = self._get_args()
@@ -214,7 +214,7 @@ class Calculator(object):
                                  u'即暴击不低于12(2.4*5)')
         return parser.parse_args()
 
-    def _init_from_kwargs(self, param_dict):
+    def init_from_kwargs(self, param_dict):
         print('Input params %s' % str(param_dict))
         for key, value in param_dict.iteritems():
             setattr(self, key, value)
