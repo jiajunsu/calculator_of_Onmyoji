@@ -28,4 +28,4 @@ def calculate():
 
 if __name__ == '__main__':
     # TODO(jjs): load host and port from config file
-    app.run(host='0.0.0.0', port=2019)
+    app.run(host='0.0.0.0', port=2019, debug=True)
