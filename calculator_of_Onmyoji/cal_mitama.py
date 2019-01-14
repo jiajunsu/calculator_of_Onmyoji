@@ -216,6 +216,7 @@ class Calculator(object):
 
     def init_from_params(self, param_dict):
         print('Input params %s' % str(param_dict))
+        # TODO: change params reader to be same as args reader
         for key, value in param_dict.iteritems():
             setattr(self, key, value)
 
