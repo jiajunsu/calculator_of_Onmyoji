@@ -111,8 +111,9 @@
 			</div>
 		</div>
 		
-		<button type="submit" class="btn btn-primary">开始计算</button>
-			
+		<form id="start">
+			<button type="submit" class="btn btn-primary">开始计算</button>
+		</form>
 	<script src="/static/js/jquery.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
 	<script>
@@ -130,6 +131,22 @@
 			if(forms.length > 1) form.remove();
 			$(add_bt).attr('disabled', false);
         }
+		$("#start").submit(function(event) {
+			event.preventDefault();
+			// 获取御魂套装限制
+			var m_types = $('[id="mitama_type"]');
+			var m_nums =  $('[id="mitama_num"]');
+			var len = m_types.length;
+			var mitama_suit = ''
+			for(var i=0; i<len; i++) {
+				mitama_suit += m_types[i].value;
+				mitama_suit += ',';
+				mitama_suit += m_nums[i].value;
+				if (i < len-1) mitama_suit += '.';
+			}
+			// TODO $.post("/calculate", data)
+			console.log(mitama_suit);
+		})
     </script>
     </body>
 </html>
