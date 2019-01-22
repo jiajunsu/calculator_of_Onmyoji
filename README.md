@@ -2,6 +2,16 @@
 
 御魂搭配计算器
 
+## Setup
+
+Python version need to be 2.7.*.
+
+```
+pip install -r requirements.txt  
+pip install .
+```
+
+
 ## Usage of calculator
 
 ```
@@ -57,6 +67,12 @@ optional arguments:
                         限定1-6号位御魂的有效副属性加成次数，用逗号,间隔与-ESP配合使用例如"-ESP 暴击 -ESPN 5,
                         3,5,3,5,0"意味着1~6号位各自的有效副属性加成次数依次不少于5,3,5,3,5,01号位副属性暴击
                         加成次数不少于5即暴击不低于12(2.4*5)
+```
+
+## Usage of cm server
+
+```
+python ./calculator_of_Onmyoji/cm_server.py
 ```
 
 ## Usage of mitama puller
