@@ -75,6 +75,9 @@ optional arguments:
 python ./calculator_of_Onmyoji/cm_server.py
 ```
 
+Then open http://127.0.0.1:2019 in web browser, Chrome etc. The ip and port could support to be modified in future.
+
+
 ## Usage of mitama puller
 
 ```
