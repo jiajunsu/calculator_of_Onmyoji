@@ -149,6 +149,11 @@
             data = {'source_data': source_data,
                     'mitama_suit': mitama_suit};
             console.log(data);
+            $.ajax({
+                    type: 'POST',
+                    url: "/calculate",
+                    data: data,
+                   });
         })
     </script>
     </body>

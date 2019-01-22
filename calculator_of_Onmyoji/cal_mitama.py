@@ -73,12 +73,12 @@ def sep_utf_str_to_dict(utf_str):
 class Calculator(object):
     def __init__(self, params=None):
         if not params:
-            self._init_from_args()
+            args = self._get_args()
         else:
-            self.init_from_params(params)
+            args = self._get_params(params)
+        self._init_attr(args)
 
-    def _init_from_args(self):
-        args = self._get_args()
+    def _init_attr(self, args):
         print('Input args: %s' % args)
 
         self.file_name = args.source_data
@@ -214,11 +214,13 @@ class Calculator(object):
                                  u'即暴击不低于12(2.4*5)')
         return parser.parse_args()
 
-    def init_from_params(self, param_dict):
-        print('Input params %s' % str(param_dict))
-        # TODO: change params reader to be same as args reader
-        for key, value in param_dict.iteritems():
-            setattr(self, key, value)
+    def _get_params(self, param_dict):
+        class Args(object):
+            def __init__(self, **entries):
+                self.__dict__.update(entries)
+
+        print('Input params: %s' % param_dict)
+        return Args(param_dict)
 
     def run(self):
         origin_data = load_data.get_mitama_data(self.file_name,

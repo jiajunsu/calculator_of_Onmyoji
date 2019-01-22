@@ -19,7 +19,7 @@ def index():
 @app.route('/calculate', methods=['POST'])
 def calculate():
     try:
-        calculator = cal_mitama.Calculator(flask.request.get_json(force=True))
+        calculator = cal_mitama.Calculator(flask.request.form.to_dict())
         calculator.run()
         return 'Calculate finished'
     except Exception:
