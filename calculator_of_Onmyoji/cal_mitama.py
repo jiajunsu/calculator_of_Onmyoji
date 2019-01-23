@@ -10,6 +10,8 @@ from calculator_of_Onmyoji import write_data
 
 
 code_t = locale.getpreferredencoding()
+need_decode = True
+global need_decode
 
 
 def str2bool(v):
@@ -22,6 +24,9 @@ def str2bool(v):
 
 
 def locale_decode(utf_str):
+    if not need_decode:
+        return utf_str
+
     try:
         uni_str = utf_str.decode(code_t)
         return uni_str
@@ -74,13 +79,15 @@ class Calculator(object):
     def __init__(self, params=None):
         if not params:
             args = self._get_args()
+            print('Input args: %s' % args)
         else:
+            global need_decode
+            need_decode = False
+            print('Input params: %s' % params)
             args = self._get_params(params)
         self._init_attr(args)
 
     def _init_attr(self, args):
-        print('Input args: %s' % args)
-
         self.file_name = args.source_data
         self.output_file = args.output_file
 
@@ -219,8 +226,7 @@ class Calculator(object):
             def __init__(self, **entries):
                 self.__dict__.update(entries)
 
-        print('Input params: %s' % param_dict)
-        return Args(param_dict)
+        return Args(**param_dict)
 
     def run(self):
         origin_data = load_data.get_mitama_data(self.file_name,

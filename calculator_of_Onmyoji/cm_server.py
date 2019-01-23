@@ -19,11 +19,16 @@ def index():
 @app.route('/calculate', methods=['POST'])
 def calculate():
     try:
-        calculator = cal_mitama.Calculator(flask.request.form.to_dict())
+        # NOTE: request must be "Content-Type: application/json"
+        if not flask.request.is_json:
+            return flask.make_response(('Request content-type must be json',
+                                        400))
+        params = flask.request.get_json()
+        calculator = cal_mitama.Calculator(params)
         calculator.run()
-        return 'Calculate finished'
+        return flask.make_response(('Calculate finished', 200))
     except Exception:
-        return traceback.format_exc()
+        return flask.make_response((traceback.format_exc(), 500))
 
 
 if __name__ == '__main__':

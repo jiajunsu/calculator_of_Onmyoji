@@ -7,7 +7,7 @@
 Python version need to be 2.7.*.
 
 ```
-pip install -r requirements.txt  
+pip install -r requirements.txt
 pip install .
 ```
 
@@ -76,6 +76,11 @@ python ./calculator_of_Onmyoji/cm_server.py
 ```
 
 Then open http://127.0.0.1:2019 in web browser, Chrome etc. The ip and port could support to be modified in future.
+
+Request example:
+```
+curl http://127.0.0.1:2019/calculate -X POST -H "Content-Type: application/json" -d '{"source_data":"/path/to/example/data_Template.xls","mitama_suit":"针女,4", "output_file":"/path/to/data_Template-result.xls", "prop_limit":"暴击,90", "upper_prop_limit":",0", "sec_prop_value":",0", "fth_prop_value":",0", "sth_prop_value":",0", "ignore_serial":"","all_suit":"True","damage_limit":"0,0,0", "health_limit":"0,0,0","attack_only":"False","effective_secondary_prop":"","effective_secondary_prop_num":""}'
+```
 
 
 ## Usage of mitama puller
