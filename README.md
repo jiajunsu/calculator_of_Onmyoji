@@ -149,3 +149,7 @@ python calculator_of_Onmyoji/result_combination.py
 
 ## Make tar
 ```tar zcf calculator.tar.gz calculator_of_Onmyoji example dist LICENSE README.md requirements.txt setup.* win_compile.txt ChangeLog```
+
+## Related projects
+
+* web-UI https://github.com/yinxin630/yys-yuhun-calculator-ui
