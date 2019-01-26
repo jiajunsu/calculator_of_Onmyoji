@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
+import json
 import traceback
 
 import flask
+from webob import exc
 
 from calculator_of_Onmyoji import cal_mitama
 
@@ -21,14 +23,20 @@ def calculate():
     try:
         # NOTE: request must be "Content-Type: application/json"
         if not flask.request.is_json:
-            return flask.make_response(('Request content-type must be json',
-                                        400))
+            res = {"reason": "Request content-type must be json"}
+            return flask.make_response((json.dumps(res),
+                                        exc.HTTPBadRequest.code))
+
         params = flask.request.get_json()
         calculator = cal_mitama.Calculator(params)
-        calculator.run()
-        return flask.make_response(('Calculate finished', 200))
+        result_num = calculator.run()
+        ret = exc.HTTPOk.code
+        res = {"result_num": result_num}
     except Exception:
-        return flask.make_response((traceback.format_exc(), 500))
+        ret = exc.HTTPInternalServerError.code
+        res = {"reason": traceback.format_exc()}
+
+    return flask.make_response((json.dumps(res), ret))
 
 
 if __name__ == '__main__':

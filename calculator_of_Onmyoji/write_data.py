@@ -83,6 +83,8 @@ def write_mitama_result(filename, comb_data_list, es_prop,
     workbook.save(filename)
     print("We got %s results" % result_num)
 
+    return result_num
+
 
 def write_header_row(worksheet, sheet_type):
     if sheet_type == 'result':
