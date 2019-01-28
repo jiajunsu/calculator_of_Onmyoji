@@ -41,7 +41,8 @@ def calculate():
         calculator = cal_mitama.Calculator(params)
         result_num = calculator.run()
         ret = exc.HTTPOk.code
-        res = {"result_num": result_num}
+        res = {"result_num": result_num,
+               "output_file": params['output_file']}
     except Exception:
         ret = exc.HTTPInternalServerError.code
         res = {"reason": traceback.format_exc()}
