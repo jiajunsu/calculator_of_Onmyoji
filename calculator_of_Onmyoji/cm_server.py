@@ -4,6 +4,7 @@
 import ConfigParser
 import json
 import os
+import sys
 import traceback
 
 import flask
@@ -12,7 +13,15 @@ from webob import exc
 from calculator_of_Onmyoji import cal_mitama
 
 
-app = flask.Flask(__name__)
+if getattr(sys, 'frozen', False):
+    template_folder = os.path.join(sys.executable, '..', 'templates')
+    static_folder = os.path.join(sys.executable, '..', 'static')
+    app = flask.Flask(__name__,
+                      template_folder=template_folder,
+                      static_folder=static_folder)
+else:
+    app = flask.Flask(__name__)
+
 work_path = os.path.dirname(os.path.realpath(__file__))
 
 
@@ -56,4 +65,4 @@ if __name__ == '__main__':
     conf.read(os.path.join(work_path, 'server.conf'))
     app.run(host=conf.get('global', 'host'),
             port=conf.get('global', 'port'),
-            debug=True)
+            )
