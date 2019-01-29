@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
+import ConfigParser
 import json
 import os
 import traceback
@@ -12,6 +13,7 @@ from calculator_of_Onmyoji import cal_mitama
 
 
 app = flask.Flask(__name__)
+work_path = os.path.dirname(os.path.realpath(__file__))
 
 
 @app.route('/', methods=['GET'])
@@ -34,7 +36,6 @@ def calculate():
             # NOTE: UI只能获取文件名，限定文件必须在当前目录
             src_filename = params['src_filename']
             dst_filename = os.path.splitext(src_filename)[0] + '-result.xls'
-            work_path = os.getcwd()
             params['source_data'] = os.path.join(work_path, src_filename)
             params['output_file'] = os.path.join(work_path, dst_filename)
 
@@ -51,5 +52,8 @@ def calculate():
 
 
 if __name__ == '__main__':
-    # TODO(jjs): load host and port from config file
-    app.run(host='0.0.0.0', port=2019, debug=True)
+    conf = ConfigParser.ConfigParser()
+    conf.read(os.path.join(work_path, 'server.conf'))
+    app.run(host=conf.get('global', 'host'),
+            port=conf.get('global', 'port'),
+            debug=True)
