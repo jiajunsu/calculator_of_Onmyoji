@@ -4,3 +4,4 @@ xlwt
 requests
 tqdm
 flask
+webob

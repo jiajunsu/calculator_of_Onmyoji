@@ -10,6 +10,8 @@ from calculator_of_Onmyoji import write_data
 
 
 code_t = locale.getpreferredencoding()
+need_decode = True
+global need_decode
 
 
 def str2bool(v):
@@ -22,6 +24,9 @@ def str2bool(v):
 
 
 def locale_decode(utf_str):
+    if not need_decode:
+        return utf_str
+
     try:
         uni_str = utf_str.decode(code_t)
         return uni_str
@@ -73,14 +78,16 @@ def sep_utf_str_to_dict(utf_str):
 class Calculator(object):
     def __init__(self, params=None):
         if not params:
-            self._init_from_args()
+            args = self._get_args()
+            print('Input args: %s' % args)
         else:
-            self.init_from_params(params)
+            global need_decode
+            need_decode = False
+            print('Input params: %s' % params)
+            args = self._get_params(params)
+        self._init_attr(args)
 
-    def _init_from_args(self):
-        args = self._get_args()
-        print('Input args: %s' % args)
-
+    def _init_attr(self, args):
         self.file_name = args.source_data
         self.output_file = args.output_file
 
@@ -214,10 +221,12 @@ class Calculator(object):
                                  u'即暴击不低于12(2.4*5)')
         return parser.parse_args()
 
-    def init_from_params(self, param_dict):
-        print('Input params %s' % str(param_dict))
-        for key, value in param_dict.iteritems():
-            setattr(self, key, value)
+    def _get_params(self, param_dict):
+        class Args(object):
+            def __init__(self, **entries):
+                self.__dict__.update(entries)
+
+        return Args(**param_dict)
 
     def run(self):
         origin_data = load_data.get_mitama_data(self.file_name,
@@ -258,12 +267,14 @@ class Calculator(object):
                                                   self.base_critdamage,
                                                   self.hp_crit_limit)
 
-        write_data.write_mitama_result(self.output_file,
-                                       filter_result,
-                                       self.es_prop,
-                                       self.base_att,
-                                       self.base_hp,
-                                       self.base_critdamage)
+        result_num = write_data.write_mitama_result(self.output_file,
+                                                    filter_result,
+                                                    self.es_prop,
+                                                    self.base_att,
+                                                    self.base_hp,
+                                                    self.base_critdamage)
+
+        return result_num
 
 
 if __name__ == '__main__':
