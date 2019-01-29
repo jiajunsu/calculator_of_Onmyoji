@@ -33,7 +33,7 @@ def calculate():
         if 'src_filename' in params:
             # NOTE: UI只能获取文件名，限定文件必须在当前目录
             src_filename = params['src_filename']
-            dst_filename = '-result'.join(os.path.splitext(src_filename))
+            dst_filename = os.path.splitext(src_filename)[0] + '-result.xls'
             work_path = os.getcwd()
             params['source_data'] = os.path.join(work_path, src_filename)
             params['output_file'] = os.path.join(work_path, dst_filename)
