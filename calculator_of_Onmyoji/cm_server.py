@@ -5,7 +5,10 @@ import ConfigParser
 import json
 import os
 import sys
+import threading
+import time
 import traceback
+import webbrowser
 
 import flask
 from webob import exc
@@ -60,9 +63,19 @@ def calculate():
     return flask.make_response((json.dumps(res), ret))
 
 
+def open_browser(host, port):
+    url = 'http://%s:%s' % (host, port)
+    time.sleep(1)
+    webbrowser.open(url)
+
+
 if __name__ == '__main__':
     conf = ConfigParser.ConfigParser()
     conf.read(os.path.join(work_path, 'server.conf'))
-    app.run(host=conf.get('global', 'host'),
-            port=conf.get('global', 'port'),
-            )
+    host = conf.get('global', 'host')
+    port = conf.get('global', 'port')
+
+    t = threading.Thread(target=open_browser, args=(host, port))
+    t.start()
+
+    app.run(host=host, port=port)
