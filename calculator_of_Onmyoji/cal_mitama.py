@@ -4,14 +4,13 @@
 import argparse
 import locale
 
-from calculator_of_Onmyoji import cal_and_filter as cal
+from calculator_of_Onmyoji import algorithm
 from calculator_of_Onmyoji import load_data
 from calculator_of_Onmyoji import write_data
 
 
 code_t = locale.getpreferredencoding()
 need_decode = True
-global need_decode
 
 
 def str2bool(v):
@@ -45,7 +44,7 @@ def sep_utf_str(utf_str):
 
 def sep_utf_str_to_list(utf_str):
     if not utf_str:
-        return dict()
+        return list()
 
     uni_str = locale_decode(utf_str)
     limit_list = uni_str.split('.')
@@ -86,6 +85,7 @@ class Calculator(object):
             print('Input params: %s' % params)
             args = self._get_params(params)
         self._init_attr(args)
+        self.combs = None
 
     def _init_attr(self, args):
         self.file_name = args.source_data
@@ -236,36 +236,21 @@ class Calculator(object):
         locate_sep_data = load_data.sep_mitama_by_loc(origin_data)
 
         print('Start calculating')
-        locate_sep_data = cal.filter_loc_and_type(locate_sep_data,
-                                                  self.l2_prop_limit,
-                                                  self.l4_prop_limit,
-                                                  self.l6_prop_limit,
-                                                  self.mitama_type_limit,
-                                                  self.attack_only,
-                                                  self.es_prop,
-                                                  self.es_prop_num)
-
-        mitama_comb, total_comb = cal.make_combination(locate_sep_data,
-                                                       self.mitama_type_limit,
-                                                       self.all_suit)
-
-        filter_result = cal.filter_mitama(mitama_comb,
+        self.combs = algorithm.MitamaComb(locate_sep_data,
+                                          self.l2_prop_limit,
+                                          self.l4_prop_limit,
+                                          self.l6_prop_limit,
                                           self.mitama_type_limit,
+                                          self.all_suit,
+                                          self.attack_only,
+                                          self.es_prop, self.es_prop_num,
                                           self.prop_limit,
                                           self.upper_prop_limit,
-                                          total_comb,
-                                          all_suit=self.all_suit)
+                                          self.base_att, self.base_critdamage,
+                                          self.damage_limit,
+                                          self.base_hp, self.hp_crit_limit)
 
-        if self.damage_limit > 0:
-            filter_result = cal.fit_damage_limit(filter_result,
-                                                 self.base_att,
-                                                 self.base_critdamage,
-                                                 self.damage_limit)
-        if self.hp_crit_limit > 0:
-            filter_result = cal.fit_hp_crit_limit(filter_result,
-                                                  self.base_hp,
-                                                  self.base_critdamage,
-                                                  self.hp_crit_limit)
+        filter_result = self.combs.get_comb()
 
         result_num = write_data.write_mitama_result(self.output_file,
                                                     filter_result,
@@ -275,6 +260,11 @@ class Calculator(object):
                                                     self.base_critdamage)
 
         return result_num
+
+    def get_progress(self):
+        if not self.combs:
+            return 0
+        return self.combs.get_progress()
 
 
 if __name__ == '__main__':
