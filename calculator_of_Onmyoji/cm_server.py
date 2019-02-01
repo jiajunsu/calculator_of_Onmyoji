@@ -11,6 +11,7 @@ import traceback
 import webbrowser
 
 import flask
+from flask_cors import CORS
 from webob import exc
 
 from calculator_of_Onmyoji import cal_mitama
@@ -25,6 +26,7 @@ if getattr(sys, 'frozen', False):
 else:
     app = flask.Flask(__name__)
 
+CORS(app)
 work_path = os.path.dirname(os.path.realpath(__file__))
 
 
@@ -78,4 +80,4 @@ if __name__ == '__main__':
     t = threading.Thread(target=open_browser, args=(host, port))
     t.start()
 
-    app.run(host=host, port=port)
+    app.run(host=host, port=port, threaded=True)

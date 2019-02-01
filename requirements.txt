@@ -4,4 +4,5 @@ xlwt
 requests
 tqdm
 flask
+flask-cors
 webob
