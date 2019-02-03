@@ -24,7 +24,7 @@ For other params, see [Readme](https://github.com/jiajunsu/calculator_of_Onmyoji
 
 ### Response
 | Code | Body_key | Type | Description |
-|--------|--------|--------|--------|--------|
+|--------|--------|--------|--------|
 | 200 | result_num | int | number of combinations got from calculator |
 |  -  | output_file | string | output file path |
 | 400 | reason | string | IOError: source_data may not exist or output_file is not writable |
@@ -35,7 +35,7 @@ _ _ _
 
 ### Response
 | Code | Body_key | Type | Description |
-|--------|--------|--------|--------|--------|
+|--------|--------|--------|--------|
 | 200 | status | string | value is "running" |
 |  -  | progress(Optional) | float | calculating precent, between 0 to 1 |
 |  -  | current(Optional) | int | calculated combinations |
