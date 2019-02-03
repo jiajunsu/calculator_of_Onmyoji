@@ -263,7 +263,7 @@ class Calculator(object):
 
     def get_progress(self):
         if not self.combs:
-            return 0
+            return 0, 0, 0
         return self.combs.get_progress()
 
 

@@ -28,6 +28,7 @@ else:
 
 CORS(app)
 work_path = os.path.dirname(os.path.realpath(__file__))
+calculator = None
 
 
 @app.route('/', methods=['GET'])
@@ -53,6 +54,7 @@ def calculate():
             params['source_data'] = os.path.join(work_path, src_filename)
             params['output_file'] = os.path.join(work_path, dst_filename)
 
+        global calculator
         calculator = cal_mitama.Calculator(params)
         result_num = calculator.run()
         ret = exc.HTTPOk.code
@@ -63,6 +65,22 @@ def calculate():
         res = {"reason": traceback.format_exc()}
 
     return flask.make_response((json.dumps(res), ret))
+
+
+@app.route('/status', methods=['GET'])
+def status():
+    if calculator:
+        progress, current, total = calculator.get_progress()
+    else:
+        progress, current, total = 0, 0, 0
+
+    res = {"status": "running"}
+    if progress:
+        res.update({"progress": progress,
+                    "current": current,
+                    "total": total})
+
+    return flask.make_response((json.dumps(res)), 200)
 
 
 def open_browser(host, port):

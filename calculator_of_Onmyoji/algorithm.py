@@ -436,6 +436,12 @@ class MitamaComb(object):
         return filter_result
 
     def get_progress(self):
+        """Return calculating progress
+
+        return value: percent, current, total
+        """
         if self.total_comb <= 0:
-            return 0
-        return self.calculated_count / self.total_comb
+            return 0, 0, 0
+        return (float(self.calculated_count) / self.total_comb,
+                self.calculated_count,
+                self.total_comb)
