@@ -60,6 +60,11 @@ def calculate():
         ret = exc.HTTPOk.code
         res = {"result_num": result_num,
                "output_file": params['output_file']}
+    except IOError:
+        ret = exc.HTTPForbidden.code
+        res = {"reason": "Please check: 1.source_file exists;"
+               " 2.output_file is writable and not be opened by other process."
+               " %s" % traceback.format_exc()}
     except Exception:
         ret = exc.HTTPInternalServerError.code
         res = {"reason": traceback.format_exc()}
