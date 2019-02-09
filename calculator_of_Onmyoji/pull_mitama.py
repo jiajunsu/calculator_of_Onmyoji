@@ -41,6 +41,36 @@ def download_data(acc_id):
         return None
 
 
+def calAddiAttrs(rattrs):
+    enAttrNames = ['attackAdditionRate',
+                   'attackAdditionVal',
+                   'critPowerAdditionVal',
+                   'critRateAdditionVal',
+                   'debuffEnhance',
+                   'debuffResist',
+                   'defenseAdditionRate',
+                   'defenseAdditionVal',
+                   'maxHpAdditionRate',
+                   'maxHpAdditionVal',
+                   'speedAdditionVal']
+
+    cnAttrNames = [u'攻击加成', u'攻击', u'暴击伤害', u'暴击',
+                   u'效果抵抗',  u'效果命中', u'防御加成',
+                   u'防御', u'生命加成', u'生命', u'速度']
+
+    basePropValue = {u'攻击加成': 4, u'攻击': 27, u'暴击伤害': 4, u'暴击': 3,
+                     u'效果抵抗': 4,  u'效果命中': 4, u'防御加成': 3,
+                     u'防御': 5, u'生命加成': 3, u'生命': 114, u'速度': 3}
+    e2cNameMap = dict(zip(enAttrNames, cnAttrNames))
+    res = {}
+    for prop, v in rattrs:
+        prop = e2cNameMap[prop]
+        if prop not in res:
+            res[prop] = 0
+        res[prop] += v
+    return [[p, res[p]*basePropValue[p]] for p in res]
+
+
 def generate_mitama_list(acc_id, filename,
                          header_row=data_format.MITAMA_COL_NAME_ZH):
     print("Downloading data...")
@@ -77,12 +107,19 @@ def generate_mitama_list(acc_id, filename,
             if single_prop:
                 mitama_attrs[single_prop[0]] = int(
                     single_prop[1].replace('%', ''))
-            for prop, value in mitama_info['attrs']:
-                value = int(value.replace('%', ''))
-                if prop not in mitama_attrs:
-                    mitama_attrs[prop] = value
-                else:
-                    mitama_attrs[prop] += value
+            if 'rattr' in mitama_info:
+                for prop, value in calAddiAttrs(mitama_info['rattr']):
+                    if prop not in mitama_attrs:
+                        mitama_attrs[prop] = value
+                    else:
+                        mitama_attrs[prop] += value
+            else:
+                for prop, value in mitama_info['attrs']:
+                    value = int(value.replace('%', ''))
+                    if prop not in mitama_attrs:
+                        mitama_attrs[prop] = value
+                    else:
+                        mitama_attrs[prop] += value
 
             mitama_sheet.write(mitama_num, 0, label=mitama_id)
             mitama_sheet.write(mitama_num, 1, label=mitama_name)
