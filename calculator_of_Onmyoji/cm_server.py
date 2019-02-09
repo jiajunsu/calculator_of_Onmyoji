@@ -11,6 +11,7 @@ import traceback
 import webbrowser
 
 import flask
+from flask_cors import CORS
 from webob import exc
 
 from calculator_of_Onmyoji import cal_mitama
@@ -25,7 +26,9 @@ if getattr(sys, 'frozen', False):
 else:
     app = flask.Flask(__name__)
 
+CORS(app)
 work_path = os.path.dirname(os.path.realpath(__file__))
+calculator = None
 
 
 @app.route('/', methods=['GET'])
@@ -51,16 +54,38 @@ def calculate():
             params['source_data'] = os.path.join(work_path, src_filename)
             params['output_file'] = os.path.join(work_path, dst_filename)
 
+        global calculator
         calculator = cal_mitama.Calculator(params)
         result_num = calculator.run()
         ret = exc.HTTPOk.code
         res = {"result_num": result_num,
                "output_file": params['output_file']}
+    except IOError:
+        ret = exc.HTTPForbidden.code
+        res = {"reason": "Please check: 1.source_file exists;"
+               " 2.output_file is writable and not be opened by other process."
+               " %s" % traceback.format_exc()}
     except Exception:
         ret = exc.HTTPInternalServerError.code
         res = {"reason": traceback.format_exc()}
 
     return flask.make_response((json.dumps(res), ret))
+
+
+@app.route('/status', methods=['GET'])
+def status():
+    if calculator:
+        progress, current, total = calculator.get_progress()
+    else:
+        progress, current, total = 0, 0, 0
+
+    res = {"status": "running"}
+    if progress:
+        res.update({"progress": progress,
+                    "current": current,
+                    "total": total})
+
+    return flask.make_response((json.dumps(res)), 200)
 
 
 def open_browser(host, port):
@@ -78,4 +103,4 @@ if __name__ == '__main__':
     t = threading.Thread(target=open_browser, args=(host, port))
     t.start()
 
-    app.run(host=host, port=port)
+    app.run(host=host, port=port, threaded=True)
