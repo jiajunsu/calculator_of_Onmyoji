@@ -229,6 +229,7 @@ class Calculator(object):
         return Args(**param_dict)
 
     def run(self):
+        self.pre_check()
         origin_data = load_data.get_mitama_data(self.file_name,
                                                 self.ignore_serial)
         print('Loading data finish')
@@ -261,9 +262,17 @@ class Calculator(object):
 
         return result_num
 
+    def pre_check(self):
+        # check input_file exist
+        with open(self.file_name, 'r'):
+            pass
+        # check output_file is writable
+        with open(self.output_file, 'w+') as fd:
+            fd.write('pre_check')
+
     def get_progress(self):
         if not self.combs:
-            return 0
+            return 0, 0, 0
         return self.combs.get_progress()
 
 
