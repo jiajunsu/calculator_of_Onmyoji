@@ -58,7 +58,7 @@ def calAddiAttrs(rattrs):
                    u'效果抵抗',  u'效果命中', u'防御加成',
                    u'防御', u'生命加成', u'生命', u'速度']
 
-    basePropValue = {u'攻击加成': 4, u'攻击': 27, u'暴击伤害': 4, u'暴击': 3,
+    basePropValue = {u'攻击加成': 3, u'攻击': 27, u'暴击伤害': 4, u'暴击': 3,
                      u'效果抵抗': 4,  u'效果命中': 4, u'防御加成': 3,
                      u'防御': 5, u'生命加成': 3, u'生命': 114, u'速度': 3}
     e2cNameMap = dict(zip(enAttrNames, cnAttrNames))
