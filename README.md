@@ -4,7 +4,7 @@
 
 ## Setup
 
-Python version need to be 2.7.*.
+Python version >= 3.6.*
 
 ```
 pip install -r requirements.txt

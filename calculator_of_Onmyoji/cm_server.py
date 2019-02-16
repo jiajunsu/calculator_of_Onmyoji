@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
-import ConfigParser
+import configparser
 import json
 import os
 import sys
@@ -95,7 +95,7 @@ def open_browser(host, port):
 
 
 if __name__ == '__main__':
-    conf = ConfigParser.ConfigParser()
+    conf = configparser.ConfigParser()
     conf.read(os.path.join(work_path, 'server.conf'))
     host = conf.get('global', 'host')
     port = conf.get('global', 'port')
