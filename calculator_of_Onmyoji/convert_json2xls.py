@@ -23,13 +23,13 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-ESPS", "--effective-secondary-prop-show",
                     type=str2bool,
                     default=True,
-                    help=u'是否展示副属性的有效条数，默认为True。如果不想展示输入False即可'
-                         u'"-ESPS True"为展示副属性有效条数'
-                         u'“输出类”为包含 攻击加成、速度、暴击、暴击伤害的有效条数'
-                         u'“奶盾类”为包含 生命加成、速度、暴击、暴击伤害的有效条数'
-                         u'“命中类”为包含 效果命中、速度的有效条数'
-                         u'“双堆类”为包含 效果命中、效果抵抗、速度的有效条数'
-                         u'首领御魂的固有属性也加入计算，首领御魂的满条为12分左右')
+                    help='是否展示副属性的有效条数，默认为True。如果不想展示输入False即可'
+                         '"-ESPS True"为展示副属性有效条数'
+                         '“输出类”为包含 攻击加成、速度、暴击、暴击伤害的有效条数'
+                         '“奶盾类”为包含 生命加成、速度、暴击、暴击伤害的有效条数'
+                         '“命中类”为包含 效果命中、速度的有效条数'
+                         '“双堆类”为包含 效果命中、效果抵抗、速度的有效条数'
+                         '首领御魂的固有属性也加入计算，首领御魂的满条为12分左右')
 
 
 if __name__ == '__main__':
@@ -52,4 +52,4 @@ if __name__ == '__main__':
 
         print('File %s has been converted' % file_path)
 
-    raw_input('Press any key to exit')
+    input('Press any key to exit')
