@@ -17,12 +17,12 @@ UASTRING = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) "
 parser = argparse.ArgumentParser()
 parser.add_argument("acc_id",
                     type=str,
-                    help=u'藏宝阁id，商品详情页面对应的网址中，'
-                         u'格式如201806211901616-3-KJ8J8IQOJTOMD8')
+                    help='藏宝阁id，商品详情页面对应的网址中，'
+                         '格式如201806211901616-3-KJ8J8IQOJTOMD8')
 parser.add_argument("-O", "--output-file",
                     type=str,
                     default='mitama_data.xls',
-                    help=u'输出文件位置，格式为pathto/filename.xls')
+                    help='输出文件位置，格式为pathto/filename.xls')
 
 
 def download_data(acc_id):
@@ -41,6 +41,36 @@ def download_data(acc_id):
         return None
 
 
+def calAddiAttrs(rattrs):
+    enAttrNames = ['attackAdditionRate',
+                   'attackAdditionVal',
+                   'critPowerAdditionVal',
+                   'critRateAdditionVal',
+                   'debuffEnhance',
+                   'debuffResist',
+                   'defenseAdditionRate',
+                   'defenseAdditionVal',
+                   'maxHpAdditionRate',
+                   'maxHpAdditionVal',
+                   'speedAdditionVal']
+
+    cnAttrNames = ['攻击加成', '攻击', '暴击伤害', '暴击',
+                   '效果抵抗',  '效果命中', '防御加成',
+                   '防御', '生命加成', '生命', '速度']
+
+    basePropValue = {'攻击加成': 3, '攻击': 27, '暴击伤害': 4, '暴击': 3,
+                     '效果抵抗': 4,  '效果命中': 4, '防御加成': 3,
+                     '防御': 5, '生命加成': 3, '生命': 114, '速度': 3}
+    e2cNameMap = dict(list(zip(enAttrNames, cnAttrNames)))
+    res = {}
+    for prop, v in rattrs:
+        prop = e2cNameMap[prop]
+        if prop not in res:
+            res[prop] = 0
+        res[prop] += v
+    return [[p, res[p]*basePropValue[p]] for p in res]
+
+
 def generate_mitama_list(acc_id, filename,
                          header_row=data_format.MITAMA_COL_NAME_ZH):
     print("Downloading data...")
@@ -52,7 +82,7 @@ def generate_mitama_list(acc_id, filename,
 
     try:
         workbook = xlwt.Workbook(encoding='utf-8')
-        mitama_sheet = workbook.add_sheet(u'御魂')
+        mitama_sheet = workbook.add_sheet('御魂')
         acct_info = res['equip']
         acct_detail = json.loads(acct_info['equip_desc'])
 
@@ -77,12 +107,19 @@ def generate_mitama_list(acc_id, filename,
             if single_prop:
                 mitama_attrs[single_prop[0]] = int(
                     single_prop[1].replace('%', ''))
-            for prop, value in mitama_info['attrs']:
-                value = int(value.replace('%', ''))
-                if prop not in mitama_attrs:
-                    mitama_attrs[prop] = value
-                else:
-                    mitama_attrs[prop] += value
+            if 'rattr' in mitama_info:
+                for prop, value in calAddiAttrs(mitama_info['rattr']):
+                    if prop not in mitama_attrs:
+                        mitama_attrs[prop] = value
+                    else:
+                        mitama_attrs[prop] += value
+            else:
+                for prop, value in mitama_info['attrs']:
+                    value = int(value.replace('%', ''))
+                    if prop not in mitama_attrs:
+                        mitama_attrs[prop] = value
+                    else:
+                        mitama_attrs[prop] += value
 
             mitama_sheet.write(mitama_num, 0, label=mitama_id)
             mitama_sheet.write(mitama_num, 1, label=mitama_name)
@@ -110,4 +147,4 @@ def main():
 
 if __name__ == '__main__':
     main()
-    raw_input('Press any key to exit.')
+    input('Press any key to exit.')

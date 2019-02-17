@@ -54,11 +54,11 @@ def get_mitama_data_json(filename, ignore_serial):
 def load_json_from_ocr_editor(data, ignore_serial):
     '''从OCR录入器读取数据'''
     mitama_data = dict()
-    percent = [u'攻击加成', u'防御加成', u'暴击', u'暴击伤害',
-               u'生命加成', u'效果命中', u'效果抵抗']
+    percent = ['攻击加成', '防御加成', '暴击', '暴击伤害',
+               '生命加成', '效果命中', '效果抵抗']
 
     data_version = 1
-    if data[0] == u"yuhun_ocr2.0":
+    if data[0] == "yuhun_ocr2.0":
         data_version = 2
         data.pop(0)
 
@@ -67,11 +67,11 @@ def load_json_from_ocr_editor(data, ignore_serial):
         if data_version < 2:
             serial += 1
         else:
-            serial = d[u'御魂ID']
+            serial = d['御魂ID']
 
         if skip_serial(serial, ignore_serial):
             continue
-        if d.get(u'御魂等级', 15) < 15:
+        if d.get('御魂等级', 15) < 15:
             continue
         # 百分比类数据乘100
         for p in d:
@@ -85,9 +85,9 @@ def load_json_from_ocr_editor(data, ignore_serial):
 def load_json_from_editor(data, ignore_serial):
     '''从网页版御魂编辑器读取数据'''
     def mitama_json_to_dict(json_obj):
-        MITAMA_COL_MAP = {u'御魂序号': u'id', u'御魂类型': u'name',
-                          u'位置': u'pos'}
-        serial = json_obj[u'id']
+        MITAMA_COL_MAP = {'御魂序号': 'id', '御魂类型': 'name',
+                          '位置': 'pos'}
+        serial = json_obj['id']
         if skip_serial(serial, ignore_serial):
             return None
         mitama = {}
@@ -97,29 +97,29 @@ def load_json_from_editor(data, ignore_serial):
             else:
                 mitama[col_name] = 0
 
-        for props in [json_obj[u'mainAttr'],
-                      json_obj[u'addonAttr']] + json_obj[u'addiAttr']:
-            if props[u'attrName'] in data_format.MITAMA_PROPS:
-                mitama[props[u'attrName']] += float(props[u'attrVal'])
+        for props in [json_obj['mainAttr'],
+                      json_obj['addonAttr']] + json_obj['addiAttr']:
+            if props['attrName'] in data_format.MITAMA_PROPS:
+                mitama[props['attrName']] += float(props['attrVal'])
 
         return (serial, mitama)
 
     mitama_list = map(mitama_json_to_dict, data['data'])
-    return dict(filter(lambda x: x, mitama_list))
+    return dict([x for x in mitama_list if x])
 
 
 def get_ignore_serial_xls(filename):
     '''Load ignore serial from data xls'''
     ignore_serial = []
     try:
-        rows_data = _get_sheet_rows(filename, u'已使用',
+        rows_data = _get_sheet_rows(filename, '已使用',
                                     print_trace=False)
     except xlrd.biffh.XLRDError:
         return ignore_serial
 
-    rows_data.next()
+    next(rows_data)
     for r_data in rows_data:
-        serial = unicode(convert_int(r_data[1].value))
+        serial = str(convert_int(r_data[1].value))
         if serial not in ignore_serial:
             ignore_serial.append(serial)
 
@@ -137,11 +137,11 @@ def convert_int(s):
 
 def get_mitama_data_xls(filename, ignore_serial):
     ignore_serial.extend(get_ignore_serial_xls(filename))
-    rows_data = _get_sheet_rows(filename, u'御魂')
+    rows_data = _get_sheet_rows(filename, '御魂')
     mitama_data = dict()
     data_len = len(data_format.MITAMA_COL_NAME_ZH)
 
-    rows_data.next()  # skip first row
+    next(rows_data)  # skip first row
     for r_data in rows_data:
         serial = convert_int(r_data[0].value)
         if skip_serial(serial, ignore_serial):
@@ -177,7 +177,7 @@ def skip_serial(serial, ignore_list):
     if not ignore_list:
         return False
 
-    serial = unicode(serial)
+    serial = str(serial)
     for ig in ignore_list:
         if not ig:
             continue
@@ -195,7 +195,7 @@ def sep_mitama_by_loc(mitama_data):
                        4: [], 5: [], 6: []}
 
     for d_k, d_v in mitama_data.items():
-        loc = d_v[u'位置']
+        loc = d_v['位置']
         if loc not in mitama_loc_data:
             print('Mitama location must be 1 to 6, please check your data.')
         mitama_loc_data[loc].append({d_k: d_v})

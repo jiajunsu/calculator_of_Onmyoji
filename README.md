@@ -1,14 +1,16 @@
-# notes by zep
-这里为了尝试大文件中result_combination的可行性，初步尝试两个问题：写文件速度过慢和暂存结果的开销过大，好像确实无解啊。。
-- 不暂存结果，先不考虑，大不了直接读文件。
-- 不执行gen_result_comb_data（也就是只算结果完全不处理和保存）: 大概300it/s;
-- 执行gen_result_comb_data，不存硬盘：10~30it/s，因为他只检查序号比自己大的套装，所以是越来越快（不写文件）：
-  - github放图太麻烦，懒得放了。
-- 写文件暂时没看那个库，留着先。
-
 # calculator\_of\_Onmyoji
 
 御魂搭配计算器
+
+## Setup
+
+Python version >= 3.6.*
+
+```
+pip install -r requirements.txt
+pip install .
+```
+
 
 ## Usage of calculator
 
@@ -18,19 +20,19 @@ usage: cal_mitama.py [-h] [-M MITAMA_SUIT] [-P PROP_LIMIT]
                      [-4P FTH_PROP_VALUE] [-6P STH_PROP_VALUE]
                      [-IG IGNORE_SERIAL] [-AS ALL_SUIT] [-DL DAMAGE_LIMIT]
                      [-HL HEALTH_LIMIT] [-AO ATTACK_ONLY]
+                     [-ESP EFFECTIVE_SECONDARY_PROP]
+                     [-ESPN EFFECTIVE_SECONDARY_PROP_NUM]
                      source_data output_file
 
 positional arguments:
-  source_data           御魂数据表格，格式参照example/data_Template.xls
+  source_data           御魂数据，格式参照example/data_Template.xls
   output_file           输出文件位置，格式为pathto/filename.xls
 
 optional arguments:
   -h, --help            show this help message and exit
   -M MITAMA_SUIT, --mitama-suit MITAMA_SUIT
-                        期望的御魂x件套类型，多个限制用英文句号.间隔，例如
-                        "-M 针女,4"为针女至少4件，
-                        "-M 针女,4.破势,2"为针女4件+破势2件，
-                        "-M 暴击,2.暴击,2.暴击,2"为3个暴击两件套
+                        期望的x件套御魂类型或者加成类型，多个限制用英文句号.间隔，例如"-M 针女,4"为针女至少4件，"-M
+                        针女,4.破势,2"为针女4件+破势2件，"-M 生命加成,2.生命加成,2.生命加成,2"为3个生命两件套
   -P PROP_LIMIT, --prop-limit PROP_LIMIT
                         期望限制的属性下限，多个属性条件用英文句号.间隔, 例如"-P
                         暴击,90.暴击伤害,70"为暴击至少90且暴击伤害至少70
@@ -67,6 +69,22 @@ optional arguments:
                         加成次数不少于5即暴击不低于12(2.4*5)
 ```
 
+## Usage of cm server
+
+```
+python ./calculator_of_Onmyoji/cm_server.py
+```
+
+Then open http://127.0.0.1:2019 in web browser, Chrome etc. The ip and port could support to be modified in future.
+
+Request example:
+```
+curl http://127.0.0.1:2019/calculate -X POST -H "Content-Type: application/json" -d '{"src_filename":"data_Template.xls", "mitama_suit":"针女,4", "prop_limit":"暴击,90", "upper_prop_limit":",0", "sec_prop_value":",0", "fth_prop_value":",0", "sth_prop_value":",0", "ignore_serial":"","all_suit":"True","damage_limit":"0,0,0", "health_limit":"0,0,0","attack_only":"False","effective_secondary_prop":"","effective_secondary_prop_num":""}'
+
+Note:
+src_filename: source file must be in current directroy
+```
+
 ## Usage of mitama puller
 
 ```
@@ -87,6 +105,20 @@ optional arguments:
 usage: make sure json files are in the same directory with convert_json2xls.py
 
 python convert_json2xls.py
+
+or
+
+python convert_json2xls.py -ESPS True
+```
+
+```
+在转换成的excel中的“输出类”、“奶盾类”、“命中类”、“双堆类”下面的值为该类包含有效属性的有效条数，
+其中:
+“输出类”为包含 攻击加成、速度、暴击、暴击伤害的有效条数'
+“奶盾类”为包含 生命加成、速度、暴击、暴击伤害的有效条数'
+“命中类”为包含 效果命中、速度的有效条数'
+“双堆类”为包含 效果命中、效果抵抗、速度的有效条数'
+“说明：首领御魂的固有属性也加入计算，因此最大可能达到12分以上”
 ```
 
 ## Usage of result\_combination
@@ -102,20 +134,23 @@ python calculator_of_Onmyoji/result_combination.py
 ## Test Command
 ```python calculator_of_Onmyoji/cal_mitama.py example/data_Template.xls result.xls -M 针女,4 -P 暴击,90```
 
-## Cal example
+## Calculate examples
 ```python calculator_of_Onmyoji/cal_mitama.py example/victor.xls v_result.xls -M 针女,4 -P 暴击,90.暴击伤害,50 -2P 攻击加成,55 -4P 攻击加成,55 -6P 暴击,55 -IG 天狗```
 
-## Cal example for 超星破势荒骷髅茨木
+* 超星破势荒骷髅茨木
 ```python calculator_of_Onmyoji/cal_mitama.py example/victor.xls v_result.xls -M 破势,4.荒骷髅,2 -P 暴击,90.速度,16 -2P 攻击加成,54 -4P 攻击加成,54 -6P 暴击,55 -DL 3216,150,17120 -AO True -ESP 暴击,暴击伤害,攻击加成,速度 -ESPN 3,3,3,3,3,0```
 
-## Cal example for 183速招财命中凤凰火
+* 183速招财命中凤凰火
 ```python calculator_of_Onmyoji/cal_mitama.py example/victor.xls v_result.xls -M 招财猫,4 -P 速度,77,效果命中,100 -2P 速度,55 -4P 效果命中,55  -AS False -ESP 速度,效果命中 -ESPN 3,3,3,0,3,3```
 
-## Cal example for 辉夜姬蚌精盾（90+5=95暴，未满暴）
+* 辉夜姬蚌精盾（90+5=95暴，未满暴）
 ```python calculator_of_Onmyoji/cal_mitama.py example/victor.xls v_result.xls -M 蚌精,4 -P 暴击,90 -2P 生命加成,54 -4P 生命加成,54 -6P 暴击,55  -HL 13785,150,40000 -AS False -ESP 暴击,暴击伤害,生命加成,速度 -ESPN 5,3,5,3,5,0```
 
-## Cal example for 散件爆伤面灵气
+* 散件爆伤面灵气
 ```python calculator_of_Onmyoji/cal_mitama.py example/victor.xls v_result.xls -M 暴击,2.暴击,2.暴击,2 -P 暴击,92 -2P 攻击加成,54 -4P 攻击加成,54 -6P 暴击伤害,88```
 
-## Make tar
+## Make tar for release
 ```tar zcf calculator.tar.gz calculator_of_Onmyoji example dist LICENSE README.md requirements.txt setup.* win_compile.txt ChangeLog```
+
+## Related projects
+* web-UI https://github.com/yinxin630/yys-yuhun-calculator-ui
