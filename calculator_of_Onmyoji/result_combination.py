@@ -108,13 +108,13 @@ class MakeResultInPool(object):
             res_book.write(comb_data)
 
     def save(self):
-        for res_book in self.result_book.itervalues():
+        for res_book in self.result_book.values():
             res_book.save()
 
     @property
     def count(self):
         count = 0
-        for res_book in self.result_book.itervalues():
+        for res_book in self.result_book.values():
             count += res_book.count
         return count
 
@@ -257,7 +257,7 @@ def cal_comb_num(n, m):
     C(n, m) = n!/((n-m)! * m!)
     '''
     x = 1
-    for i in xrange(n, m, -1):
+    for i in range(n, m, -1):
         x *= i
     x /= factorial(n - m)
 
@@ -274,7 +274,7 @@ def make_all_independent_combs(file_name, mitama_combs, expect_counts,
     print('Use CPU cores number %s' % cores)
     if expect_counts == 0:
         combs_count = 0
-        for c in xrange(2, len(mitama_combs)):
+        for c in range(2, len(mitama_combs)):
             # 从2开始遍历，直至无法再找到独立组合
             res_count = make_independent_comb(file_name,
                                               mitama_combs, c, cores)
@@ -356,7 +356,7 @@ def input_expect_combs_counts():
 
 def input_use_multi_process():
     prompt = get_encode_str('是否使用多进程计算(电脑会比较卡) y/n: ')
-    input = raw_input(prompt)
+    input = input(prompt)
     if input.strip().lower() == 'y':
         return True
     else:
