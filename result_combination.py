@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 
 from itertools import combinations
+from functools import reduce,map
 from collections import defaultdict
 import locale
 from math import factorial
@@ -13,6 +14,7 @@ from tqdm import tqdm
 import xlrd
 import xlwt
 from xlutils.copy import copy
+import csv
 
 from calculator_of_Onmyoji import data_format
 from calculator_of_Onmyoji import load_data
@@ -64,6 +66,25 @@ class ResultBook(object):
 
         self.write_book.save(result_file)
 
+class ResultBookCSV(object):
+    def __init__(self, filename, postfix):
+        self.filename = filename
+        self.postfix = str(postfix)
+        # self.write_book = open(self.filename+'_'+self.postfix+'.csv','wb')
+        self.write_book = open(self.filename+'_'+self.postfix+'.csv','w',newline='') # py3
+        self.writer = csv.DictWriter(self.write_book, data_format.RESULT_COMB_HEADER_NOENCODE)
+        self.writer.writeheader()
+        self.count = 0
+
+    def write(self, comb_data):
+        self.writer.writerow(comb_data)
+        self.count += 1
+
+    def save_and_close(self):
+        self.write_book.close()
+
+
+
 
 class MakeResultInPool(object):
     def __init__(self, filename, postfix):
@@ -105,7 +126,8 @@ def load_result_sheet(filename):
     rows_data = data_sheet.get_rows()
 
     comb_dict_keys = []
-    r_data = rows_data.next()  # first row is key name
+    # r_data = rows_data.next()  # first row is key name
+    r_data = next(rows_data)
     for k in r_data:
         comb_dict_keys.append(k.value)
 
@@ -168,13 +190,13 @@ def make_independent_comb(file_name, mitama_combs, last_result_combs, sub_comb_l
         return make_comb_data_parallel.count
     else:
         print("Loading mitamas...")
-        result_book = ResultBook(file_name, sub_comb_length)
+        result_book = ResultBookCSV(file_name, sub_comb_length)
         mitama_combs_next = []
 
         print('Calculating %d combo results...' %sub_comb_length)
 
         if sub_comb_length==2:
-            for midx in tqdm(xrange(len(mitama_combs)),
+            for midx in tqdm(range(len(mitama_combs)),
                               desc='Calculating', total=n, unit='comb'):
                 comb = mitama_combs[midx]
                 mitama_serials = comb.get(u'御魂序号')
@@ -186,8 +208,9 @@ def make_independent_comb(file_name, mitama_combs, last_result_combs, sub_comb_l
                         comb_data = gen_result_comb_data([comb, mitama_combs[ac]])
                         # mitama_combs_next.append(comb_data)
                         # print(comb_data)
-                        # result_book.write(comb_data)
+                        result_book.write(comb_data)
         else:
+            #TODO: Load last result_book(no memory directly)
             for midx in tqdm(xrange(len(last_result_combs)),
                               desc='Calculating', total=n, unit='comb'):
                 rcomb = last_result_combs[midx]
@@ -214,7 +237,7 @@ def make_independent_comb(file_name, mitama_combs, last_result_combs, sub_comb_l
         #                     desc='Writing', total=len(mitama_combs_next), unit='comb'):
         #     result_book.write(comb_data)
 
-        result_book.save()
+        result_book.save_and_close()
         return result_book.count, mitama_combs_next
 
 
@@ -251,7 +274,7 @@ def make_all_independent_combs(file_name, mitama_combs, expect_counts,
     else:
         invertMitamaSet = defaultdict(set)
         allMitamaSet = set()
-        for midx in tqdm(xrange(len(mitama_combs)), desc='Initializing', total=len(mitama_combs), unit='comb'):
+        for midx in tqdm(range(len(mitama_combs)), desc='Initializing', total=len(mitama_combs), unit='comb'):
             mitama_comb = mitama_combs[midx]
             mitama_serials = mitama_comb.get(u'御魂序号') # set(123456)
             for mitama in mitama_serials:
@@ -260,7 +283,7 @@ def make_all_independent_combs(file_name, mitama_combs, expect_counts,
         # print(invertMitamaSet)
         combs_count = 0
         result_combs = []
-        for expect in xrange(2,expect_counts+1):
+        for expect in range(2,expect_counts+1):
             # print(expect)
             # print(result_combs)
             combs_count,result_combs = make_independent_comb(file_name,
@@ -289,7 +312,7 @@ def gen_result_comb_data(independent_comb):
     # result_comb_data[u'组合个数'] = len(independent_comb)
 
     result_comb_data = {key:','.join([str(d[key]) for d in independent_comb]) 
-                            for key in data_format.RESULT_COMB_HEADER[1:]}
+                            for key in data_format.RESULT_COMB_HEADER_NOENCODE[1:]}
     result_comb_data[u'组合个数'] = len(independent_comb)
     # result_comb_data = {u'组合个数': len(independent_comb)}
 
@@ -306,11 +329,12 @@ def gen_result_comb_data(independent_comb):
 
 
 def input_expect_combs_counts():
-    prompt = get_encode_str(u'请输入期望的独立套装个数并回车'
-                            u'(0为计算所有可能): ')
-    input = raw_input(prompt)
+    # prompt = get_encode_str(u'请输入期望的独立套装个数并回车'
+    #                         u'(0为计算所有可能): ')
+    prompt = u'请输入期望的独立套装个数并回车(0为计算所有可能): '
+    inputchar = input(prompt)
     try:
-        expect_counts = int(input)
+        expect_counts = int(inputchar)
         if expect_counts < 2 and expect_counts != 0:
             raise ValueError
     except Exception:

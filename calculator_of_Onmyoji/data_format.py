@@ -10,6 +10,9 @@ RESULT_HEADER = [u'组合序号'] + MITAMA_COL_NAME_ZH
 RESULT_COMB_HEADER = [u'组合个数', u'组合序号',
                       u'暴击', u'攻击x暴伤', u'速度']
 
+RESULT_COMB_HEADER_NOENCODE = ['组合个数', '组合序号',
+                      '暴击', '攻击x暴伤', '速度']
+
 EXTEND_HEADER = [u'式神基础攻击', u'式神基础生命', u'式神基础暴伤',
                  u'总攻击', u'总生命',
                  u'攻击x暴伤', u'生命×暴伤']
