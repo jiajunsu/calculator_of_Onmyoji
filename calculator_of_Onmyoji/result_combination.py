@@ -39,7 +39,7 @@ class ResultBook(object):
         self.count = 0
 
     def init_work_sheet(self):
-        self.work_sheet = self.write_book.add_sheet(u'independent_combs_%s'
+        self.work_sheet = self.write_book.add_sheet('independent_combs_%s'
                                                     % self.work_sheet_num)
         self.work_sheet_num += 1
 
@@ -146,12 +146,12 @@ def load_result_sheet(filename):
         combs_data = dict()
         for i in range(len(comb_dict_keys)):
             k = comb_dict_keys[i]
-            if k == u'组合序号':
+            if k == '组合序号':
                 try:
                     combs_data[k] = int(r_data[i].value)
                 except ValueError:
                     combs_data[k] = r_data[i].value
-            elif k == u'御魂序号':
+            elif k == '御魂序号':
                 # 直接转换为set，减少循环内的计算
                 combs_data[k] = set(r_data[i].value.split(','))
             else:
@@ -166,7 +166,7 @@ def get_independent_comb_data(mitama_combs):
 
     for combs_data in mitama_combs:
         # print(combs_data)
-        mitama_serials = combs_data.get(u'御魂序号') # set(123456)
+        mitama_serials = combs_data.get('御魂序号') # set(123456)
         if seed_serials & mitama_serials:
             return None
         else:
@@ -208,7 +208,7 @@ def make_independent_comb(file_name, mitama_combs, last_result_combs_fn, sub_com
                               desc='Calculating', total=n, unit='comb'):
                 comb = mitama_combs[midx]
                 # print(comb)
-                mitama_serials = comb.get(u'御魂序号')
+                mitama_serials = comb.get('御魂序号')
                 available_combs = reduce(lambda x,y:x-y, [allMitamaSet]+[invertMitamaSet[ms] for ms in mitama_serials])
 
                 for ac in available_combs:
@@ -224,10 +224,10 @@ def make_independent_comb(file_name, mitama_combs, last_result_combs_fn, sub_com
             for midx in tqdm(range(len(last_result_combs)),
                               desc='Calculating', total=n, unit='comb'):
                 rcomb = last_result_combs[midx]
-                last_comb_serials = rcomb.get(u'组合序号').split(',')
+                last_comb_serials = rcomb.get('组合序号').split(',')
                 # tqdm.write(last_comb_serials)
                 comb = [mitama_combs[int(i)-1] for i in last_comb_serials]
-                mitama_serials = reduce(lambda x,y:x|y, map(lambda x:x.get(u'御魂序号'), comb))
+                mitama_serials = reduce(lambda x,y:x|y, map(lambda x:x.get('御魂序号'), comb))
                 # print(mitama_serials)
                 available_combs = reduce(lambda x,y:x-y, [allMitamaSet]+[invertMitamaSet[ms] for ms in mitama_serials])
                 # print(available_combs)
@@ -286,7 +286,7 @@ def make_all_independent_combs(file_name, mitama_combs, expect_counts,
         allMitamaSet = set()
         for midx in tqdm(range(len(mitama_combs)), desc='Initializing', total=len(mitama_combs), unit='comb'):
             mitama_comb = mitama_combs[midx]
-            mitama_serials = mitama_comb.get(u'御魂序号') # set(123456)
+            mitama_serials = mitama_comb.get('御魂序号') # set(123456)
             for mitama in mitama_serials:
                 invertMitamaSet[mitama] |= set([midx])
                 allMitamaSet |= set([midx])
@@ -321,7 +321,7 @@ def gen_result_comb_data(independent_comb):
     # result_comb_data = merge(A,B, merge_func)
     # result_comb_data[u'组合个数'] = len(independent_comb)
     result_comb_data = {key:','.join([str(d[key]) for d in independent_comb]) 
-                            for key in data_format.RESULT_COMB_HEADER_NOENCODE[1:]}
+                            for key in data_format.RESULT_COMB_HEADER[1:]}
     result_comb_data['组合个数'] = len(independent_comb)
     # result_comb_data = {u'组合个数': len(independent_comb)}
 
@@ -340,14 +340,14 @@ def gen_result_comb_data(independent_comb):
 def input_expect_combs_counts():
     # prompt = get_encode_str(u'请输入期望的独立套装个数并回车'
     #                         u'(0为计算所有可能): ')
-    prompt = u'请输入期望的独立套装个数并回车(0为计算所有可能): '
+    prompt = '请输入期望的独立套装个数并回车(0为计算所有可能): '
     inputchar = input(prompt)
     try:
         expect_counts = int(inputchar)
         if expect_counts < 2 and expect_counts != 0:
             raise ValueError
     except Exception:
-        exc_prompt = get_encode_str(u'输入必须为0或大于等于2的整数')
+        exc_prompt = get_encode_str('输入必须为0或大于等于2的整数')
         print(exc_prompt)
         os.exit(1)
 
@@ -355,7 +355,7 @@ def input_expect_combs_counts():
 
 
 def input_use_multi_process():
-    prompt = get_encode_str(u'是否使用多进程计算(电脑会比较卡) y/n: ')
+    prompt = get_encode_str('是否使用多进程计算(电脑会比较卡) y/n: ')
     input = raw_input(prompt)
     if input.strip().lower() == 'y':
         return True
