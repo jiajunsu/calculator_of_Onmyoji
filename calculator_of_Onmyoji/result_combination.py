@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
+import csv
 from itertools import combinations
-import locale
 from math import factorial
 import multiprocessing
 import os
@@ -11,14 +11,10 @@ import traceback
 from tqdm import tqdm
 import xlrd
 from xlutils.copy import copy
-import csv
 
 from calculator_of_Onmyoji import data_format
 from calculator_of_Onmyoji import load_data
 from calculator_of_Onmyoji import write_data
-
-
-code_t = locale.getpreferredencoding()
 
 
 class ResultBook(object):
@@ -62,22 +58,26 @@ class ResultBook(object):
 
         self.write_book.save(result_file)
 
+
 class ResultBookCSV(object):
     """Write comb result into .csv file.
-    
+
     Attributes:
-        count (int): comb nums of result book. 
+        count (int): comb nums of result book.
         filename (str): File name
-        postfix (str or int): postfix to seperate this file from original mitama combs. 
+        postfix (str or int): postfix to seperate this file from
+            original mitama combs.
         write_book (_io.TextIOWrapper): file descriptor.
         writer (csv.DictWriter): csv.DictWriter
     """
 
     def __init__(self, filename, postfix):
         self.postfix = str(postfix)
-        self.filename = filename[:-4]+'_'+self.postfix+'.csv'
-        self.write_book = open(self.filename,'w',newline='',encoding='utf-8') # py3
-        self.writer = csv.DictWriter(self.write_book, data_format.RESULT_COMB_HEADER)
+        self.filename = filename[:-4] + '_' + self.postfix + '.csv'
+        self.write_book = open(self.filename, 'w',
+                               newline='', encoding='utf-8')
+        self.writer = csv.DictWriter(self.write_book,
+                                     data_format.RESULT_COMB_HEADER)
         self.writer.writeheader()
         self.count = 0
 
@@ -154,20 +154,19 @@ def load_result_sheet(filename):
 
     return mitama_combs
 
+
 def load_comb_result_sheet(filename):
     """load .csv comb file into memory. Not used in this version.
-    
+
     Args:
         filename (str): File name to be loaded
-    
+
     Returns:
-        combs_data(list of OrderedDict): data of mitama combs. 
+        combs_data(list of OrderedDict): data of mitama combs.
     """
-    
-    # filename = 'data_test-result.xls_2.csv'
-    print("Loading previous result: %s"%filename)
-    with open(filename, 'r') as file:
-        reader = csv.DictReader(file)
+    print("Loading previous result: %s" % filename)
+    with open(filename, 'r') as fd:
+        reader = csv.DictReader(fd)
         # print(reader.fieldnames)
         combs_data = list(reader)
     return combs_data
@@ -284,10 +283,6 @@ def input_use_multi_process():
         return True
     else:
         return False
-
-# @deprecated
-def get_encode_str(ustr):
-    return ustr.encode(code_t)
 
 
 def main():
