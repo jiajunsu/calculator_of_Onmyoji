@@ -2,15 +2,10 @@
 # coding: utf-8
 
 import argparse
-import locale
 
 from calculator_of_Onmyoji import algorithm
 from calculator_of_Onmyoji import load_data
 from calculator_of_Onmyoji import write_data
-
-
-code_t = locale.getpreferredencoding()
-need_decode = True
 
 
 def str2bool(v):
@@ -22,31 +17,17 @@ def str2bool(v):
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
 
-def locale_decode(utf_str):
-    if not need_decode:
-        return utf_str
-
-    try:
-        uni_str = utf_str.decode(code_t)
-        return uni_str
-    except UnicodeDecodeError:
-        print('Decode failed %s' % utf_str)
-        raise UnicodeDecodeError
-
-
-def sep_utf_str(utf_str):
-    uni_str = locale_decode(utf_str)
+def sep_utf_str(uni_str):
     if ',' in uni_str:
         return uni_str.split(',')
     else:
         return [uni_str]
 
 
-def sep_utf_str_to_list(utf_str):
-    if not utf_str:
+def sep_utf_str_to_list(uni_str):
+    if not uni_str:
         return list()
 
-    uni_str = locale_decode(utf_str)
     limit_list = uni_str.split('.')
     formated_list = list()
     for limit in limit_list:
@@ -58,11 +39,10 @@ def sep_utf_str_to_list(utf_str):
     return formated_list
 
 
-def sep_utf_str_to_dict(utf_str):
-    if not utf_str:
+def sep_utf_str_to_dict(uni_str):
+    if not uni_str:
         return dict()
 
-    uni_str = locale_decode(utf_str)
     limit_list = uni_str.split('.')
     formated_dict = dict()
     for limit in limit_list:
@@ -80,8 +60,6 @@ class Calculator(object):
             args = self._get_args()
             print('Input args: %s' % args)
         else:
-            global need_decode
-            need_decode = False
             print('Input params: %s' % params)
             args = self._get_params(params)
         self._init_attr(args)
