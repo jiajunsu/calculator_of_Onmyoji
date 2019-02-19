@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
+import codecs
 import csv
 from itertools import combinations
 from math import factorial
@@ -73,8 +74,11 @@ class ResultBookCSV(object):
 
     def __init__(self, filename, postfix):
         self.postfix = str(postfix)
-        self.filename = filename[:-4] + '_' + self.postfix + '.csv'
-        self.write_book = open(self.filename, 'w',
+        self.filename = filename[:-4] + '-comb_' + self.postfix + '.csv'
+        # Avoid messy code in win platform
+        with open(self.filename, 'wb') as fd:
+            fd.write(codecs.BOM_UTF8)
+        self.write_book = open(self.filename, 'a',
                                newline='', encoding='utf-8')
         self.writer = csv.DictWriter(self.write_book,
                                      data_format.RESULT_COMB_HEADER)
