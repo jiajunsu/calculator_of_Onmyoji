@@ -4,7 +4,7 @@
 
 ## Setup
 
-Python version need to be 2.7.*.
+Python version >= 3.6.*
 
 ```
 pip install -r requirements.txt
@@ -150,7 +150,7 @@ python calculator_of_Onmyoji/result_combination.py
 ```python calculator_of_Onmyoji/cal_mitama.py example/victor.xls v_result.xls -M 暴击,2.暴击,2.暴击,2 -P 暴击,92 -2P 攻击加成,54 -4P 攻击加成,54 -6P 暴击伤害,88```
 
 ## Make tar for release
-```tar zcf calculator.tar.gz calculator_of_Onmyoji example dist LICENSE README.md requirements.txt setup.* win_compile.txt ChangeLog```
+```tar zcf calculator.tar.gz calculator_of_Onmyoji example dist doc LICENSE README.md requirements.txt setup.* win_compile.txt```
 
 ## Related projects
 * web-UI https://github.com/yinxin630/yys-yuhun-calculator-ui

@@ -4,6 +4,7 @@ import itertools
 import sys
 
 from calculator_of_Onmyoji import data_format
+from functools import reduce
 
 
 class MitamaComb(object):
@@ -37,13 +38,13 @@ class MitamaComb(object):
 
     def filter_loc_and_type(self):
         print('mitama nums by loc is %s'
-              % str([len(d) for d in self.locate_sep_data.values()]))
+              % str([len(d) for d in list(self.locate_sep_data.values())]))
 
         if self.attack_only:
             # 只计算输出类御魂,已选定的御魂套装不过滤
             selected_types = [t for t, _ in self.mitama_type_limit]
             filter_types = selected_types + data_format.ATTACK_MITAMA_TYPE
-            for loc, data in self.locate_sep_data.iteritems():
+            for loc, data in self.locate_sep_data.items():
                 self.locate_sep_data[loc] = \
                     self.filter_mitama_type(data, filter_types)
 
@@ -63,13 +64,13 @@ class MitamaComb(object):
 
         # 全位置副属性过滤
         if self.es_prop and self.es_prop_num:
-            for loc, data_list in self.locate_sep_data.iteritems():
+            for loc, data_list in self.locate_sep_data.items():
                 self.locate_sep_data[loc] = \
                     self.filter_effective_secondary_prop(
                         data_list, self.es_prop_num[loc-1])
 
         print('after filter by loc prop and type %s'
-              % str([len(d) for d in self.locate_sep_data.values()]))
+              % str([len(d) for d in list(self.locate_sep_data.values())]))
 
         self.locate_sep_data = dict(zip(range(1, 7),
                                         [d for d in
@@ -83,9 +84,9 @@ class MitamaComb(object):
             candidates.append(mitama_type)
         elif mitama_type in data_format.MITAMA_PROPS:
             for m_type in data_format.MITAMA_TYPES:
-                if (data_format.MITAMA_ENHANCE[m_type][u"加成类型"] ==
+                if (data_format.MITAMA_ENHANCE[m_type]["加成类型"] ==
                         mitama_type or
-                        not data_format.MITAMA_ENHANCE[m_type][u"加成类型"]):
+                        not data_format.MITAMA_ENHANCE[m_type]["加成类型"]):
                     candidates.append(m_type)
         return candidates
 
@@ -162,8 +163,8 @@ class MitamaComb(object):
 
     def make_combination(self):
         def filter_mitama_by_type(mitama, desired_type):
-            mitama_info = mitama.values()[0]
-            if mitama_info[u'御魂类型'] == desired_type:
+            mitama_info = list(mitama.values())[0]
+            if mitama_info['御魂类型'] == desired_type:
                 return True
             else:
                 return False
@@ -174,8 +175,8 @@ class MitamaComb(object):
                 mitama_data_by_type[m_type] = {}
                 for i in range(1, 7):
                     mitama_data_by_type[m_type][i] =\
-                        filter(lambda x: filter_mitama_by_type(x, m_type),
-                               self.locate_sep_data[i])
+                        [x for x in self.locate_sep_data[i]
+                         if filter_mitama_by_type(x, m_type)]
             return mitama_data_by_type
 
         mitama_data_by_type = None
@@ -203,7 +204,7 @@ class MitamaComb(object):
 
     def filter_loc_prop(self, data_list, prop_limit):
         def prop_value_le_min(mitama):
-            mitama_info = mitama.values()[0]
+            mitama_info = list(mitama.values())[0]
             for prop_type, prop_min_value in prop_limit.items():
                 if (mitama_info.get(prop_type, 0) and
                         mitama_info[prop_type] >= prop_min_value):
@@ -211,37 +212,37 @@ class MitamaComb(object):
             else:
                 return False
 
-        return filter(prop_value_le_min, data_list)
+        return list(filter(prop_value_le_min, data_list))
 
     def filter_effective_secondary_prop(self, data_list, es_prop_num):
         mitama_growth = data_format.MITAMA_GROWTH
 
         def es_prop_num_le_min(mitama):
-            mitama_info = mitama.values()[0]
+            mitama_info = list(mitama.values())[0]
             prop_num = 0
             for prop in self.es_prop:
                 prop_value = mitama_info.get(prop, 0.0)
-                main_prop_value = mitama_growth[prop][u"主属性"]
+                main_prop_value = mitama_growth[prop]["主属性"]
                 if prop_value >= main_prop_value:
                     prop_value -= main_prop_value
-                prop_num += prop_value / mitama_growth[prop][u"最小成长值"]
+                prop_num += prop_value / mitama_growth[prop]["最小成长值"]
 
             if prop_num >= es_prop_num:
                 return True
             else:
                 return False
 
-        return filter(es_prop_num_le_min, data_list)
+        return list(filter(es_prop_num_le_min, data_list))
 
     def filter_mitama_type(self, data_list, mitama_type_list):
         def mitama_type_in_list(mitama):
-            mitama_info = mitama.values()[0]
-            if mitama_info.get(u'御魂类型', '') in mitama_type_list:
+            mitama_info = list(mitama.values())[0]
+            if mitama_info.get('御魂类型', '') in mitama_type_list:
                 return True
             else:
                 return False
 
-        return filter(mitama_type_in_list, data_list)
+        return list(filter(mitama_type_in_list, data_list))
 
     def filter_mitama(self, mitama_comb_list):
         mitama_sum_data = self.fit_mitama_type(mitama_comb_list)
@@ -272,9 +273,9 @@ class MitamaComb(object):
 
             mitama_type_count = {}
             for mitama in mitama_comb:
-                mitama_info = mitama.values()[0]
+                mitama_info = list(mitama.values())[0]
 
-                mitama_type = mitama_info.get(u'御魂类型')
+                mitama_type = mitama_info.get('御魂类型')
                 if mitama_type not in mitama_type_count:
                     mitama_type_count[mitama_type] = 1
                 else:
@@ -288,7 +289,7 @@ class MitamaComb(object):
                 if not is_suit:
                     continue
 
-            comb_data = {'sum': {u'御魂计数': mitama_type_count},
+            comb_data = {'sum': {'御魂计数': mitama_type_count},
                          'info': mitama_comb}
 
             printed_rate = self.print_cal_rate(printed_rate)
@@ -299,12 +300,12 @@ class MitamaComb(object):
         mitama_enhance = data_format.MITAMA_ENHANCE
 
         for mitama_data in mitama_sum_data:
-            mitama_type_count = mitama_data['sum'].get(u'御魂计数')
+            mitama_type_count = mitama_data['sum'].get('御魂计数')
             mitama_comb = mitama_data['info']
             prop_value = 0
 
             for mitama in mitama_comb:
-                mitama_info = mitama.values()[0]
+                mitama_info = list(mitama.values())[0]
                 if mitama_info.get(prop_type, 0):
                     prop_value += mitama_info[prop_type]
 
@@ -312,11 +313,11 @@ class MitamaComb(object):
                 if m_count < 2:
                     continue
                 else:
-                    p_type = mitama_enhance[m_type].get(u'加成类型')
+                    p_type = mitama_enhance[m_type].get('加成类型')
                     if p_type == prop_type:
                         multi_times = 2 if m_count == 6 else 1  # 6个御魂算2次套装
                         prop_value += (
-                            multi_times * mitama_enhance[m_type].get(u'加成数值'))
+                            multi_times * mitama_enhance[m_type].get('加成数值'))
 
             if min_value <= prop_value <= max_value:
                 yield mitama_data
@@ -333,18 +334,18 @@ class MitamaComb(object):
             float: total_damage
         """
         sum_data = mitama_comb['sum']
-        m_att = float(sum_data[u'攻击'] if sum_data[u'攻击'] else 0)
-        m_att_en = float(sum_data[u'攻击加成'] if sum_data[u'攻击加成'] else 0)
-        m_critdamage = float(sum_data[u'暴击伤害'] if sum_data[u'暴击伤害'] else 0)
+        m_att = float(sum_data['攻击'] if sum_data['攻击'] else 0)
+        m_att_en = float(sum_data['攻击加成'] if sum_data['攻击加成'] else 0)
+        m_critdamage = float(sum_data['暴击伤害'] if sum_data['暴击伤害'] else 0)
         total_damage = ((self.base_att * (1 + m_att_en / 100) + m_att) *
                         (self.base_critdamage + m_critdamage) / 100)
         return total_damage
 
     def cal_hp_crit(self, mitama_comb):
         sum_data = mitama_comb['sum']
-        m_hp = float(sum_data[u'生命'] if sum_data[u'生命'] else 0)
-        m_hp_en = float(sum_data[u'生命加成'] if sum_data[u'生命加成'] else 0)
-        m_critdamage = float(sum_data[u'暴击伤害'] if sum_data[u'暴击伤害'] else 0)
+        m_hp = float(sum_data['生命'] if sum_data['生命'] else 0)
+        m_hp_en = float(sum_data['生命加成'] if sum_data['生命加成'] else 0)
+        m_critdamage = float(sum_data['暴击伤害'] if sum_data['暴击伤害'] else 0)
         total_hp_crit = ((self.base_hp * (1 + m_hp_en / 100) + m_hp) *
                          (self.base_critdamage + m_critdamage) / 100)
         return total_hp_crit
@@ -375,7 +376,7 @@ class MitamaComb(object):
 
     def cal_mitama_comb_prop(self, mitama_sum_data):
         for mitama_data in mitama_sum_data:
-            mitama_type_count = mitama_data['sum'].get(u'御魂计数')
+            mitama_type_count = mitama_data['sum'].get('御魂计数')
             mitama_comb = mitama_data['info']
 
             comb_sum = self.sum_prop(mitama_comb, mitama_type_count)
@@ -390,7 +391,7 @@ class MitamaComb(object):
         mitama_enhance = data_format.MITAMA_ENHANCE
 
         for mitama in mitama_comb:
-            mitama_info = mitama.values()[0]
+            mitama_info = list(mitama.values())[0]
 
             # 计算除套装外的总属性
             for prop_type in prop_type_list:
@@ -402,10 +403,10 @@ class MitamaComb(object):
                 continue
             else:
                 multi_times = 2 if m_count == 6 else 1  # 6个同类御魂算2次套装效果
-                prop_type = mitama_enhance[m_type].get(u'加成类型')
+                prop_type = mitama_enhance[m_type].get('加成类型')
                 if prop_type:
                     sum_result[prop_type] += (
-                        multi_times * mitama_enhance[m_type].get(u'加成数值'))
+                        multi_times * mitama_enhance[m_type].get('加成数值'))
 
         return sum_result
 
