@@ -69,6 +69,7 @@ def calculate():
         ret = exc.HTTPInternalServerError.code
         res = {"reason": traceback.format_exc()}
 
+    print(res)
     return flask.make_response((json.dumps(res), ret))
 
 
