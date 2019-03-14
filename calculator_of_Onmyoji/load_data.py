@@ -42,8 +42,11 @@ def get_mitama_data_json(filename, ignore_serial):
     with open(filename) as f:
         data = json.load(f)
 
-    if isinstance(data, dict):
-        return load_json_from_editor(data, ignore_serial)
+    if isinstance(data, dict) and 'data' in data:
+        if isinstance(data['data'], list):
+            return load_json_from_editor(data, ignore_serial)
+        else:
+            return load_json_from_yyx(data, ignore_serial)
     elif isinstance(data, list):
         return load_json_from_ocr_editor(data, ignore_serial)
     else:
@@ -54,8 +57,8 @@ def get_mitama_data_json(filename, ignore_serial):
 def load_json_from_ocr_editor(data, ignore_serial):
     '''从OCR录入器读取数据'''
     mitama_data = dict()
-    percent = ['攻击加成', '防御加成', '暴击', '暴击伤害',
-               '生命加成', '效果命中', '效果抵抗']
+    PERCENT_PROP = ['攻击加成', '防御加成', '暴击', '暴击伤害',
+                    '生命加成', '效果命中', '效果抵抗']
 
     data_version = 1
     if data[0] == "yuhun_ocr2.0":
@@ -75,11 +78,59 @@ def load_json_from_ocr_editor(data, ignore_serial):
             continue
         # 百分比类数据乘100
         for p in d:
-            if p in percent:
+            if p in PERCENT_PROP:
                 d[p] *= 100
         mitama_data[serial] = d
 
     return mitama_data
+
+
+def load_json_from_yyx(data, ignore_serial):
+    '''从痒痒熊读取数据'''
+    PROP_NAME_MAP = {'Hp': '生命', 'Defense': '防御', 'Attack': '攻击',
+                     'HpRate': '生命加成', 'DefenseRate': '防御加成',
+                     'AttackRate': '攻击加成', 'Speed': '速度', 'CritRate': '暴击',
+                     'CritPower': '暴击伤害', 'EffectHitRate': '效果命中',
+                     'EffectResistRate': '效果抵抗'}
+
+    PERCENT_PROP = ['攻击加成', '防御加成', '暴击', '暴击伤害',
+                    '生命加成', '效果命中', '效果抵抗']
+
+    MITAMA_COL_MAP = {'御魂序号': 'id', '御魂类型': 'suit_id',
+                      '位置': 'pos'}
+
+    def mitama_json_to_dict(json_obj):
+        serial = json_obj['id']
+        if skip_serial(serial, ignore_serial) \
+           or json_obj.get('level', 15) < 15:
+            return None
+        mitama = {}
+        for col_name in data_format.MITAMA_COL_NAME_ZH[1:]:
+            if col_name in MITAMA_COL_MAP:
+                mitama[col_name] = json_obj[MITAMA_COL_MAP[col_name]]
+            else:
+                mitama[col_name] = 0
+
+        mitama['御魂类型'] = data_format.SUIT_ID_TO_NAME.get(mitama['御魂类型'])
+        mitama['位置'] += 1
+
+        attr_list = [json_obj['base_attr']]
+        attr_list.extend(json_obj['attrs'])
+        if 'single_attrs' in json_obj:
+            attr_list.extend(json_obj['single_attrs'])
+
+        for prop in attr_list:
+            prop_name = PROP_NAME_MAP.get(prop['type'], None)
+            if prop_name in data_format.MITAMA_PROPS:
+                if prop_name in PERCENT_PROP:
+                    mitama[prop_name] += float(prop['value'])*100
+                else:
+                    mitama[prop_name] += float(prop['value'])
+
+        return (serial, mitama)
+
+    mitama_list = map(mitama_json_to_dict, data['data'].get('hero_equips', []))
+    return dict([x for x in mitama_list if x])
 
 
 def load_json_from_editor(data, ignore_serial):
@@ -210,3 +261,6 @@ if __name__ == '__main__':
     print(d)
     l_d = sep_mitama_by_loc(d)
     print(l_d)
+
+    from calculator_of_Onmyoji import write_data
+    write_data.write_original_mitama_data('test.xls', d)
