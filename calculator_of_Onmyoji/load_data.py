@@ -39,7 +39,7 @@ def _get_sheet_rows(filename, sheet_name, print_trace=True):
 
 
 def get_mitama_data_json(filename, ignore_serial):
-    with open(filename) as f:
+    with open(filename, encoding='utf-8') as f:
         data = json.load(f)
 
     if isinstance(data, dict) and 'data' in data:
