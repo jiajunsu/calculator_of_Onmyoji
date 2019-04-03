@@ -141,19 +141,19 @@ python calculator_of_Onmyoji/result_combination.py
 ```python calculator_of_Onmyoji/cal_mitama.py example/data_Template.xls result.xls -M 针女,4 -P 暴击,90```
 
 ## Calculate examples
-```python calculator_of_Onmyoji/cal_mitama.py example/victor.xls v_result.xls -M 针女,4 -P 暴击,90.暴击伤害,50 -2P 攻击加成,55 -4P 攻击加成,55 -6P 暴击,55 -IG 天狗```
+```python calculator_of_Onmyoji/cal_mitama.py example/victor.xls v_result.xls -M 针女,4 -P 暴击,90#暴击伤害,50 -2P 攻击加成,55 -4P 攻击加成,55 -6P 暴击,55 -IG 天狗```
 
 * 超星破势荒骷髅茨木
-```python calculator_of_Onmyoji/cal_mitama.py example/victor.xls v_result.xls -M 破势,4.荒骷髅,2 -P 暴击,90.速度,16 -2P 攻击加成,55 -4P 攻击加成,55 -6P 暴击,55 -DL 3216,150,17120 -AO True -ESP 暴击,暴击伤害,攻击加成,速度 -ESPN 3,3,3,3,3,0```
+```python calculator_of_Onmyoji/cal_mitama.py example/victor.xls v_result.xls -M 破势,4#荒骷髅,2 -P 暴击,90#速度,16 -2P 攻击加成,55 -4P 攻击加成,55 -6P 暴击,55 -DL 3216,150,17120 -AO True -ESP 暴击,暴击伤害,攻击加成,速度 -ESPN 3,3,3,3,3,0```
 
 * 190速150命中招财凤凰火
-```python calculator_of_Onmyoji/cal_mitama.py example/victor.xls v_result.xls -M 招财猫,4 -P 速度,84,效果命中,150 -2P 速度,57 -4P 效果命中,55  -AS False -ESP 速度,效果命中 -ESPN 3,3,3,0,3,3```
+```python calculator_of_Onmyoji/cal_mitama.py example/victor.xls v_result.xls -M 招财猫,4 -P 速度,84#效果命中,150 -2P 速度,57 -4P 效果命中,55  -AS False -ESP 速度,效果命中 -ESPN 3,3,3,0,3,3```
 
 * 辉夜姬蚌精盾
 ```python calculator_of_Onmyoji/cal_mitama.py example/victor.xls v_result.xls -M 蚌精,4 -P 暴击,95 -2P 生命加成,55 -4P 生命加成,55 -6P 暴击,55  -HL 13785,150,40000 -AS False -ESP 暴击,暴击伤害,生命加成,速度 -ESPN 5,3,5,3,5,0```
 
 * 散件爆伤面灵气
-```python calculator_of_Onmyoji/cal_mitama.py example/victor.xls v_result.xls -M 暴击,2.暴击,2.暴击,2 -P 暴击,92 -2P 攻击加成,54 -4P 攻击加成,54 -6P 暴击伤害,89 -ESP 暴击,暴击伤害,攻击加成,速度 -ESPN 3,3,3,3,3,0```
+```python calculator_of_Onmyoji/cal_mitama.py example/victor.xls v_result.xls -M 暴击,2#暴击,2#暴击,2 -P 暴击,92 -2P 攻击加成,54 -4P 攻击加成,54 -6P 暴击伤害,89 -ESP 暴击,暴击伤害,攻击加成,速度 -ESPN 3,3,3,3,3,0```
 
 * 散件生生暴蜃气楼书翁
 ```python calculator_of_Onmyoji/cal_mitama.py example/victor.xls v_result.xls -M 蜃气楼,2 -P 暴击,92 -2P 生命加成,55 -4P 生命加成,55 -6P 暴击,55 -ESP 暴击,暴击伤害,生命加成,速度 -ESPN 3,3,3,3,3,0```
