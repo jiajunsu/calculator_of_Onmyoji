@@ -27,8 +27,11 @@ def sep_utf_str(uni_str):
 def sep_utf_str_to_list(uni_str):
     if not uni_str:
         return list()
-
-    limit_list = uni_str.split('.')
+    
+    if '#' in uni_str:
+        limit_list = uni_str.split('#')
+    else:
+        limit_list = uni_str.split('.')
     formated_list = list()
     for limit in limit_list:
         if ',' not in limit:
@@ -43,14 +46,17 @@ def sep_utf_str_to_dict(uni_str):
     if not uni_str:
         return dict()
 
-    limit_list = uni_str.split('.')
+    if '#' in uni_str:
+        limit_list = uni_str.split('#')
+    else:
+        limit_list = uni_str.split('.')
     formated_dict = dict()
     for limit in limit_list:
         if ',' not in limit:
             continue
         key, value = limit.split(',')
         if key:
-            formated_dict[key] = int(value)
+            formated_dict[key] = float(value)
     return formated_dict
 
 
@@ -117,41 +123,41 @@ class Calculator(object):
                             type=str,
                             default=',0',
                             help='期望的x件套御魂类型或者加成类型，'
-                                 '多个限制用英文句号.间隔，'
+                                 '多个限制用英文句号#间隔，'
                                  '例如"-M 针女,4"为针女至少4件，'
-                                 '"-M 针女,4.破势,2"为针女4件+破势2件，'
-                                 '"-M 生命加成,2.生命加成,2.生命加成,2"为3个生命两件套')
+                                 '"-M 针女,4#破势,2"为针女4件+破势2件，'
+                                 '"-M 生命加成,2#生命加成,2#生命加成,2"为3个生命两件套')
         parser.add_argument("-P", "--prop-limit",
                             type=str,
                             default='',
-                            help='期望限制的属性下限，多个属性条件用英文句号.间隔, '
-                                 '例如"-P 暴击,90.暴击伤害,70"为暴击至少90'
+                            help='期望限制的属性下限，多个属性条件用英文句号#间隔, '
+                                 '例如"-P 暴击,90#暴击伤害,70"为暴击至少90'
                                  '且暴击伤害至少70')
         parser.add_argument("-UP", "--upper-prop-limit",
                             type=str,
                             default='',
-                            help='期望限制的属性上限，多个属性条件用英文句号.间隔，'
-                                 '例如"-UP 暴击,95.速度,20"为暴击最多95'
+                            help='期望限制的属性上限，多个属性条件用英文句号#间隔，'
+                                 '例如"-UP 暴击,95#速度,20"为暴击最多95'
                                  '且速度最多20')
         parser.add_argument("-2P", "--sec-prop-value",
                             type=str,
                             default=',0',
                             help='二号位限制的属性类型和数值，'
-                                 '多个属性用英文句号.间隔，'
-                                 '例如"-2P 攻击加成,55"为二号位攻击加成至少55')
+                                 '多个属性用英文句号#间隔，'
+                                 '例如"-2P 攻击加成,55#速度,57"为二号位攻击加成至少55或速度至少为57')
         parser.add_argument("-4P", "--fth-prop-value",
                             type=str,
                             default=',0',
                             help='四号位限制的属性类型和数值，'
-                                 '多个属性用英文句号.间隔，'
+                                 '多个属性用英文句号#间隔，'
                                  '例如"-4P 攻击加成,55"为四号位攻击加成至少55')
         parser.add_argument("-6P", "--sth-prop-value",
                             type=str,
                             default=',0',
                             help='六号位限制的属性类型和数值，'
-                                 '多个属性用英文句号.间隔，'
+                                 '多个属性用英文句号#间隔，'
                                  '例如"-6P 暴击,55"为六号位暴击至少55，'
-                                 '"-6P 暴击,55.暴击伤害,89"为六号位暴击至少55'
+                                 '"-6P 暴击,55#暴击伤害,89"为六号位暴击至少55'
                                  '或暴击伤害至少89')
         parser.add_argument("-IG", "--ignore-serial",
                             type=str,
@@ -190,13 +196,14 @@ class Calculator(object):
         parser.add_argument("-ESPN", "--effective-secondary-prop-num",
                             type=str,
                             default='',
-                            help='限定1-6号位御魂的有效副属性加成次数，用逗号,间隔'
-                                 '与-ESP配合使用'
-                                 '例如"-ESP 暴击 -ESPN 5,3,5,3,5,0"'
-                                 '意味着1~6号位各自的有效副属性加成次数'
-                                 '依次不少于5,3,5,3,5,0'
-                                 '1号位副属性暴击加成次数不少于5'
-                                 '即暴击不低于12(2.4*5)')
+                            help='与-ESP配合使用,限定1-6号位御魂的有效副属性加成次数（含初始次数）用逗号,间隔'
+                                 '例如"-ESP 暴击,暴击伤害 -ESPN 3,3,5,3,5,0"'
+                                 '意味着1、2、3、4、5、6号位御魂以暴击和暴击伤害为集合的有效属性集合，出现的总次数不低于3、3、5、3、5、0次'
+                                 '以一号位举例，暴击、暴击伤害的加成次数（含初始次数）为3次的分布可能有如下情况：'
+                                 '组合一：暴击*3、暴击伤害*0，即暴击+7.2、暴击伤害+0'
+                                 '组合二：暴击*2、暴击伤害*1，即暴击+4.8、暴击伤害+3.2'
+                                 '组合三：暴击*1、暴击伤害*2，即暴击+2.4、暴击伤害+6.4'
+                                 '组合四：暴击*0、暴击伤害*3，即暴击+0  、暴击伤害+9.6')
         return parser.parse_args()
 
     def _get_params(self, param_dict):
