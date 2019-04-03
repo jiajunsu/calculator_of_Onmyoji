@@ -27,8 +27,11 @@ def sep_utf_str(uni_str):
 def sep_utf_str_to_list(uni_str):
     if not uni_str:
         return list()
-
-    limit_list = uni_str.split('#')
+    
+    if '#' in uni_str:
+        limit_list = uni_str.split('#')
+    else:
+        limit_list = uni_str.split('.')
     formated_list = list()
     for limit in limit_list:
         if ',' not in limit:
@@ -43,7 +46,10 @@ def sep_utf_str_to_dict(uni_str):
     if not uni_str:
         return dict()
 
-    limit_list = uni_str.split('#')
+    if '#' in uni_str:
+        limit_list = uni_str.split('#')
+    else:
+        limit_list = uni_str.split('.')
     formated_dict = dict()
     for limit in limit_list:
         if ',' not in limit:
