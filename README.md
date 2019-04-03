@@ -121,22 +121,6 @@ python convert_json2xls.py -ESPS True
 “说明：首领御魂的固有属性也加入计算，因此最大可能达到12分以上”
 ```
 
-## Usage of mitama json converter for 附带有效副属性的展示
-
-```
-usage: make sure json files are in the same directory with convert_json2xls.py
-
-python convert_json2xls.py -ESPS True
-
-在转换成的excel中的“输出类”、“奶盾类”、“命中类”、“双堆类”下面的值为该类包含有效属性的有效条数，
-其中:
-“输出类”为包含 攻击加成、速度、暴击、暴击伤害的有效条数'
-“奶盾类”为包含 生命加成、速度、暴击、暴击伤害的有效条数'
-“命中类”为包含 效果命中、速度的有效条数'
-“双堆类”为包含 效果命中、效果抵抗、速度的有效条数'
-“说明：首领御魂的固有属性也加入计算，因此最大可能达到12分以上”
-```
-
 ## Usage of result\_combination
 
 ```
