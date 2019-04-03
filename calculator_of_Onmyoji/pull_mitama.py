@@ -55,7 +55,7 @@ def calAddiAttrs(rattrs):
                    'speedAdditionVal']
 
     cnAttrNames = ['攻击加成', '攻击', '暴击伤害', '暴击',
-                   '效果抵抗',  '效果命中', '防御加成',
+                   '效果命中', '效果抵抗', '防御加成',
                    '防御', '生命加成', '生命', '速度']
 
     basePropValue = {'攻击加成': 3, '攻击': 27, '暴击伤害': 4, '暴击': 3,
@@ -108,6 +108,10 @@ def generate_mitama_list(acc_id, filename,
                 mitama_attrs[single_prop[0]] = int(
                     single_prop[1].replace('%', ''))
             if 'rattr' in mitama_info:
+                # 主属性从attrs获取
+                base_prop = mitama_info['attrs'][0]
+                mitama_attrs[base_prop[0]] = float(base_prop[1].replace('%', ''))
+                # 副属性由rattr的强化记录进行推导
                 for prop, value in calAddiAttrs(mitama_info['rattr']):
                     if prop not in mitama_attrs:
                         mitama_attrs[prop] = value

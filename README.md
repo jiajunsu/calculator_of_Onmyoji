@@ -53,7 +53,7 @@ optional arguments:
                         是否全为套装，默认为True。"-AS False"为允许非套装的组合出现，如5针女1破势
   -DL DAMAGE_LIMIT, --damage-limit DAMAGE_LIMIT
                         基础攻击,基础暴伤,期望的攻击*暴伤，例如"-DL
-                        3126,150，20500"，当基础攻击为3126，基础暴伤为150，攻击*暴伤>=20500
+                        3126,150,20500"，当基础攻击为3126，基础暴伤为150，攻击*暴伤>=20500
   -HL HEALTH_LIMIT, --health-limit HEALTH_LIMIT
                         基础生命,基础暴伤,期望的生命*暴伤，例如"-HL
                         8000,150,60000"，当基础生命为8000，基础暴伤为150，生命*暴伤>=60000
@@ -166,7 +166,7 @@ python calculator_of_Onmyoji/result_combination.py
 ```python calculator_of_Onmyoji/cal_mitama.py example/victor.xls v_result.xls -M 暴击,2.暴击,2.暴击,2 -P 暴击,92 -2P 攻击加成,54 -4P 攻击加成,54 -6P 暴击伤害,88```
 
 ## Make tar for release
-```tar zcf calculator.tar.gz calculator_of_Onmyoji example dist LICENSE README.md requirements.txt setup.* win_compile.txt ChangeLog```
+```tar zcf calculator.tar.gz calculator_of_Onmyoji example dist doc LICENSE README.md requirements.txt setup.* win_compile.txt```
 
 ## Related projects
 * web-UI https://github.com/yinxin630/yys-yuhun-calculator-ui

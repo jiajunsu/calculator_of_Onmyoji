@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
+import codecs
+import csv
 from itertools import combinations
-import locale
 from math import factorial
 import multiprocessing
 import os
@@ -15,9 +16,6 @@ from xlutils.copy import copy
 from calculator_of_Onmyoji import data_format
 from calculator_of_Onmyoji import load_data
 from calculator_of_Onmyoji import write_data
-
-
-code_t = locale.getpreferredencoding()
 
 
 class ResultBook(object):
@@ -60,6 +58,39 @@ class ResultBook(object):
                                file_extension])
 
         self.write_book.save(result_file)
+
+
+class ResultBookCSV(object):
+    """Write comb result into .csv file.
+
+    Attributes:
+        count (int): comb nums of result book.
+        filename (str): File name
+        postfix (str or int): postfix to seperate this file from
+            original mitama combs.
+        write_book (_io.TextIOWrapper): file descriptor.
+        writer (csv.DictWriter): csv.DictWriter
+    """
+
+    def __init__(self, filename, postfix):
+        self.postfix = str(postfix)
+        self.filename = filename[:-4] + '-comb_' + self.postfix + '.csv'
+        # Avoid messy code in win platform
+        with open(self.filename, 'wb') as fd:
+            fd.write(codecs.BOM_UTF8)
+        self.write_book = open(self.filename, 'a',
+                               newline='', encoding='utf-8')
+        self.writer = csv.DictWriter(self.write_book,
+                                     data_format.RESULT_COMB_HEADER)
+        self.writer.writeheader()
+        self.count = 0
+
+    def write(self, comb_data):
+        self.writer.writerow(comb_data)
+        self.count += 1
+
+    def save_and_close(self):
+        self.write_book.close()
 
 
 class MakeResultInPool(object):
@@ -128,6 +159,23 @@ def load_result_sheet(filename):
     return mitama_combs
 
 
+def load_comb_result_sheet(filename):
+    """load .csv comb file into memory. Not used in this version.
+
+    Args:
+        filename (str): File name to be loaded
+
+    Returns:
+        combs_data(list of OrderedDict): data of mitama combs.
+    """
+    print("Loading previous result: %s" % filename)
+    with open(filename, 'r') as fd:
+        reader = csv.DictReader(fd)
+        # print(reader.fieldnames)
+        combs_data = list(reader)
+    return combs_data
+
+
 def get_independent_comb_data(mitama_combs):
     seed_serials = set()
 
@@ -162,14 +210,14 @@ def make_independent_comb(file_name, mitama_combs, sub_comb_length, cores):
         make_comb_data_parallel.save()
         return make_comb_data_parallel.count
     else:
-        result_book = ResultBook(file_name, sub_comb_length)
+        result_book = ResultBookCSV(file_name, sub_comb_length)
         for combs in tqdm(combinations(mitama_combs, sub_comb_length),
                           desc='Calculating', total=total, unit='comb'):
             comb_data = get_independent_comb_data(combs)
             if comb_data:
                 result_book.write(comb_data)
 
-        result_book.save()
+        result_book.save_and_close()
         return result_book.count
 
 
@@ -221,32 +269,24 @@ def gen_result_comb_data(independent_comb):
 
 
 def input_expect_combs_counts():
-    prompt = get_encode_str('请输入期望的独立套装个数并回车'
-                            '(0为计算所有可能): ')
-    input = input(prompt)
+    prompt = '请输入期望的独立套装个数并回车(0为计算所有可能): '
+    inputchar = input(prompt)
     try:
-        expect_counts = int(input)
+        expect_counts = int(inputchar)
         if expect_counts < 2 and expect_counts != 0:
             raise ValueError
     except Exception:
-        exc_prompt = get_encode_str('输入必须为0或大于等于2的整数')
-        print(exc_prompt)
+        print('输入必须为0或大于等于2的整数')
         os.exit(1)
-
     return expect_counts
 
 
 def input_use_multi_process():
-    prompt = get_encode_str('是否使用多进程计算(电脑会比较卡) y/n: ')
-    input = input(prompt)
-    if input.strip().lower() == 'y':
+    inputchar = input('是否使用多进程计算(电脑会比较卡) y/n: ')
+    if inputchar.strip().lower() == 'y':
         return True
     else:
         return False
-
-
-def get_encode_str(ustr):
-    return ustr.encode(code_t)
 
 
 def main():

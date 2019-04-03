@@ -18,8 +18,12 @@ from calculator_of_Onmyoji import cal_mitama
 
 
 if getattr(sys, 'frozen', False):
-    template_folder = os.path.join(sys.executable, '..', 'templates')
-    static_folder = os.path.join(sys.executable, '..', 'static')
+    if sys.platform == 'darwin':
+        template_folder = os.path.join(sys._MEIPASS, 'templates')
+        static_folder = os.path.join(sys._MEIPASS, 'static')
+    elif sys.platform == 'win32':
+        template_folder = os.path.join(sys.executable, '..', 'templates')
+        static_folder = os.path.join(sys.executable, '..', 'static')
     app = flask.Flask(__name__,
                       template_folder=template_folder,
                       static_folder=static_folder)
@@ -69,6 +73,7 @@ def calculate():
         ret = exc.HTTPInternalServerError.code
         res = {"reason": traceback.format_exc()}
 
+    print(res)
     return flask.make_response((json.dumps(res), ret))
 
 
