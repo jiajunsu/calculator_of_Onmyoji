@@ -262,7 +262,7 @@ def gen_result_comb_data(independent_comb):
     result_comb_data = {'组合个数': len(independent_comb)}
 
     for key in data_format.RESULT_COMB_HEADER[1:]:
-        result_comb_data[key] = ','.join([str(d.get(key, 0))
+        result_comb_data[key] = '#'.join([str(d.get(key, 0))
                                           for d in independent_comb])
 
     return result_comb_data
