@@ -8,7 +8,13 @@ Destination platform: win
 1.Must run setup.py install before compile
 
 2.Update UI files
+```sed -i "s/\/\/cdn.suisuijiang.com\/calculator\//\"{{ url_for('static',filename='/g" calculator_of_Onmyoji/static/index.html
+sed -i "s/\.css/\.css')}}\"/g" calculator_of_Onmyoji/static/index.html
+sed -i "s/\.js/\.js')}}\"/g" calculator_of_Onmyoji/static/index.html
+sed -i "s/\.ico/\.ico')}}\"/g" calculator_of_Onmyoji/static/index.html
+```
 ```cp calculator_of_Onmyoji/templates dist/ -r; cp calculator_of_Onmyoji/static dist -r;cp calculator_of_Onmyoji/server.conf dist```
+
 
 ### Compile:
 
