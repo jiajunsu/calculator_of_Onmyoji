@@ -75,7 +75,7 @@ MITAMA_ENHANCE = {"珍珠": {"加成类型": "防御加成", "加成数值": 30}
                   "蜃气楼": {"加成类型": "", "加成数值": 0},
                   }
 
-MITAMA_TYPES = MITAMA_ENHANCE.keys()
+MITAMA_TYPES = list(MITAMA_ENHANCE.keys())
 
 MITAMA_GROWTH = {"攻击加成": {"最小成长值": 2.4,
                                   "副属性最大值": 26,
