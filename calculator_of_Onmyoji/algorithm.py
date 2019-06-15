@@ -13,7 +13,7 @@ class MitamaComb(object):
                  mitama_type_limit, all_suit, attack_only,
                  es_prop, es_prop_num,
                  prop_limit, upper_prop_limit,
-                 base_att, base_critdamage, damage_limit,
+                 base_att, base_critdamage, damage_limit, attack_buff,
                  base_hp, hp_crit_limit):
 
         self.locate_sep_data = locate_sep_data
@@ -30,6 +30,7 @@ class MitamaComb(object):
         self.base_att = base_att
         self.base_critdamage = base_critdamage
         self.damage_limit = damage_limit
+        self.attack_buff = attack_buff
         self.base_hp = base_hp
         self.hp_crit_limit = hp_crit_limit
 
@@ -337,7 +338,8 @@ class MitamaComb(object):
         m_att = float(sum_data['攻击'] if sum_data['攻击'] else 0)
         m_att_en = float(sum_data['攻击加成'] if sum_data['攻击加成'] else 0)
         m_critdamage = float(sum_data['暴击伤害'] if sum_data['暴击伤害'] else 0)
-        total_damage = ((self.base_att * (1 + m_att_en / 100) + m_att) *
+        total_damage = ((self.base_att * (1 + m_att_en / 100) + m_att
+                         + self.base_att * self.attack_buff / 100) *
                         (self.base_critdamage + m_critdamage) / 100)
         return total_damage
 

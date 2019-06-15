@@ -27,7 +27,7 @@ def sep_utf_str(uni_str):
 def sep_utf_str_to_list(uni_str):
     if not uni_str:
         return list()
-    
+
     if '#' in uni_str:
         limit_list = uni_str.split('#')
     else:
@@ -110,6 +110,8 @@ class Calculator(object):
             self.base_critdamage = self.base_critdamage_att
         else:
             self.base_critdamage = self.base_critdamage_hp
+
+        self.attack_buff = args.attack_buff
 
     def _get_args(self):
         parser = argparse.ArgumentParser()
@@ -204,6 +206,12 @@ class Calculator(object):
                                  '组合二：暴击*2、暴击伤害*1，即暴击+4.8、暴击伤害+3.2'
                                  '组合三：暴击*1、暴击伤害*2，即暴击+2.4、暴击伤害+6.4'
                                  '组合四：暴击*0、暴击伤害*3，即暴击+0  、暴击伤害+9.6')
+        parser.add_argument("-AB", "--attack-buff",
+                            type=int,
+                            default='0',
+                            help='攻击加成，在-DL参数中计算伤害时会计入对应的攻击加成'
+                                 '例如"-AB 40", 用来计算黑拉面（兔子舞+黑晴明共40%攻击加成）的面板')
+
         return parser.parse_args()
 
     def _get_params(self, param_dict):
@@ -233,7 +241,7 @@ class Calculator(object):
                                           self.prop_limit,
                                           self.upper_prop_limit,
                                           self.base_att, self.base_critdamage,
-                                          self.damage_limit,
+                                          self.damage_limit, self.attack_buff,
                                           self.base_hp, self.hp_crit_limit)
 
         filter_result = self.combs.get_comb()
@@ -243,6 +251,7 @@ class Calculator(object):
                                                     self.es_prop,
                                                     self.base_att,
                                                     self.base_hp,
+                                                    self.attack_buff,
                                                     self.base_critdamage)
 
         return result_num

@@ -22,7 +22,7 @@ RESULT_COMB_HEADER = ['组合个数', '组合序号',
 
 EXTEND_HEADER = ['式神基础攻击', '式神基础生命', '式神基础暴伤',
                  '总攻击', '总生命',
-                 '攻击x暴伤', '生命×暴伤']
+                 '攻击x暴伤', '生命×暴伤', '攻击x暴伤(+buff)']
 
 EXTEND_INDEX = {EXTEND_HEADER[i]: COL_INDEX[i+RESULT_HEADER_LEN]
                 for i in range(len(EXTEND_HEADER))}
