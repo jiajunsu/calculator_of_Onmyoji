@@ -9,7 +9,7 @@ MAX_ROW = 65532  # divided by 6 for each result is a combination of 6 details
 
 
 def write_mitama_result(filename, comb_data_list, es_prop,
-                        base_att=0, base_hp=0, base_critdamage=0):
+                        base_att=0, base_hp=0, attack_buff=0, base_critdamage=0):
     workbook = xlwt.Workbook(encoding='utf-8')
     result_num = 0
     detail_sheet_num = 0
@@ -44,7 +44,7 @@ def write_mitama_result(filename, comb_data_list, es_prop,
             result_sheet.write(result_row, 2, label='sum')
             write_mitama_row(result_sheet, sum_data, result_row, start_col=4)
             write_extend_col(result_sheet, result_row, base_att, base_hp,
-                             base_critdamage)
+                             attack_buff, base_critdamage)
             result_row += 1
 
             # write each mitama data into detail file
@@ -112,7 +112,7 @@ def write_mitama_row(worksheet, comb_prop, row_num, start_col,
         worksheet.write(row_num, col, label=cell_data)
 
 
-def write_extend_col(worksheet, row_num, base_att, base_hp, base_critdamage):
+def write_extend_col(worksheet, row_num, base_att, base_hp, attack_buff, base_critdamage):
     start_col = data_format.RESULT_HEADER_LEN
     str_row_num = str(row_num + 1)  # excel行名称编号比行号大1
     # EXTEND_COL: u'式神基础攻击', u'式神基础生命', u'式神基础暴伤',
@@ -146,9 +146,11 @@ def write_extend_col(worksheet, row_num, base_att, base_hp, base_critdamage):
                                  str_row_num)
     mitama_crit_damage_col_name = (data_format.RESULT_INDEX['暴击伤害'] +
                                    str_row_num)
-    formula_att_crit = '%s*(%s+%s)/100' % (total_att_col_name,
-                                           base_crit_damage_col_name,
-                                           mitama_crit_damage_col_name)
+    formula_att_crit = '%s*(%s+%s)/100' % (
+                         total_att_col_name,
+                         base_crit_damage_col_name,
+                         mitama_crit_damage_col_name
+                        )
     worksheet.write(row_num, start_col+5, xlwt.Formula(formula_att_crit))
 
     # 生命×暴伤 = 总生命 * (基础暴伤+御魂暴伤)/100
@@ -157,6 +159,21 @@ def write_extend_col(worksheet, row_num, base_att, base_hp, base_critdamage):
                                           base_crit_damage_col_name,
                                           mitama_crit_damage_col_name)
     worksheet.write(row_num, start_col+6, xlwt.Formula(formula_hp_crit))
+
+    # 攻击×暴伤(+buff) = (总攻击 + (基础攻击*攻击buff/100))* (基础暴伤+御魂暴伤)/100
+    total_att_col_name = data_format.EXTEND_INDEX['总攻击'] + str_row_num
+    base_crit_damage_col_name = (data_format.EXTEND_INDEX['式神基础暴伤'] +
+                                 str_row_num)
+    mitama_crit_damage_col_name = (data_format.RESULT_INDEX['暴击伤害'] +
+                                   str_row_num)
+    formula_att_crit = '(%s+%s*%s/100)*(%s+%s)/100' % (
+                         total_att_col_name,
+                         base_att_col_name,
+                         attack_buff,
+                         base_crit_damage_col_name,
+                         mitama_crit_damage_col_name
+                        )
+    worksheet.write(row_num, start_col+7, xlwt.Formula(formula_att_crit))
 
 
 def write_original_mitama_data(filename, data, esps_show=False):
