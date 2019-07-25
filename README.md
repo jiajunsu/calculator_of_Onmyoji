@@ -80,9 +80,9 @@ optional arguments:
 python ./calculator_of_Onmyoji/cm_server.py
 ```
 
-Then open http://127.0.0.1:2019 in web browser, Chrome etc. The ip and port could support to be modified in future.
+Then open http://127.0.0.1:2019 in web browser, Chrome etc. The ip and port could be modified in `server.conf`.
 
-Request example:
+Request example, see details in [api_doc](./doc/API.md)
 ```
 curl http://127.0.0.1:2019/calculate -X POST -H "Content-Type: application/json" -d '{"src_filename":"data_Template.xls", "mitama_suit":"针女,4", "prop_limit":"暴击,90", "upper_prop_limit":",0", "sec_prop_value":",0", "fth_prop_value":",0", "sth_prop_value":",0", "ignore_serial":"","all_suit":"True","damage_limit":"0,0,0", "health_limit":"0,0,0","attack_only":"False","effective_secondary_prop":"","effective_secondary_prop_num":""}'
 
