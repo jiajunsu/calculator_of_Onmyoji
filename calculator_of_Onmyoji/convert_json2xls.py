@@ -47,6 +47,10 @@ if __name__ == '__main__':
 
         file_name, _ = os.path.splitext(file_path)
         file_name_xls = file_name + '.xls'
+        
+        if os.path.exists(file_name_xls):
+            print('%s already exists, skip it.' % file_name_xls)
+            continue
 
         write_data.write_original_mitama_data(file_name_xls, data, esps_show)
 
