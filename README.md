@@ -2,6 +2,8 @@
 
 御魂搭配计算器
 
+**Note** This project has been archived and not maitained any more. Thanks for your attention.
+
 ## Setup
 
 Python version >= 3.6.*
